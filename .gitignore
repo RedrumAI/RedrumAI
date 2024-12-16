@@ -1,3 +1,6 @@
+# Ignore My API KEY
+Config/Secrets.ini
+
 # Visual Studio 2015 user specific files
 .vs/
 

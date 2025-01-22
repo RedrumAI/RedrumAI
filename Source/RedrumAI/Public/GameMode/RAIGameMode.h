@@ -17,7 +17,8 @@ public:
 	ARAIGameMode();
 	
 	virtual void BeginPlay() override;
-
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;
 
 };

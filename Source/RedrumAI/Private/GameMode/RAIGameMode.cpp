@@ -47,5 +47,5 @@ void ARAIGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HttpManager->SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
+	//HttpManager->SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
 }

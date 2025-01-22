@@ -2,14 +2,19 @@
 
 
 #include "GameMode/RAIGameMode.h"
-//Secrets.ini 경로 탐지 및 ini로부터 읽어오는 헤더
+//Secrets.ini 경로 탐지 및 ini로부터 읽어오는 헤더. CoreMinimal에 Path관련 코드가 있기에 없어도된다.
+/*
 #include "Misc/ConfigCacheIni.h"
 #include "Misc/Paths.h"
 #include "HAL/PlatformFileManager.h"
+*/
+
+#include "Manager/RAIHttpManager.h"
 
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
 {
+	/*
 	// Secrets.ini 경로 지정
 	FString SecretsPath = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Secrets.ini"));
 	GConfig->LoadFile(SecretsPath);
@@ -33,4 +38,11 @@ ARAIGameMode::ARAIGameMode()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load HF_API_KEY from Secrets"));
 	}
+	*/
+
+	URAIHttpManager* HttpManager;
+	HttpManager = NewObject<URAIHttpManager>();
+
+	HttpManager->SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
+
 }

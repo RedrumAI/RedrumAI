@@ -6,9 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "RAIGameMode.generated.h"
 
-/**
- * 
- */
+class ARAIHttpManager;
+
 UCLASS()
 class REDRUMAI_API ARAIGameMode : public AGameModeBase
 {
@@ -17,4 +16,8 @@ class REDRUMAI_API ARAIGameMode : public AGameModeBase
 public:
 	ARAIGameMode();
 	
+	virtual void BeginPlay() override;
+
+	TObjectPtr<ARAIHttpManager> HttpManager;
+
 };

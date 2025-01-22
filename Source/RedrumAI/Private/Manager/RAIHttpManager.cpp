@@ -12,7 +12,7 @@
 #include "HAL/PlatformFileManager.h"
 */
 
-URAIHttpManager::URAIHttpManager()
+ARAIHttpManager::ARAIHttpManager()
 {
     // Secrets.ini 경로 지정
     FString SecretsPath = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Secrets.ini"));
@@ -28,15 +28,20 @@ URAIHttpManager::URAIHttpManager()
     }
 }
 
+void ARAIHttpManager::BeginPlay()
+{
+    Super::BeginPlay();
+}
+
 //문장 전송
-void URAIHttpManager::SendRequestToOpenAI(const FString& Prompt)
+void ARAIHttpManager::SendRequestToOpenAI(const FString& Prompt)
 {
     // OpenAI API URL
     FString Url = "https://api.openai.com/v1/completions";
 
     // HTTP 요청 생성
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-    Request->OnProcessRequestComplete().BindUObject(this, &URAIHttpManager::OnResponseReceived);
+    Request->OnProcessRequestComplete().BindUObject(this, &ARAIHttpManager::OnResponseReceived);
     Request->SetURL(Url);
     Request->SetVerb("POST");
     Request->SetHeader("Content-Type", "application/json");
@@ -61,7 +66,7 @@ void URAIHttpManager::SendRequestToOpenAI(const FString& Prompt)
 }
 
 //문장 수신
-void URAIHttpManager::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void ARAIHttpManager::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
     if (bWasSuccessful && Response.IsValid())
     {
@@ -69,6 +74,7 @@ void URAIHttpManager::OnResponseReceived(FHttpRequestPtr Request, FHttpResponseP
         TSharedPtr<FJsonObject> JsonObject;
         TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
 
+        /* 
         // 역직렬화
         if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
         {
@@ -88,8 +94,10 @@ void URAIHttpManager::OnResponseReceived(FHttpRequestPtr Request, FHttpResponseP
             }
         }
     }
+    */
     else
     {
         UE_LOG(LogTemp, Error, TEXT("Request failed"));
     }
 }
+

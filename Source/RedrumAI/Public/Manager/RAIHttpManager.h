@@ -3,20 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "GameFramework/Actor.h"
 #include "Interfaces/IHttpRequest.h"	// FHttpRequestPtr사용을 위함이므로 헤더추가(상속X)
 #include "Interfaces/IHttpResponse.h"
 
 #include "RAIHttpManager.generated.h"
 
 UCLASS(Blueprintable)
-class REDRUMAI_API URAIHttpManager : public UObject
+class REDRUMAI_API ARAIHttpManager : public AActor
 {
 	GENERATED_BODY()
 	
-public:
+	public:	
 
-	URAIHttpManager();
+	ARAIHttpManager();
+
+	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
 	void SendRequestToOpenAI(const FString& Prompt);

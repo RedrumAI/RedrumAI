@@ -40,9 +40,12 @@ ARAIGameMode::ARAIGameMode()
 	}
 	*/
 
-	URAIHttpManager* HttpManager;
-	HttpManager = NewObject<URAIHttpManager>();
+
+}
+
+void ARAIGameMode::BeginPlay()
+{
+	Super::BeginPlay();
 
 	HttpManager->SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
-
 }

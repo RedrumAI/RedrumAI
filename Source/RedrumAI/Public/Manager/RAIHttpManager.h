@@ -21,11 +21,17 @@ class REDRUMAI_API ARAIHttpManager : public AActor
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SendRequestToOpenAI(const FString& Prompt);
+	void SendRequestToOpenAI(const FString& InputText);
 
-	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
+	void SendRequestToNLP(const FString& InputText);
+
+	void OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 public:
-	FString OpenAI_API_Key;
+	FString APIKey_OpenAI;
+	FString URL_OpenAI = TEXT("https://api.openai.com/v1/chat/completions"); // chat model과 통신
+	FString APIKey_NLP;
+	FString URL_NLP = TEXT("https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"); //TEXT매크로를 사용하면 추가 TCHAR변환 필요X
 };

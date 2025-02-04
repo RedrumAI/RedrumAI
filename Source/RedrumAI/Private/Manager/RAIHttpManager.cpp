@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Manager/RAIHttpManager.h"
 #include "HttpModule.h"
@@ -14,7 +14,7 @@
 
 ARAIHttpManager::ARAIHttpManager()
 {
-    // Secrets.ini °æ·Î ÁöÁ¤
+    // Secrets.ini ê²½ë¡œ ì§€ì •
     FString SecretsPath = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Secrets.ini"));
     GConfig->LoadFile(SecretsPath);
 
@@ -43,30 +43,30 @@ void ARAIHttpManager::BeginPlay()
 {
     Super::BeginPlay();
 
-    // OpenAI Request¿Í Receive Å×½ºÆ® ÄÚµå
-    //SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
-
-    SendRequestToNLP(FString::Printf(TEXT("Today is Monday. I Have to Study. Im so Sad.")));
+    // OpenAI Requestì™€ Receive í…ŒìŠ¤íŠ¸ ì½”ë“œ
+    
+    SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
+    //SendRequestToNLP(FString::Printf(TEXT("(ì…ìˆ ì„ ë–¨ë©°, ì†ì— ë•€ì„ í˜ë¦¬ê³  ì–¼êµ´ì´ ì¼ê·¸ëŸ¬ì§) ê·¸ê²Œ... ê·¸ê²Œ ë¬´ìŠ¨ ëœ»ì´ì—ìš” ? ì œê°€ ê·¸ ì»¤íŠ¼ì„ ë§Œì¡Œë‹¤ê³ ìš” ? ê·¸ëŸ´ ë¦¬ ì—†ì–´ìš”!ì œê°€ ê·¸ëŸ° ì§“ì„ í•  ì´ìœ ê°€ ì—†ì–ì•„ìš”.ê·¸ëŸ° ìêµ­ì„ ë‚¨ê¸°ê²Œ ë  ì´ìœ ê°€... ì—†ë‹¤ê³ ìš”!(ì‹¬ì¥ì´ ë¹ ë¥´ê²Œ ë›°ê³ , ìˆ¨ì„ ê³ ë¥´ì§€ ëª»í•¨) ì €ëŠ” ì •ë§ë¡œ ê·¸ëŸ° ì¼ì„ í•˜ì§€ ì•Šì•˜ì–´ìš”! ì œë°œ ë¯¿ì–´ì£¼ì„¸ìš”!")));
 }
 
-//¹®Àå Àü¼Û
+//ë¬¸ì¥ ì „ì†¡
 void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
 {
-    // HTTP ¿äÃ» »ı¼º    
+    // HTTP ìš”ì²­ ìƒì„±    
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
-    Request->OnProcessRequestComplete().BindUObject(this, &ARAIHttpManager::OnOpenAIResponse); //´ÜÀÏ delegate
+    Request->OnProcessRequestComplete().BindUObject(this, &ARAIHttpManager::OnOpenAIResponse); //ë‹¨ì¼ delegate
     Request->SetURL(URL_OpenAI);
     Request->SetVerb("POST");
     Request->SetHeader("Content-Type", "application/json");
     Request->SetHeader("Authorization", FString::Printf(TEXT("Bearer %s"), *APIKey_OpenAI));
     
      
-    // ¿äÃ» º»¹® ¼³Á¤
+    // ìš”ì²­ ë³¸ë¬¸ ì„¤ì •
     TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject);
-    RequestBody->SetStringField("model", "gpt-4o-mini"); // »ç¿ë ¸ğµ¨ ¼³Á¤. gpt-4o-mini ¼±ÅÃ
-    RequestBody->SetNumberField("max_tokens", 100); // ÀÀ´ä ±æÀÌ ¼³Á¤
-    RequestBody->SetNumberField("temperature", 0.7); // Ã¢ÀÇ¼º ¼³Á¤
-    // 'messages' ¹è¿­ »ı¼º
+    RequestBody->SetStringField("model", "gpt-4o-mini"); // ì‚¬ìš© ëª¨ë¸ ì„¤ì •. gpt-4o-mini ì„ íƒ
+    RequestBody->SetNumberField("max_tokens", 100); // ì‘ë‹µ ê¸¸ì´ ì„¤ì •
+    RequestBody->SetNumberField("temperature", 0.7); // ì°½ì˜ì„± ì„¤ì •
+    // 'messages' ë°°ì—´ ìƒì„±
     TArray<TSharedPtr<FJsonValue>> MessagesArray;
     TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
     UserMessage->SetStringField("role", "user");
@@ -74,14 +74,14 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
     MessagesArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
     RequestBody->SetArrayField("messages", MessagesArray);
     
-    // JSON Á÷·ÄÈ­
+    // JSON ì§ë ¬í™”
     FString OutputString;
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
     FJsonSerializer::Serialize(RequestBody.ToSharedRef(), Writer);
     Request->SetContentAsString(OutputString);
 
 
-    if (Request->ProcessRequest()) // ¿äÃ» º¸³»±â
+    if (Request->ProcessRequest()) // ìš”ì²­ ë³´ë‚´ê¸°
     {
         UE_LOG(LogTemp, Log, TEXT("OpenAI Request Send Success"));
     }
@@ -92,7 +92,7 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
     
 }
 
-//¹®Àå ¼ö½Å
+//ë¬¸ì¥ ìˆ˜ì‹ 
 void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
     if (!bWasSuccessful || !Response.IsValid())
@@ -101,24 +101,24 @@ void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr
         return;
     }
 
-    // ÀÀ´ä ÆÄ½Ì
+    // ì‘ë‹µ íŒŒì‹±
     FString ResponseString = Response->GetContentAsString();
 
-    // JSON ¹®ÀÚ¿­À» ·Î±×·Î Ãâ·Â
+    // JSON ë¬¸ìì—´ì„ ë¡œê·¸ë¡œ ì¶œë ¥
     UE_LOG(LogTemp, Log, TEXT("OpenAI Full Response: %s"), *ResponseString);
 
-    // JSON ¹®ÀÚ¿­À» JSON °´Ã¼·Î ÆÄ½Ì
+    // JSON ë¬¸ìì—´ì„ JSON ê°ì²´ë¡œ íŒŒì‹±
     TSharedPtr<FJsonObject> JsonObject;
     TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
 
     if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
     {
-        // JSON °´Ã¼¸¦ ´Ù½Ã ¹®ÀÚ¿­·Î Á÷·ÄÈ­ÇÏ¿© ÀüÃ¼ ³»¿ë Ãâ·Â
+        // JSON ê°ì²´ë¥¼ ë‹¤ì‹œ ë¬¸ìì—´ë¡œ ì§ë ¬í™”í•˜ì—¬ ì „ì²´ ë‚´ìš© ì¶œë ¥
         FString JsonPrettyString;
         TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonPrettyString);
         FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-        // Á÷·ÄÈ­µÈ JSON ³»¿ëÀ» ·Î±×·Î Ãâ·Â
+        // ì§ë ¬í™”ëœ JSON ë‚´ìš©ì„ ë¡œê·¸ë¡œ ì¶œë ¥
         UE_LOG(LogTemp, Log, TEXT("Parsed JSON Content: %s"), *JsonPrettyString);
     }
     /*
@@ -128,25 +128,25 @@ void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr
         TSharedPtr<FJsonObject> JsonObject;
         TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
 
-        // ¹ŞÀº Response°¡ ¾î¶»°Ô »ı°å´ÂÁö º¸°í½Í´Ù.
+        // ë°›ì€ Responseê°€ ì–´ë–»ê²Œ ìƒê²¼ëŠ”ì§€ ë³´ê³ ì‹¶ë‹¤.
 
 
         /*
-        // ¿ªÁ÷·ÄÈ­
+        // ì—­ì§ë ¬í™”
         if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
         {
-            // 'choices' ÇÊµå¿¡¼­ Ã¹ ¹øÂ° ¿ä¼Ò¸¦ °¡Á®¿É´Ï´Ù.
+            // 'choices' í•„ë“œì—ì„œ ì²« ë²ˆì§¸ ìš”ì†Œë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤.
             TArray<TSharedPtr<FJsonValue>> ChoicesArray = JsonObject->GetArrayField("choices");
             if (ChoicesArray.Num() > 0 && ChoicesArray[0].IsValid())
             {
-                // Ã¹ ¹øÂ° ¿ä¼Ò¸¦ FJsonObject·Î º¯È¯
+                // ì²« ë²ˆì§¸ ìš”ì†Œë¥¼ FJsonObjectë¡œ ë³€í™˜
                 TSharedPtr<FJsonObject> ChoiceObject = ChoicesArray[0]->AsObject();
                 if (ChoiceObject.IsValid())
                 {
-                    // 'text' ÇÊµå¿¡ Á¢±ÙÇÏ¿© ¹®ÀÚ¿­ °¡Á®¿À±â
+                    // 'text' í•„ë“œì— ì ‘ê·¼í•˜ì—¬ ë¬¸ìì—´ ê°€ì ¸ì˜¤ê¸°
                     FString Answer = ChoiceObject->GetStringField("text");
                     UE_LOG(LogTemp, Log, TEXT("OpenAI Response: %s"), *Answer);
-                    // ÀÀ´äÀ» °ÔÀÓ ³»¿¡ Ç¥½ÃÇÏ°Å³ª ´Ù¸¥ ÀÛ¾÷¿¡ »ç¿ë
+                    // ì‘ë‹µì„ ê²Œì„ ë‚´ì— í‘œì‹œí•˜ê±°ë‚˜ ë‹¤ë¥¸ ì‘ì—…ì— ì‚¬ìš©
                 }
             }
         }
@@ -160,7 +160,7 @@ void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr
 
 void ARAIHttpManager::SendRequestToNLP(const FString& InputText)
 {
-    // HTTP ¿äÃ» »ı¼º
+    // HTTP ìš”ì²­ ìƒì„±
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
     Request->OnProcessRequestComplete().BindUObject(this, &ARAIHttpManager::OnNLPResponse);
     Request->SetURL(URL_NLP);
@@ -168,19 +168,19 @@ void ARAIHttpManager::SendRequestToNLP(const FString& InputText)
     Request->SetHeader("Content-Type", "application/json");
     Request->SetHeader("Authorization", FString::Printf(TEXT("Bearer %s"), *APIKey_NLP));
 
-    // ¿äÃ» º»¹® ¼³Á¤
+    // ìš”ì²­ ë³¸ë¬¸ ì„¤ì •
     TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject()); //RequestBody = JsonObject
-    //messages ¹è¿­ »ı¼º
+    //messages ë°°ì—´ ìƒì„±
     RequestBody->SetStringField(TEXT("inputs"), InputText);
 
-    // JSON Á÷·ÄÈ­
+    // JSON ì§ë ¬í™”
     FString OutputString;
     TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
     FJsonSerializer::Serialize(RequestBody.ToSharedRef(), Writer);
     Request->SetContentAsString(OutputString);
 
-    // ¿äÃ» ½ÇÇà
-    if (Request->ProcessRequest()) // ¿äÃ» º¸³»±â
+    // ìš”ì²­ ì‹¤í–‰
+    if (Request->ProcessRequest()) // ìš”ì²­ ë³´ë‚´ê¸°
     {
         UE_LOG(LogTemp, Log, TEXT("NLP Request Send Success"));
     }
@@ -198,23 +198,22 @@ void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Re
         return;
     }
 
-    // ÀÀ´ä ÆÄ½Ì
-    FString ResponseString = Response->GetContentAsString();
-
-    // JSON ¹®ÀÚ¿­À» ·Î±×·Î Ãâ·Â
-    UE_LOG(LogTemp, Log, TEXT("NLP Full Response: %s"), *ResponseString);
-
-    TArray<TSharedPtr<FJsonValue>> JsonResponse;
-    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
+    TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldNameì´ ì—†ì–´ì„œ FJsonValueì˜ ë°°ì—´ì„ ì‚¬ìš©í•´ì•¼í•  ê²ƒ ê°™ë‹¤.
+    TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Response->GetContentAsString());
 
     if (FJsonSerializer::Deserialize(Reader, JsonResponse) && JsonResponse.Num() > 0)
     {
-        TArray<TSharedPtr<FJsonValue>> InnerArray = JsonResponse[0]->AsArray();
+        UE_LOG(LogTemp, Log, TEXT("NLP InnerObject :"));
 
-        // TODO: Label°ú Score¸¦ »Ì¾Æ³»´Â ÄÚµå
+        TArray<TSharedPtr<FJsonValue>> InnerArray = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] í˜•íƒœì´ê¸°ì— JsonResponse[0] = ë°°ì—´
+        for (auto EmotionJsonValue : InnerArray)
+        {
+            TSharedPtr<FJsonObject> EmotionObject = EmotionJsonValue->AsObject();
+            FString Label = EmotionObject->GetStringField("label");
+            double Score = EmotionObject->GetNumberField("score");
 
-
-        //UE_LOG(LogTemp, Log, TEXT("Label: %s, Score: %f"), *Label, Score);
+            UE_LOG(LogTemp, Log, TEXT("Label : %s , Score : %f"), *Label, Score);
+        }
     }
     else
     {

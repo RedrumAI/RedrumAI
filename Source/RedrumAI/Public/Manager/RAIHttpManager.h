@@ -36,7 +36,6 @@ public:
 	FString URL_NLP = TEXT("https://api-inference.huggingface.co/models/bhadresh-savani/distilbert-base-uncased-emotion");	//TEXT매크로를 사용하면 추가 TCHAR변환 필요X
 																															// https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english //긍정/부정 확률을 반환하는 모델
 																															//"https://api-inference.huggingface.co/models/bhadresh-savani/distilbert-base-uncased-emotion" //감정6가지로 반환 확률인지는 아직몰라잇
-	FString OpenAIComment;
 
-
+	int cnt = 0;
 };

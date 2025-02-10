@@ -29,5 +29,5 @@ public:
 
 	FEmotionScore EmotionScore;
 
-	void SetEmotionScore(FEmotionScore& InEmotionScore, float Love, float Joy, float Surprise, float Anger, float Fear, float Sadness);
+	void SetEmotionScore(TArray<TSharedPtr<FJsonValue>> EmotionJson);
 };

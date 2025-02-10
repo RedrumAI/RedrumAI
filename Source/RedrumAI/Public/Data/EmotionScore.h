@@ -11,6 +11,10 @@ struct FEmotionScore
 	GENERATED_BODY()
 
 public:
+
+	FEmotionScore();
+	~FEmotionScore();
+
 	//¹üÀ§ = clamp(9.99, 0.00)
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Love;

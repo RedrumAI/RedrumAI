@@ -211,6 +211,14 @@ void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Re
         UE_LOG(LogTemp, Log, TEXT("NLP InnerObject :"));
 
         TArray<TSharedPtr<FJsonValue>> InnerArray = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] 형태이기에 JsonResponse[0] = 배열
+
+        //TODO :    InnerArray를 GM에게 BroadCast (지금할일)
+        //          ->GM은 InnerArray를 ChatManager에 전송
+        //          ->ChatManager는 InnerArray를 파싱하여 Label에 맞게 Score입력
+
+        //BroadCast(InnerArray)
+
+        /*
         for (auto EmotionJsonValue : InnerArray)
         {
             TSharedPtr<FJsonObject> EmotionObject = EmotionJsonValue->AsObject();
@@ -219,6 +227,7 @@ void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Re
 
             UE_LOG(LogTemp, Log, TEXT("Label : %s , Score : %f"), *Label, Score);
         }
+    */
     }
     else
     {

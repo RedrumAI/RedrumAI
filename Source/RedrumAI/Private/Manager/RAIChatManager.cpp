@@ -2,6 +2,7 @@
 
 
 #include "Manager/RAIChatManager.h"
+#include "Json.h"
 
 // Sets default values
 ARAIChatManager::ARAIChatManager()
@@ -25,8 +26,15 @@ void ARAIChatManager::Tick(float DeltaTime)
 
 }
 
-void ARAIChatManager::SetEmotionScore(TArray<TSharedPtr<FJsonValue>> EmotionJson)
+void ARAIChatManager::SetEmotionScore(TArray<FString> InJsonData)
 {
+	//다시 TArray<TSharedPtr<FJsonVlaue>> 형태로 복구
+	TArray<TSharedPtr<FJsonValue>> EmotionJson;
+	for (const FString& Str : InJsonData)
+	{
+		EmotionJson.Add(MakeShared<FJsonValueString>(Str));
+	}
+
 	for (auto EmotionJsonValue : EmotionJson)
 	{
 		TSharedPtr<FJsonObject> EmotionObject = EmotionJsonValue->AsObject();
@@ -42,4 +50,5 @@ void ARAIChatManager::SetEmotionScore(TArray<TSharedPtr<FJsonValue>> EmotionJson
 			else if (Label == TEXT("sadness")) EmotionScore.Sadness = Score;
 		}
 	}
+
 }

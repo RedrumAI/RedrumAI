@@ -85,6 +85,8 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
     Request->SetContentAsString(OutputString);
 
 
+
+
     if (Request->ProcessRequest()) // 요청 보내기
     {
         UE_LOG(LogTemp, Log, TEXT("OpenAI Request Send Success"));
@@ -212,11 +214,32 @@ void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Re
 
         TArray<TSharedPtr<FJsonValue>> InnerArray = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] 형태이기에 JsonResponse[0] = 배열
 
-        //TODO :    InnerArray를 GM에게 BroadCast (지금할일)
-        //          ->GM은 InnerArray를 ChatManager에 전송
-        //          ->ChatManager는 InnerArray를 파싱하여 Label에 맞게 Score입력
+        //TArray<TSharedPtr<FJsonValue>> -> TArray<FString> 으로 변환
+        TArray<FString> JsonData;
+        for (const TSharedPtr<FJsonValue>& JsonValue : InnerArray)
+        {
+            FString ValueStr;
+            if (JsonValue->TryGetString(ValueStr))
+            {
+                JsonData.Add(ValueStr);
+            }
+            else
+            {
+                // 만약 문자열이 아니면, JSON 데이터를 그대로 직렬화해서 문자열로 저장
+                ValueStr = JsonValue->AsString();
+                JsonData.Add(ValueStr);
+            }
+        }
 
-        //BroadCast(InnerArray)
+        //Bind확인용 if문
+        if (ResponseDelegate_NLP.IsBound())
+        {
+            ResponseDelegate_NLP.Broadcast(JsonData);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("ResponseDelegate_NLP is Not BOUND"));
+        }
 
         /*
         for (auto EmotionJsonValue : InnerArray)
@@ -227,7 +250,7 @@ void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Re
 
             UE_LOG(LogTemp, Log, TEXT("Label : %s , Score : %f"), *Label, Score);
         }
-    */
+           */
     }
     else
     {

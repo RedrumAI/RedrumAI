@@ -7,6 +7,7 @@
 #include "RAIGameMode.generated.h"
 
 class ARAIHttpManager;
+class ARAIChatManager;
 
 UCLASS()
 class REDRUMAI_API ARAIGameMode : public AGameModeBase
@@ -18,7 +19,14 @@ public:
 	
 	virtual void BeginPlay() override;
 	
+	UFUNCTION()
+	void BindHM2CM();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<ARAIChatManager> ChatManager;
+
+	FTimerHandle TimerHandle_BindHM;
 
 };

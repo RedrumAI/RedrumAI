@@ -29,5 +29,5 @@ public:
 
 	FEmotionScore EmotionScore;
 
-	void SetEmotionScore(TArray<TSharedPtr<FJsonValue>> EmotionJson);
+	void SetEmotionScore(TArray<FString> EmotionJson);
 };

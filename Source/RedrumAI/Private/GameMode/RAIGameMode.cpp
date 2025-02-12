@@ -2,14 +2,8 @@
 
 
 #include "GameMode/RAIGameMode.h"
-//Secrets.ini 경로 탐지 및 ini로부터 읽어오는 헤더. CoreMinimal에 Path관련 코드가 있기에 없어도된다.
-/*
-#include "Misc/ConfigCacheIni.h"
-#include "Misc/Paths.h"
-#include "HAL/PlatformFileManager.h"
-*/
-
 #include "Manager/RAIHttpManager.h"
+#include "Manager/RAIChatManager.h"
 
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
@@ -47,5 +41,32 @@ void ARAIGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!IsValid(HttpManager))
+	{
+		HttpManager = GetWorld()->SpawnActor<ARAIHttpManager>(ARAIHttpManager::StaticClass());
+	}
+
+	BindHM2CM();
 	//HttpManager->SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
+
+}
+
+void ARAIGameMode::BindHM2CM()
+{
+	if (IsValid(HttpManager))
+	{
+		//TODO: HM의 델리게이트 트리거와 바인드하기
+		HttpManager->ResponseDelegate_NLP.AddDynamic(ChatManager, &ARAIChatManager::SetEmotionScore);
+	}
+	else
+	{
+		//TODO: 타이머를 통해 0.1초 뒤에 BindHM() 다시 실행.
+		GetWorldTimerManager().SetTimer(
+			TimerHandle_BindHM,
+			this,
+			&ARAIGameMode::BindHM2CM,
+			0.1f,
+			false
+		);
+	}
 }

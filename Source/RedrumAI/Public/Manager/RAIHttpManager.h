@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/IHttpRequest.h"	// FHttpRequestPtr사용을 위함이므로 헤더추가(상속X)
+#include "Interfaces/IHttpRequest.h" // FHttpRequestPtr사용을 명시하기 위해 헤더추가(상속X)
 #include "Interfaces/IHttpResponse.h"
 #include "RAIHttpManager.generated.h"
 
 //TArray<TSharedPtr<FJsonValue>>는 TSharedPtr이 Delegate에서 사용할 수 없기에 FString으롭 변환하여 인자 사용
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNLPResponseDelegate, TArray<FString>, InJsonData); 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNLPResponseDelegate, FString, InJsonData);
 
 UCLASS(Blueprintable)
 class REDRUMAI_API ARAIHttpManager : public AActor
 {
 	GENERATED_BODY()
 	
-	public:	
+public:
 
 	ARAIHttpManager();
 
@@ -25,8 +25,9 @@ class REDRUMAI_API ARAIHttpManager : public AActor
 	UFUNCTION(BlueprintCallable)
 	void SendRequestToOpenAI(const FString& InputText);
 
-	void OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful); //UHT에서 FHttp..Ptr들을 읽지못하기에 UFUNCTION 사용불가
 
+	UFUNCTION(BlueprintCallable)
 	void SendRequestToNLP(const FString& InputText);
 
 	void OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);

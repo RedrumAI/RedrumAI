@@ -22,6 +22,8 @@ public:
 	UFUNCTION()
 	void BindHM2CM();
 
+	void tmpRequestNLP();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

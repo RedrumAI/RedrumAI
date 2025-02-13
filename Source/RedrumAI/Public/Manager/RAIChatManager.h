@@ -29,5 +29,6 @@ public:
 
 	FEmotionScore EmotionScore;
 
-	void SetEmotionScore(TArray<FString> EmotionJson);
+	UFUNCTION(BlueprintCallable)
+	void SetEmotionScore(FString EmotionJson);
 };

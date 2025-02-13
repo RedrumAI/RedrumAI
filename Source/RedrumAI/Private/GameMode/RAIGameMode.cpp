@@ -1,39 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameMode/RAIGameMode.h"
 #include "Manager/RAIHttpManager.h"
 #include "Manager/RAIChatManager.h"
 
-//Secretes.ini·ÎºÎÅÍ API_KEY ºÒ·¯¿À´Â ¿¹½ÃÄÚµå
+//Secretes.inië¡œë¶€í„° API_KEY ë¶ˆëŸ¬ì˜¤ëŠ” ì˜ˆì‹œì½”ë“œ
 ARAIGameMode::ARAIGameMode()
 {
-	/*
-	// Secrets.ini °æ·Î ÁöÁ¤
-	FString SecretsPath = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Secrets.ini"));
-	GConfig->LoadFile(SecretsPath);
-
-	FString OpenAI_API_Key;
-	if (GConfig->GetString(TEXT("OpenAI"), TEXT("OpenAI_API_KEY"), OpenAI_API_Key, SecretsPath))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OpenAI_API_KEY Loaded: %s"), *OpenAI_API_Key);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to load OpenAI_API_KEY from Secrets"));
-	}
-
-	FString HF_API_Key;
-	if (GConfig->GetString(TEXT("HuggingFace"), TEXT("HF_API_KEY"), HF_API_Key, SecretsPath))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("HF_API_KEY Loaded: %s"), *HF_API_Key);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to load HF_API_KEY from Secrets"));
-	}
-	*/
-
 
 }
 
@@ -45,22 +19,40 @@ void ARAIGameMode::BeginPlay()
 	{
 		HttpManager = GetWorld()->SpawnActor<ARAIHttpManager>(ARAIHttpManager::StaticClass());
 	}
+	if (!IsValid(ChatManager))
+	{
+		ChatManager = GetWorld()->SpawnActor<ARAIChatManager>(ARAIChatManager::StaticClass());
+	}
 
 	BindHM2CM();
-	//HttpManager->SendRequestToOpenAI(FString::Printf(TEXT("Say just Hi")));
 
+	FTimerHandle TimerHandle_tmp;
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_tmp,
+		this,
+		&ARAIGameMode::tmpRequestNLP,
+		3.0f,
+		false
+	);
+}
+
+void ARAIGameMode::tmpRequestNLP()
+{
+	FString str;
+	str = FString::Printf(TEXT("Good Morning. Do you want some tea"));
+	HttpManager->SendRequestToNLP(str);
 }
 
 void ARAIGameMode::BindHM2CM()
 {
-	if (IsValid(HttpManager))
+	if (IsValid(HttpManager) && IsValid(ChatManager))
 	{
-		//TODO: HMÀÇ µ¨¸®°ÔÀÌÆ® Æ®¸®°Å¿Í ¹ÙÀÎµåÇÏ±â
+		//TODO: HMì˜ ë¸ë¦¬ê²Œì´íŠ¸ íŠ¸ë¦¬ê±°ì™€ ë°”ì¸ë“œí•˜ê¸°
 		HttpManager->ResponseDelegate_NLP.AddDynamic(ChatManager, &ARAIChatManager::SetEmotionScore);
 	}
 	else
 	{
-		//TODO: Å¸ÀÌ¸Ó¸¦ ÅëÇØ 0.1ÃÊ µÚ¿¡ BindHM() ´Ù½Ã ½ÇÇà.
+		//TODO: íƒ€ì´ë¨¸ë¥¼ í†µí•´ 0.1ì´ˆ ë’¤ì— BindHM() ë‹¤ì‹œ ì‹¤í–‰.
 		GetWorldTimerManager().SetTimer(
 			TimerHandle_BindHM,
 			this,
@@ -70,3 +62,4 @@ void ARAIGameMode::BindHM2CM()
 		);
 	}
 }
+

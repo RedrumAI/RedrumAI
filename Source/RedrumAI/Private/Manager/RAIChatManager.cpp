@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Manager/RAIChatManager.h"
@@ -7,7 +7,7 @@
 // Sets default values
 ARAIChatManager::ARAIChatManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -16,7 +16,7 @@ ARAIChatManager::ARAIChatManager()
 void ARAIChatManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -31,14 +31,14 @@ void ARAIChatManager::SetEmotionScore(FString InJsonData)
 
 	TArray<TSharedPtr<FJsonValue>> OuterArray;
 
-	//´Ù½Ã TArray<TSharedPtr<FJsonVlaue>> ÇüÅÂ·Î º¹±¸
-	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldNameÀÌ ¾ø¾î¼­ FJsonValueÀÇ ¹è¿­À» »ç¿ëÇØ¾ßÇÒ °Í °°´Ù.
+	//ë‹¤ì‹œ TArray<TSharedPtr<FJsonVlaue>> í˜•íƒœë¡œ ë³µêµ¬
+	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldNameì´ ì—†ì–´ì„œ FJsonValueì˜ ë°°ì—´ì„ ì‚¬ìš©í•´ì•¼í•  ê²ƒ ê°™ë‹¤.
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(InJsonData);
 
 	if (FJsonSerializer::Deserialize(Reader, JsonResponse) && JsonResponse.Num() > 0)
 	{
 		UE_LOG(LogTemp, Log, TEXT("NLP InnerObject :"));
-		TArray<TSharedPtr<FJsonValue>> EmotionJson = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] ÇüÅÂÀÌ±â¿¡ JsonResponse[0] = ¹è¿­
+		TArray<TSharedPtr<FJsonValue>> EmotionJson = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] í˜•íƒœì´ê¸°ì— JsonResponse[0] = ë°°ì—´
 
 		UE_LOG(LogTemp, Log, TEXT("CM:EmotionScore Love Joy .. start"));
 		for (auto EmotionJsonValue : EmotionJson)
@@ -54,12 +54,13 @@ void ARAIChatManager::SetEmotionScore(FString InJsonData)
 			double Score = 0;
 			if (EmotionObject->TryGetStringField(TEXT("label"), Label) && EmotionObject->TryGetNumberField(TEXT("score"), Score))
 			{
-				if (Label == TEXT("love")) EmotionScore.Love = Score;
-				else if (Label == TEXT("joy")) EmotionScore.Joy = Score;
-				else if (Label == TEXT("surprise")) EmotionScore.Surprise = Score;
-				else if (Label == TEXT("anger")) EmotionScore.Anger = Score;
-				else if (Label == TEXT("fear")) EmotionScore.Fear = Score;
-				else if (Label == TEXT("sadness")) EmotionScore.Sadness = Score;
+				if (Label == TEXT("love")) CalculateEmotion(EmotionScore.Love, Score);
+				else if (Label == TEXT("joy")) CalculateEmotion(EmotionScore.Joy, Score);
+				else if (Label == TEXT("surprise")) CalculateEmotion(EmotionScore.Surprise, Score);
+				else if (Label == TEXT("anger")) CalculateEmotion(EmotionScore.Anger, Score);
+				else if (Label == TEXT("fear")) CalculateEmotion(EmotionScore.Fear, Score);
+				else if (Label == TEXT("sadness")) CalculateEmotion(EmotionScore.Sadness, Score);
+				Score = 0;
 			}
 		}
 	}
@@ -71,4 +72,87 @@ void ARAIChatManager::SetEmotionScore(FString InJsonData)
 	UE_LOG(LogTemp, Error, TEXT("Love:%f, Joy:%f, Surprise:%f, Anger:%f, Fear:%f, Sadness:%f"),
 		EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
 
+}
+
+void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
+{
+	//í•œë²ˆ ì§ˆë¬¸ë§ˆë‹¤ ê°ì •ì˜ ì‚¬ê·¸ë¼ì§ = (-0.1) ë”í•¨
+	Emotion = Emotion - 0.1 + Score;
+	//Emotionì„ 0.XX í˜•íƒœë¡œ ë§Œë“ ë‹¤.
+	FMath::Clamp(Emotion, 0.00, 0.99); //0.88;
+	Emotion = FMath::FloorToFloat(Emotion * 100) / 100; //0.XXXXX -> XX.XXXX -> XX -> 0.XX
+}
+
+void ARAIChatManager::AddMessageArray(FString InJsonData, FString Message, EMessageRole MessageRole)
+{
+	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
+	switch (MessageRole)
+	{
+	case EMessageRole::Developer:
+	{
+		UserMessage->SetStringField("role", "developer");
+		UserMessage->SetStringField("content", Message); //Developerë¬¸ì¥ ì¶”ê°€ ê²½ìš° InJsonData=NULL;
+		break;
+	}
+	case EMessageRole::User:
+	{
+		UserMessage->SetStringField("role", "user");
+
+		FString ScoreString = FString::Printf(TEXT("[%f,%f,%f,%f,%f,%f]"),
+			EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
+		FString ScoreAddedMessage = ScoreString.Append(Message);
+
+		UserMessage->SetStringField("content", ScoreAddedMessage);
+		break;
+	}
+	case EMessageRole::Assistant:
+	{
+		UserMessage->SetStringField("role", "assistant");
+
+		SetEmotionScore(InJsonData);
+		FString  ScoreString = FString::Printf(TEXT("[%f,%f,%f,%f,%f,%f]"),
+			EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
+		FString ScoreAddedMessage = ScoreString.Append(Message);
+		UserMessage->SetStringField("content", ScoreAddedMessage);
+		break;
+	}
+	default:
+		break;
+	}	
+	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+}
+
+void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
+{
+	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
+	switch (MessageRole)
+	{
+	case EMessageRole::Developer:
+	{
+		UserMessage->SetStringField("role", "developer");
+		UserMessage->SetStringField("content", Message); //Developerë¬¸ì¥ ì¶”ê°€ ê²½ìš° InJsonData=NULL;
+		break;
+	}
+	case EMessageRole::User:
+	{
+		UserMessage->SetStringField("role", "user");
+
+		FString ScoreString = FString::Printf(TEXT("[%f,%f,%f,%f,%f,%f]"),
+			EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
+		FString ScoreAddedMessage = ScoreString.Append(Message);
+
+		UserMessage->SetStringField("content", ScoreAddedMessage);
+		break;
+	}
+	case EMessageRole::Assistant:
+	{
+		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::Assistant. Use with InJsonData."));
+		break;
+	}
+	default:
+		break;
+	}
+	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+
+	UE_LOG(LogTemp, Warning, TEXT("AddMessageArray ì»´í”Œë¦¬íŠ¸"));
 }

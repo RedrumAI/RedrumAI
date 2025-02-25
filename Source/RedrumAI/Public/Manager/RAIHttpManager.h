@@ -9,6 +9,7 @@
 #include "RAIHttpManager.generated.h"
 
 //TArray<TSharedPtr<FJsonValue>>는 TSharedPtr이 Delegate에서 사용할 수 없기에 FString으롭 변환하여 인자 사용
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOpenAIResponseDelegate, FString, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNLPResponseDelegate, FString, InJsonData);
 
 UCLASS(Blueprintable)
@@ -39,7 +40,8 @@ public:
 	FString URL_NLP = TEXT("https://api-inference.huggingface.co/models/bhadresh-savani/distilbert-base-uncased-emotion");	//TEXT매크로를 사용하면 추가 TCHAR변환 필요X
 					
 	UPROPERTY()
+	FOnOpenAIResponseDelegate ResponseDelegate_OpenAI;
+	UPROPERTY()
 	FOnNLPResponseDelegate ResponseDelegate_NLP;
-
 	int cnt = 0;
 };

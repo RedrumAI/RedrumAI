@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Data/MessageRole.h"
 #include "RAIGameMode.generated.h"
 
 class ARAIHttpManager;
@@ -18,17 +19,23 @@ public:
 	ARAIGameMode();
 	
 	virtual void BeginPlay() override;
-	
-	UFUNCTION()
-	void BindHM2CM();
 
-	void tmpRequestNLP();
+	UFUNCTION()
+	void BindHM();
+
+	UFUNCTION()
+	void OnEventDelegate_NLP(FString InJsonData);
+	UFUNCTION()
+	void OnEventDelegate_OpenAI(FString Message);
+
+
+	void tmpTestFunction();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIChatManager> ChatManager;
 
-	FTimerHandle TimerHandle_BindHM;
-
+	TOptional<FString> ScoreString; //NLP에서 온 점수Fstring
+	TOptional<FString> ResponseString; //OpenAI에서 온 응답FString
 };

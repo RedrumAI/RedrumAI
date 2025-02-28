@@ -22,14 +22,19 @@ public:
 
 	UFUNCTION()
 	void BindHM();
+	UFUNCTION()
+	void BindCM();
 
 	UFUNCTION()
 	void OnEventDelegate_NLP(FString InJsonData);
 	UFUNCTION()
 	void OnEventDelegate_OpenAI(FString Message);
+	UFUNCTION()
+	void OnEventDelegate_SendMessageArray(FString MessageString);
 
-
-	void tmpTestFunction();
+	void tmpTimerFunction();
+	void tmpTimerFunction2();
+	void tmpTimerFunction3();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;

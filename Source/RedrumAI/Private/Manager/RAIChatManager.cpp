@@ -29,8 +29,6 @@ void ARAIChatManager::SetEmotionScore(FString InJsonData)
 {
 	UE_LOG(LogTemp, Log, TEXT("CM:SetEmotionScore Started"));
 
-	TArray<TSharedPtr<FJsonValue>> OuterArray;
-
 	//다시 TArray<TSharedPtr<FJsonVlaue>> 형태로 복구
 	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldName이 없어서 FJsonValue의 배열을 사용해야할 것 같다.
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(InJsonData);
@@ -68,19 +66,20 @@ void ARAIChatManager::SetEmotionScore(FString InJsonData)
 	{
 		UE_LOG(LogTemp, Error, TEXT("CM: Failed to parse JSON string: %s"), *InJsonData);
 	}
-
-	UE_LOG(LogTemp, Error, TEXT("Love:%f, Joy:%f, Surprise:%f, Anger:%f, Fear:%f, Sadness:%f"),
+	/*
+	UE_LOG(LogTemp, Warning, TEXT("Love:%f, Joy:%f, Surprise:%f, Anger:%f, Fear:%f, Sadness:%f"),
 		EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
-
+		*/
 }
 
 void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
 {
 	//한번 질문마다 감정의 사그라짐 = (-0.1) 더함
-	Emotion = Emotion - 0.1 + Score;
+	Emotion = Emotion - 0.1f + Score;
 	//Emotion을 0.XX 형태로 만든다.
-	FMath::Clamp(Emotion, 0.00, 0.99); //0.88;
+	Emotion = FMath::Clamp(Emotion, 0.00f, 0.99f); //0.88;
 	Emotion = FMath::FloorToFloat(Emotion * 100) / 100; //0.XXXXX -> XX.XXXX -> XX -> 0.XX
+	
 }
 
 void ARAIChatManager::AddMessageArray(FString InJsonData, FString Message, EMessageRole MessageRole)
@@ -90,36 +89,47 @@ void ARAIChatManager::AddMessageArray(FString InJsonData, FString Message, EMess
 	{
 	case EMessageRole::Developer:
 	{
-		UserMessage->SetStringField("role", "developer");
-		UserMessage->SetStringField("content", Message); //Developer문장 추가 경우 InJsonData=NULL;
+		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::Developer. Use without InJsonData."));
 		break;
 	}
 	case EMessageRole::User:
 	{
-		UserMessage->SetStringField("role", "user");
-
-		FString ScoreString = FString::Printf(TEXT("[%f,%f,%f,%f,%f,%f]"),
-			EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
-		FString ScoreAddedMessage = ScoreString.Append(Message);
-
-		UserMessage->SetStringField("content", ScoreAddedMessage);
+		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::User. Use without InJsonData."));
 		break;
 	}
 	case EMessageRole::Assistant:
 	{
 		UserMessage->SetStringField("role", "assistant");
 
-		SetEmotionScore(InJsonData);
-		FString  ScoreString = FString::Printf(TEXT("[%f,%f,%f,%f,%f,%f]"),
-			EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
-		FString ScoreAddedMessage = ScoreString.Append(Message);
-		UserMessage->SetStringField("content", ScoreAddedMessage);
+		if (MessageArray.Num() > 2) //첫 developer와 assistant("!")는 점수계산 제외
+		{
+			SetEmotionScore(InJsonData);
+			FString  ScoreString = FString::Printf(TEXT("[%.2f,%.2f,%.2f,%.2f,%.2f,%.2f]"),
+				EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
+			FString ScoreAddedMessage = ScoreString.Append(Message);
+			UserMessage->SetStringField("content", ScoreAddedMessage);
+		}
+		else
+		{
+			UserMessage->SetStringField("content", Message);
+		}
 		break;
 	}
 	default:
 		break;
-	}	
+	}
 	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+
+	//테스트용 MessageArray내 FJsonObject를 전부 출력
+
+	UE_LOG(LogTemp, Warning, TEXT("<로그 내역>"));
+	for (auto MessageOne : MessageArray)
+	{
+		FString tmp = MessageOne->AsObject()->GetStringField(TEXT("content"));
+
+		UE_LOG(LogTemp, Log, TEXT("%s"), *tmp);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("로그 끝"));
 }
 
 void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
@@ -129,7 +139,7 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 	{
 	case EMessageRole::Developer:
 	{
-		UserMessage->SetStringField("role", "developer");
+		UserMessage->SetStringField("role", "developer"); //24년말부턴 system이 아닌 developer
 		UserMessage->SetStringField("content", Message); //Developer문장 추가 경우 InJsonData=NULL;
 		break;
 	}
@@ -137,7 +147,7 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 	{
 		UserMessage->SetStringField("role", "user");
 
-		FString ScoreString = FString::Printf(TEXT("[%f,%f,%f,%f,%f,%f]"),
+		FString ScoreString = FString::Printf(TEXT("[%.2f,%.2f,%.2f,%.2f,%.2f,%.2f]"),
 			EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
 		FString ScoreAddedMessage = ScoreString.Append(Message);
 
@@ -152,7 +162,19 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 	default:
 		break;
 	}
-	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
 
-	UE_LOG(LogTemp, Warning, TEXT("AddMessageArray 컴플리트"));
+	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+	
+	SendMessageArrayToGM();
 }
+
+void ARAIChatManager::SendMessageArrayToGM()
+{
+	//MessageArray를 Fstring으로 변환
+	FString MessageString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&MessageString);
+	FJsonSerializer::Serialize(MessageArray, Writer);
+
+	SendMessageDelegate.Broadcast(MessageString);
+}
+

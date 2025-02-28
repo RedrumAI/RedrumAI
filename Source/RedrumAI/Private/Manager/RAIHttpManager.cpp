@@ -85,9 +85,6 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
 	FJsonSerializer::Serialize(RequestBody.ToSharedRef(), Writer);
 	Request->SetContentAsString(OutputString);
 
-
-
-
 	if (Request->ProcessRequest()) // 요청 보내기
 	{
 		UE_LOG(LogTemp, Log, TEXT("OpenAI Request Send Success"));
@@ -107,63 +104,21 @@ void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr
 		UE_LOG(LogTemp, Error, TEXT("OpenAI Request failed"));
 		return;
 	}
-
-	// 응답 파싱
 	FString ResponseString = Response->GetContentAsString();
-
-	// JSON 문자열을 로그로 출력
-	UE_LOG(LogTemp, Log, TEXT("OpenAI Full Response: %s"), *ResponseString);
-
 	// JSON 문자열을 JSON 객체로 파싱
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
-
-	/*
 	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
 	{
-		// JSON 객체를 다시 문자열로 직렬화하여 전체 내용 출력
-		FString JsonPrettyString;
-		TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonPrettyString);
-		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+		TArray<TSharedPtr<FJsonValue>> ChoicesArray;
+		ChoicesArray = JsonObject->GetArrayField(TEXT("choices"));
+		TSharedPtr<FJsonObject> ChoiceObject = ChoicesArray[0]->AsObject();
+		TSharedPtr<FJsonObject> MessageObject = ChoiceObject->GetObjectField(TEXT("message"));
+		FString ContentString = MessageObject->GetStringField(TEXT("content"));
 
-		// 직렬화된 JSON 내용을 로그로 출력
-		UE_LOG(LogTemp, Log, TEXT("Parsed JSON Content: %s"), *JsonPrettyString);
+		SendRequestToNLP(ContentString);
+		ResponseDelegate_OpenAI.Broadcast(ContentString);
 	}
-
-	if (bWasSuccessful && Response.IsValid())
-	{
-		FString ResponseString = Response->GetContentAsString();
-		TSharedPtr<FJsonObject> JsonObject;
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
-
-		// 받은 Response가 어떻게 생겼는지 보고싶다.
-
-
-		/*
-		// 역직렬화
-		if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
-		{
-			// 'choices' 필드에서 첫 번째 요소를 가져옵니다.
-			TArray<TSharedPtr<FJsonValue>> ChoicesArray = JsonObject->GetArrayField("choices");
-			if (ChoicesArray.Num() > 0 && ChoicesArray[0].IsValid())
-			{
-				// 첫 번째 요소를 FJsonObject로 변환
-				TSharedPtr<FJsonObject> ChoiceObject = ChoicesArray[0]->AsObject();
-				if (ChoiceObject.IsValid())
-				{
-					// 'text' 필드에 접근하여 문자열 가져오기
-					FString Answer = ChoiceObject->GetStringField("text");
-					UE_LOG(LogTemp, Log, TEXT("OpenAI Response: %s"), *Answer);
-					// 응답을 게임 내에 표시하거나 다른 작업에 사용
-				}
-			}
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Request failed"));
-	}
-	*/
 }
 
 void ARAIHttpManager::SendRequestToNLP(const FString& InputText)

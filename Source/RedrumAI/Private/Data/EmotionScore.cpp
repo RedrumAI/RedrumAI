@@ -5,12 +5,12 @@
 
 FEmotionScore::FEmotionScore()
 {
-	Love = 0;
-	Joy = 0;
-	Surprise = 0;
-	Anger = 0;
-	Fear = 0;
-	Sadness = 0;
+	Love = 0.5;
+	Joy = 0.5;
+	Surprise = 0.5;
+	Anger = 0.5;
+	Fear = 0.5;
+	Sadness = 0.5;
 }
 
 FEmotionScore::~FEmotionScore()

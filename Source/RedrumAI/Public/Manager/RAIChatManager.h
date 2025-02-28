@@ -8,6 +8,8 @@
 #include "Data/MessageRole.h"
 #include "RAIChatManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendMessageDelegate, FString, MessageArray);
+
 UCLASS()
 class REDRUMAI_API ARAIChatManager : public AActor
 {
@@ -37,4 +39,8 @@ public:
 
 	virtual void AddMessageArray(FString InJsonData, FString Message, EMessageRole MessageRole);
 	virtual void AddMessageArray(FString Message, EMessageRole MessageRole);
+
+	void SendMessageArrayToGM();
+
+	FOnSendMessageDelegate SendMessageDelegate;
 };

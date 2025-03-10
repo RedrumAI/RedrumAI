@@ -1,0 +1,179 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#include "Manager/RAIHttpManager.h"
+#include "HttpModule.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "Json.h"
+
+ARAIHttpManager::ARAIHttpManager()
+{
+	// Secrets.ini 경로 지정
+	FString SecretsPath = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Secrets.ini"));
+	GConfig->LoadFile(SecretsPath);
+
+	//APIKey_OpenAI
+	if (GConfig->GetString(TEXT("OpenAI"), TEXT("OpenAI_API_KEY"), APIKey_OpenAI, SecretsPath))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APIKey_OpenAI Loaded: %s"), *APIKey_OpenAI);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load OpenAI_API_KEY from Secrets"));
+	}
+
+	//APIKey_NLP
+	if (GConfig->GetString(TEXT("HuggingFace"), TEXT("HF_API_KEY"), APIKey_NLP, SecretsPath))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APIKey_NLP Loaded: %s"), *APIKey_NLP);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load APIKey_NLP from Secrets"));
+	}
+}
+
+void ARAIHttpManager::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+//문장 전송
+void ARAIHttpManager::SendRequestToOpenAI(const FString& InputString)
+{
+	// HTTP 요청 생성    
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ARAIHttpManager::OnOpenAIResponse); //단일 delegate
+	Request->SetURL(URL_OpenAI);
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->SetHeader("Authorization", FString::Printf(TEXT("Bearer %s"), *APIKey_OpenAI));
+
+	// 요청 본문 설정
+	TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject);
+	RequestBody->SetStringField("model", "gpt-4o-mini"); // 사용 모델 설정. gpt-4o-mini 선택
+	RequestBody->SetNumberField("max_tokens", 100); // 응답 길이 설정
+	RequestBody->SetNumberField("temperature", 0.7); // 창의성 설정
+
+	// 'messages' 배열 생성
+	TArray<TSharedPtr<FJsonValue>> MessagesArray;
+	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
+	UserMessage->SetStringField("role", "user");
+	UserMessage->SetStringField("content", InputString);
+	MessagesArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+
+	RequestBody->SetArrayField("messages", MessagesArray);
+
+	// JSON 직렬화
+	FString OutputString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+	FJsonSerializer::Serialize(RequestBody.ToSharedRef(), Writer);
+	Request->SetContentAsString(OutputString);
+
+	if (Request->ProcessRequest()) // 요청 보내기
+	{
+		UE_LOG(LogTemp, Log, TEXT("OpenAI Request Send Success"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("OpenAI Request Send Failed"));
+	}
+
+}
+
+//문장 수신
+void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	if (!bWasSuccessful || !Response.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("OpenAI Request failed"));
+		return;
+	}
+	FString ResponseString = Response->GetContentAsString();
+	// JSON 문자열을 JSON 객체로 파싱
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseString);
+	if (FJsonSerializer::Deserialize(Reader, JsonObject) && JsonObject.IsValid())
+	{
+		TArray<TSharedPtr<FJsonValue>> ChoicesArray;
+		ChoicesArray = JsonObject->GetArrayField(TEXT("choices"));
+		TSharedPtr<FJsonObject> ChoiceObject = ChoicesArray[0]->AsObject();
+		TSharedPtr<FJsonObject> MessageObject = ChoiceObject->GetObjectField(TEXT("message"));
+		FString ContentString = MessageObject->GetStringField(TEXT("content"));
+
+		InputStringForNLP = ContentString;	//TOptional 저장
+		SendRequestToNLP();
+		ResponseDelegate_OpenAI.Broadcast(ContentString);
+	}
+}
+
+void ARAIHttpManager::SendRequestToNLP()
+{
+	// HTTP 요청 생성
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+	Request->OnProcessRequestComplete().BindUObject(this, &ARAIHttpManager::OnNLPResponse);
+	Request->SetURL(URL_NLP);
+	Request->SetVerb("POST");
+	Request->SetHeader("Content-Type", "application/json");
+	Request->SetHeader("Authorization", FString::Printf(TEXT("Bearer %s"), *APIKey_NLP));
+
+	// 요청 본문 설정
+	TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject()); //RequestBody = JsonObject
+	//messages 배열 생성
+	ensure(InputStringForNLP.IsSet());
+	RequestBody->SetStringField(TEXT("inputs"), InputStringForNLP.GetValue());
+
+	// JSON 직렬화
+	FString OutputString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+	FJsonSerializer::Serialize(RequestBody.ToSharedRef(), Writer);
+	Request->SetContentAsString(OutputString);
+
+	// 요청 실행
+	if (Request->ProcessRequest()) // 요청 보내기
+	{
+		UE_LOG(LogTemp, Log, TEXT("NLP Request Send Success"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("NLP Request Send Failed"));
+	}
+}
+
+void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	if (!bWasSuccessful || !Response.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("NLP Request Failed"));
+		return;
+	}
+
+	if (Response->GetResponseCode() == 503)	//서버 응답 없음(잠듦)
+	{
+		if (NLPcnt < 10)
+		{
+			UE_LOG(LogTemp, Error, TEXT("NLP Server is Unavailable(503 error). Send Again"));
+			++NLPcnt;
+
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				TimerHandle,
+				this,
+				&ARAIHttpManager::SendRequestToNLP,
+				2.0f,
+				false
+			);
+			return;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("NLP Trying is over 10. Check Server state"));
+			return;
+		}
+	}
+	NLPcnt = 0;
+	InputStringForNLP.Reset();
+
+	ensure(ResponseDelegate_NLP.IsBound());
+	ResponseDelegate_NLP.Broadcast(Response->GetContentAsString());
+}

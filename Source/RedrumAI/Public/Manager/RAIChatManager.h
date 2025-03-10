@@ -27,7 +27,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//추후 AI가 여러개가 된다면 TMap을 사용해 AI이름과 내역을 짝지어 관리하는게 좋겠다.
+	//추후 AI가 여러개가 된다면 TMap를 사용해 AI이름과 내역을 짝지어 관리하는게 좋겠다.
 	TArray<TSharedPtr<FJsonValue>> MessageArray;
 	
 	FEmotionScore EmotionScore;

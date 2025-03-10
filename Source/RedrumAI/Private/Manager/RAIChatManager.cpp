@@ -25,12 +25,13 @@ void ARAIChatManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
 void ARAIChatManager::SetEmotionScore(FString InJsonData)
 {
 	UE_LOG(LogTemp, Log, TEXT("CM:SetEmotionScore Started"));
 
 	//다시 TArray<TSharedPtr<FJsonVlaue>> 형태로 복구
-	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldName이 없어서 FJsonValue의 배열을 사용해야할 것 같다.
+	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldName이 없어서 FJsonValue의 배열을 사용
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(InJsonData);
 
 	if (FJsonSerializer::Deserialize(Reader, JsonResponse) && JsonResponse.Num() > 0)
@@ -66,10 +67,6 @@ void ARAIChatManager::SetEmotionScore(FString InJsonData)
 	{
 		UE_LOG(LogTemp, Error, TEXT("CM: Failed to parse JSON string: %s"), *InJsonData);
 	}
-	/*
-	UE_LOG(LogTemp, Warning, TEXT("Love:%f, Joy:%f, Surprise:%f, Anger:%f, Fear:%f, Sadness:%f"),
-		EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
-		*/
 }
 
 void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
@@ -169,7 +166,7 @@ void ARAIChatManager::SendMessageArrayToGM()
 
 void ARAIChatManager::ShowMessageArray()
 {
-	//테스트용 MessageArray내 FJsonObject를 전부 출력
+	//MessageArray내 FJsonObject를 전부 출력
 	UE_LOG(LogTemp, Warning, TEXT("<로그 출력 시작>"));
 	for (auto MessageOne : MessageArray)
 	{

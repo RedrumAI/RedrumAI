@@ -5,12 +5,6 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Json.h"
-//#include "JsonUtilities.h"
-/*
-#include "Misc/ConfigCacheIni.h"
-#include "Misc/Paths.h"
-#include "HAL/PlatformFileManager.h"
-*/
 
 ARAIHttpManager::ARAIHttpManager()
 {
@@ -42,14 +36,6 @@ ARAIHttpManager::ARAIHttpManager()
 void ARAIHttpManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// OpenAI Request와 Receive 테스트 코드
-	/*
-	SendRequestToOpenAI(FString::Printf(TEXT("좋은 아침이라고 해줘.")));
-	SendRequestToOpenAI(FString::Printf(TEXT("내가 아까전에 뭘 말해달라고 했지?")));
-	*/
-	//SendRequestToNLP(FString::Printf(TEXT("(입술을 떨며, 손에 땀을 흘리고 얼굴이 일그러짐) 그게... 그게 무슨 뜻이에요 ? 제가 그 커튼을 만졌다고요 ? 그럴 리 없어요!제가 그런 짓을 할 이유가 없잖아요.그런 자국을 남기게 될 이유가... 없다고요!(심장이 빠르게 뛰고, 숨을 고르지 못함) 저는 정말로 그런 일을 하지 않았어요! 제발 믿어주세요!")));
-
 }
 
 //문장 전송
@@ -62,7 +48,6 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputString)
 	Request->SetVerb("POST");
 	Request->SetHeader("Content-Type", "application/json");
 	Request->SetHeader("Authorization", FString::Printf(TEXT("Bearer %s"), *APIKey_OpenAI));
-
 
 	// 요청 본문 설정
 	TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject);

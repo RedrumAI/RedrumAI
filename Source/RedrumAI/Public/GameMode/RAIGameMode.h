@@ -32,9 +32,8 @@ public:
 	UFUNCTION()
 	void OnEventDelegate_SendMessageArray(FString MessageString);
 
-	void tmpTimerFunction();
-	void tmpTimerFunction2();
-	void tmpTimerFunction3();
+	void InitSettingOpenAI();
+	void tmpTimerFunction1();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;

@@ -26,38 +26,31 @@ void ARAIGameMode::BeginPlay()
 
 	BindHM();
 	BindCM();
-	/*
 	FTimerHandle TimerHandle_tmp;
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle_tmp,
 		this,
-		&ARAIGameMode::tmpTimerFunction,
-		3.0f,
+		&ARAIGameMode::InitSettingOpenAI,
+		1.0f,
 		false
 	);
-	FTimerHandle TimerHandle2_tmp;
+
+	/*
+	FTimerHandle TimerHandle1_tmp;
 	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle2_tmp,
+		TimerHandle1_tmp,
 		this,
-		&ARAIGameMode::tmpTimerFunction2,
+		&ARAIGameMode::tmpTimerFunction1,
 		8.0f,
 		false
 	);
 	*/
-	FTimerHandle TimerHandle3_tmp;
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle3_tmp,
-		this,
-		&ARAIGameMode::tmpTimerFunction3,
-		5.0f,
-		false
-	);
 }
 
-void ARAIGameMode::tmpTimerFunction()
+void ARAIGameMode::InitSettingOpenAI()
 {
-	FString str;
-	str = FString::Printf(
+	FString SettingString;
+	SettingString = FString::Printf(
 		TEXT("우리는 역할극을 진행 중이야. 나는 형사이고 너는 살인범이야. ")
 		TEXT("앞으로 내 메시지에는 너의 감정 상태 점수가 반드시 대괄호로 표시되어 있을 거야. ")
 		TEXT("이 감정 점수는 순서대로 [애정, 즐거움, 놀라움, 분노, 공포, 슬픔]을 나타내며, ")
@@ -69,13 +62,12 @@ void ARAIGameMode::tmpTimerFunction()
 	);
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
-		ChatManager->AddMessageArray(str, Developer);
+		ChatManager->AddMessageArray(SettingString, Developer);
 	}
-	//일단 이 developer메시지가 cm에 잘들어가는지만 확인해보자.
-	//UE_LOG(LogTemp, Warning, TEXT("%s", ))
 }
 
-void ARAIGameMode::tmpTimerFunction2()
+//C++ 테스트를 위한 임시함수. 추후 함수삭제예정
+void ARAIGameMode::tmpTimerFunction1()
 {
 	FString str;
 	str = FString::Printf(
@@ -84,31 +76,6 @@ void ARAIGameMode::tmpTimerFunction2()
 	if (IsValid(ChatManager) && HttpManager)
 	{
 		ChatManager->AddMessageArray(str, User);
-	}
-}
-
-void ARAIGameMode::tmpTimerFunction3()
-{
-	/*
-	FString str;
-	str = FString::Printf(
-		TEXT("그래 천천히해보자. 네 이름이 뭐지? 이건 꼭 대답해.")
-	);
-	if (IsValid(ChatManager) && HttpManager)
-	{
-		ChatManager->AddMessageArray(str, User);
-	}
-	*/
-
-	FString str;
-	str = FString::Printf(
-		TEXT("테스트를 위한 문장. 기분이 좋아요.")
-	);
-	if (IsValid(HttpManager))
-	{
-		
-		HttpManager->InputStringForNLP = str;
-		HttpManager->SendRequestToNLP();
 	}
 }
 

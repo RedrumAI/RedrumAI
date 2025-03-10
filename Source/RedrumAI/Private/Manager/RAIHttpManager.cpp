@@ -53,7 +53,7 @@ void ARAIHttpManager::BeginPlay()
 }
 
 //문장 전송
-void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
+void ARAIHttpManager::SendRequestToOpenAI(const FString& InputString)
 {
 	// HTTP 요청 생성    
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -74,7 +74,7 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputText)
 	TArray<TSharedPtr<FJsonValue>> MessagesArray;
 	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
 	UserMessage->SetStringField("role", "user");
-	UserMessage->SetStringField("content", InputText);
+	UserMessage->SetStringField("content", InputString);
 	MessagesArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
 
 	RequestBody->SetArrayField("messages", MessagesArray);
@@ -116,12 +116,13 @@ void ARAIHttpManager::OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr
 		TSharedPtr<FJsonObject> MessageObject = ChoiceObject->GetObjectField(TEXT("message"));
 		FString ContentString = MessageObject->GetStringField(TEXT("content"));
 
-		SendRequestToNLP(ContentString);
+		InputStringForNLP = ContentString;	//TOptional 저장
+		SendRequestToNLP();
 		ResponseDelegate_OpenAI.Broadcast(ContentString);
 	}
 }
 
-void ARAIHttpManager::SendRequestToNLP(const FString& InputText)
+void ARAIHttpManager::SendRequestToNLP()
 {
 	// HTTP 요청 생성
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -134,7 +135,8 @@ void ARAIHttpManager::SendRequestToNLP(const FString& InputText)
 	// 요청 본문 설정
 	TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject()); //RequestBody = JsonObject
 	//messages 배열 생성
-	RequestBody->SetStringField(TEXT("inputs"), InputText);
+	ensure(InputStringForNLP.IsSet());
+	RequestBody->SetStringField(TEXT("inputs"), InputStringForNLP.GetValue());
 
 	// JSON 직렬화
 	FString OutputString;
@@ -161,7 +163,32 @@ void ARAIHttpManager::OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Re
 		return;
 	}
 
+	if (Response->GetResponseCode() == 503)	//서버 응답 없음(잠듦)
+	{
+		if (NLPcnt < 10)
+		{
+			UE_LOG(LogTemp, Error, TEXT("NLP Server is Unavailable(503 error). Send Again"));
+			++NLPcnt;
+
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(
+				TimerHandle,
+				this,
+				&ARAIHttpManager::SendRequestToNLP,
+				2.0f,
+				false
+			);
+			return;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("NLP Trying is over 10. Check Server state"));
+			return;
+		}
+	}
+	NLPcnt = 0;
+	InputStringForNLP.Reset();
+
 	ensure(ResponseDelegate_NLP.IsBound());
 	ResponseDelegate_NLP.Broadcast(Response->GetContentAsString());
 }
-

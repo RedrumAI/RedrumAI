@@ -42,5 +42,7 @@ public:
 
 	void SendMessageArrayToGM();
 
+	void ShowMessageArray();
+
 	FOnSendMessageDelegate SendMessageDelegate;
 };

@@ -119,17 +119,6 @@ void ARAIChatManager::AddMessageArray(FString InJsonData, FString Message, EMess
 		break;
 	}
 	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
-
-	//테스트용 MessageArray내 FJsonObject를 전부 출력
-
-	UE_LOG(LogTemp, Warning, TEXT("<로그 내역>"));
-	for (auto MessageOne : MessageArray)
-	{
-		FString tmp = MessageOne->AsObject()->GetStringField(TEXT("content"));
-
-		UE_LOG(LogTemp, Log, TEXT("%s"), *tmp);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("로그 끝"));
 }
 
 void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
@@ -176,5 +165,18 @@ void ARAIChatManager::SendMessageArrayToGM()
 	FJsonSerializer::Serialize(MessageArray, Writer);
 
 	SendMessageDelegate.Broadcast(MessageString);
+}
+
+void ARAIChatManager::ShowMessageArray()
+{
+	//테스트용 MessageArray내 FJsonObject를 전부 출력
+	UE_LOG(LogTemp, Warning, TEXT("<로그 출력 시작>"));
+	for (auto MessageOne : MessageArray)
+	{
+		FString MessageContent = MessageOne->AsObject()->GetStringField(TEXT("content"));
+
+		UE_LOG(LogTemp, Log, TEXT("%s"), *MessageContent);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("<로그 출력 완료>"));
 }
 

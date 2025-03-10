@@ -26,7 +26,7 @@ void ARAIGameMode::BeginPlay()
 
 	BindHM();
 	BindCM();
-
+	/*
 	FTimerHandle TimerHandle_tmp;
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle_tmp,
@@ -43,12 +43,13 @@ void ARAIGameMode::BeginPlay()
 		8.0f,
 		false
 	);
+	*/
 	FTimerHandle TimerHandle3_tmp;
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle3_tmp,
 		this,
 		&ARAIGameMode::tmpTimerFunction3,
-		13.0f,
+		5.0f,
 		false
 	);
 }
@@ -66,7 +67,7 @@ void ARAIGameMode::tmpTimerFunction()
 		TEXT("이전 메시지에 감정 점수가 있었다 하더라도 반드시 무시하고, 오직 응답 내용만 보내줘. ")
 		TEXT("그리고 나의 첫 번째 시스템 메시지에 대해서는 응답으로 단지 \"!\"만 보내.")
 	);
-	if (IsValid(ChatManager) && HttpManager)
+	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
 		ChatManager->AddMessageArray(str, Developer);
 	}
@@ -88,6 +89,7 @@ void ARAIGameMode::tmpTimerFunction2()
 
 void ARAIGameMode::tmpTimerFunction3()
 {
+	/*
 	FString str;
 	str = FString::Printf(
 		TEXT("그래 천천히해보자. 네 이름이 뭐지? 이건 꼭 대답해.")
@@ -95,6 +97,18 @@ void ARAIGameMode::tmpTimerFunction3()
 	if (IsValid(ChatManager) && HttpManager)
 	{
 		ChatManager->AddMessageArray(str, User);
+	}
+	*/
+
+	FString str;
+	str = FString::Printf(
+		TEXT("테스트를 위한 문장. 기분이 좋아요.")
+	);
+	if (IsValid(HttpManager))
+	{
+		
+		HttpManager->InputStringForNLP = str;
+		HttpManager->SendRequestToNLP();
 	}
 }
 

@@ -24,12 +24,12 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SendRequestToOpenAI(const FString& InputText);
+	void SendRequestToOpenAI(const FString& InputString);
 
 	void OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful); //UHT에서 FHttp..Ptr들을 읽지못하기에 UFUNCTION 사용불가
 
 	UFUNCTION(BlueprintCallable)
-	void SendRequestToNLP(const FString& InputText);
+	void SendRequestToNLP();
 
 	void OnNLPResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
@@ -43,5 +43,8 @@ public:
 	FOnOpenAIResponseDelegate ResponseDelegate_OpenAI;
 	UPROPERTY()
 	FOnNLPResponseDelegate ResponseDelegate_NLP;
-	int cnt = 0;
+
+	int NLPcnt = 0;
+
+	TOptional<FString> InputStringForNLP;
 };

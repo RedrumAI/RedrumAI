@@ -32,12 +32,11 @@ public:
 	
 	FEmotionScore EmotionScore;
 
-	UFUNCTION(BlueprintCallable)
-	void SetEmotionScore(FString EmotionJson);	
+	void SetEmotionScore(const FEmotionScore& InEmotionStruct);
+	void CalculateEmotion(float& EmotionScore, float Score);
 
-	void CalculateEmotion(float &EmotionScore,float Score);
 
-	virtual void AddMessageArray(FString InJsonData, FString Message, EMessageRole MessageRole);
+	virtual void AddMessageArray(const FEmotionScore& EmotionStruct, FString Message, EMessageRole MessageRole);
 	virtual void AddMessageArray(FString Message, EMessageRole MessageRole);
 
 	void SendMessageArrayToGM();

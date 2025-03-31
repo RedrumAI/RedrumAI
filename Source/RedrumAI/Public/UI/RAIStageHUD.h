@@ -6,16 +6,18 @@
 #include "Blueprint/UserWidget.h"
 #include "RAIStageHUD.generated.h"
 
-/**
- * 
- */
+class URAIChatUI;
+
+
 UCLASS()
 class REDRUMAI_API URAIStageHUD : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	//virtual void NativeConstruct() override;
+	virtual void NativeConstruct() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<URAIChatUI> ChatUI;
 
 };

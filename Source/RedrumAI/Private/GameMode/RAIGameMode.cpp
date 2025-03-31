@@ -5,6 +5,8 @@
 #include "Manager/RAIHttpManager.h"
 #include "Manager/RAIChatManager.h"
 
+
+
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
 {
@@ -79,6 +81,57 @@ void ARAIGameMode::tmpTimerFunction1()
 	}
 }
 
+void ARAIGameMode::AskSuspect(const FText& Text)
+{
+	if (IsValid(ChatManager) && HttpManager)
+	{
+		ChatManager->AddMessageArray(Text.ToString(), User);
+	}
+}
+
+void ARAIGameMode::SetScoreStruct(const FString& String)
+{
+	UE_LOG(LogTemp, Log, TEXT("GM:DeserializeNLP Started"));
+
+	//다시 TArray<TSharedPtr<FJsonVlaue>> 형태로 복구
+	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldName이 없어서 FJsonValue의 배열을 사용
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(String);
+
+	if (FJsonSerializer::Deserialize(Reader, JsonResponse) && JsonResponse.Num() > 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("NLP InnerObject :"));
+		TArray<TSharedPtr<FJsonValue>> EmotionJson = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] 형태이기에 JsonResponse[0] = 배열
+
+		UE_LOG(LogTemp, Log, TEXT("CM:EmotionScore Love Joy .. start"));
+		for (auto EmotionJsonValue : EmotionJson)
+		{
+			TSharedPtr<FJsonObject> EmotionObject = EmotionJsonValue->AsObject();
+			if (!EmotionObject.IsValid())
+			{
+				UE_LOG(LogTemp, Error, TEXT("CM: Invalid Emotion JSON Object"));
+				continue;
+			}
+
+			FString Label;
+			double Score = 0;
+			if (EmotionObject->TryGetStringField(TEXT("label"), Label) && EmotionObject->TryGetNumberField(TEXT("score"), Score))
+			{
+				if (Label == TEXT("love")) ScoreStruct->Love = Score;
+				else if (Label == TEXT("joy")) ScoreStruct->Joy = Score;
+				else if (Label == TEXT("surprise")) ScoreStruct->Surprise = Score;
+				else if (Label == TEXT("anger")) ScoreStruct->Anger = Score;
+				else if (Label == TEXT("fear")) ScoreStruct->Fear = Score;
+				else if (Label == TEXT("sadness")) ScoreStruct->Sadness = Score;
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("CM: Failed to parse JSON string: %s"), *String);
+	}
+}
+
+
 void ARAIGameMode::BindHM()
 {
 	if (IsValid(HttpManager))
@@ -128,11 +181,12 @@ void ARAIGameMode::OnEventDelegate_NLP(FString InJsonData)
 	//언리얼엔진의 멀티쓰레드 환경을 고려해 OnEventDelegate_OpenAI의 CM->AddMessageArray가 작동하는 것을 방지하기 위해 단일쓰레드 강제사용
 	AsyncTask(ENamedThreads::GameThread, [this, InJsonData]()
 	{
-		ScoreString = InJsonData;
-		if (ScoreString.IsSet() && ResponseString.IsSet())
+		SetScoreStruct(InJsonData); //단일쓰레드에서 작동하기에 값중 하나만 설정돼도 이 함수가 전부 작동했음을 보장할 수 있다.
+
+		if (ScoreStruct.IsSet() && ResponseString.IsSet())
 		{
-			ChatManager->AddMessageArray(ScoreString.GetValue(), ResponseString.GetValue(), Assistant);
-			ScoreString.Reset();
+			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), Assistant);
+			ScoreStruct.Reset();
 			ResponseString.Reset();
 		}
 	});
@@ -145,10 +199,11 @@ void ARAIGameMode::OnEventDelegate_OpenAI(FString Message)
 	AsyncTask(ENamedThreads::GameThread, [this, Message]()
 	{
 		ResponseString = Message;
-		if (ScoreString.IsSet() && ResponseString.IsSet())
+
+		if (ScoreStruct.IsSet() && ResponseString.IsSet())
 		{
-			ChatManager->AddMessageArray(ScoreString.GetValue(), ResponseString.GetValue(), Assistant);
-			ScoreString.Reset();
+			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), Assistant);
+			ScoreStruct.Reset();
 			ResponseString.Reset();
 		}
 	});

@@ -26,47 +26,14 @@ void ARAIChatManager::Tick(float DeltaTime)
 
 }
 
-void ARAIChatManager::SetEmotionScore(FString InJsonData)
+void ARAIChatManager::SetEmotionScore(const FEmotionScore& InEmotionStruct)
 {
-	UE_LOG(LogTemp, Log, TEXT("CM:SetEmotionScore Started"));
-
-	//다시 TArray<TSharedPtr<FJsonVlaue>> 형태로 복구
-	TArray<TSharedPtr<FJsonValue>> JsonResponse; //FieldName이 없어서 FJsonValue의 배열을 사용
-	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(InJsonData);
-
-	if (FJsonSerializer::Deserialize(Reader, JsonResponse) && JsonResponse.Num() > 0)
-	{
-		UE_LOG(LogTemp, Log, TEXT("NLP InnerObject :"));
-		TArray<TSharedPtr<FJsonValue>> EmotionJson = JsonResponse[0]->AsArray(); // [ [ {},{} ] ] 형태이기에 JsonResponse[0] = 배열
-
-		UE_LOG(LogTemp, Log, TEXT("CM:EmotionScore Love Joy .. start"));
-		for (auto EmotionJsonValue : EmotionJson)
-		{
-			TSharedPtr<FJsonObject> EmotionObject = EmotionJsonValue->AsObject();
-			if (!EmotionObject.IsValid())
-			{
-				UE_LOG(LogTemp, Error, TEXT("CM: Invalid Emotion JSON Object"));
-				continue;
-			}
-
-			FString Label;
-			double Score = 0;
-			if (EmotionObject->TryGetStringField(TEXT("label"), Label) && EmotionObject->TryGetNumberField(TEXT("score"), Score))
-			{
-				if (Label == TEXT("love")) CalculateEmotion(EmotionScore.Love, Score);
-				else if (Label == TEXT("joy")) CalculateEmotion(EmotionScore.Joy, Score);
-				else if (Label == TEXT("surprise")) CalculateEmotion(EmotionScore.Surprise, Score);
-				else if (Label == TEXT("anger")) CalculateEmotion(EmotionScore.Anger, Score);
-				else if (Label == TEXT("fear")) CalculateEmotion(EmotionScore.Fear, Score);
-				else if (Label == TEXT("sadness")) CalculateEmotion(EmotionScore.Sadness, Score);
-				Score = 0;
-			}
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("CM: Failed to parse JSON string: %s"), *InJsonData);
-	}
+	CalculateEmotion(EmotionScore.Anger, InEmotionStruct.Anger);
+	CalculateEmotion(EmotionScore.Fear, InEmotionStruct.Fear);
+	CalculateEmotion(EmotionScore.Joy, InEmotionStruct.Joy);
+	CalculateEmotion(EmotionScore.Love, InEmotionStruct.Love);
+	CalculateEmotion(EmotionScore.Sadness, InEmotionStruct.Sadness);
+	CalculateEmotion(EmotionScore.Surprise, InEmotionStruct.Surprise);
 }
 
 void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
@@ -76,10 +43,9 @@ void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
 	//Emotion을 0.XX 형태로 만든다.
 	Emotion = FMath::Clamp(Emotion, 0.00f, 0.99f); //0.88;
 	Emotion = FMath::FloorToFloat(Emotion * 100) / 100; //0.XXXXX -> XX.XXXX -> XX -> 0.XX
-	
 }
 
-void ARAIChatManager::AddMessageArray(FString InJsonData, FString Message, EMessageRole MessageRole)
+void ARAIChatManager::AddMessageArray(const FEmotionScore& EmotionStruct, FString Message, EMessageRole MessageRole)
 {
 	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
 	switch (MessageRole)
@@ -100,7 +66,9 @@ void ARAIChatManager::AddMessageArray(FString InJsonData, FString Message, EMess
 
 		if (MessageArray.Num() > 2) //첫 developer와 assistant("!")는 점수계산 제외
 		{
-			SetEmotionScore(InJsonData);
+
+			//구조체가 들어오니 해당 구조체에서 점수뽑아서 기존점수에 계산하기
+			SetEmotionScore(EmotionStruct);
 			FString  ScoreString = FString::Printf(TEXT("[%.2f,%.2f,%.2f,%.2f,%.2f,%.2f]"),
 				EmotionScore.Love, EmotionScore.Joy, EmotionScore.Surprise, EmotionScore.Anger, EmotionScore.Fear, EmotionScore.Sadness);
 			FString ScoreAddedMessage = ScoreString.Append(Message);

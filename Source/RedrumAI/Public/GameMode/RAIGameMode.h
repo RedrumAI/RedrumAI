@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Data/MessageRole.h"
+#include "Data/EmotionScore.h"
 #include "RAIGameMode.generated.h"
 
 class ARAIHttpManager;
@@ -35,11 +36,17 @@ public:
 	void InitSettingOpenAI();
 	void tmpTimerFunction1();
 
+	void AskSuspect(const FText& Text);
+
+	void SetScoreStruct(const FString& String);
+
+
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIChatManager> ChatManager;
 
-	TOptional<FString> ScoreString; //NLP에서 온 점수Fstring
-	TOptional<FString> ResponseString; //OpenAI에서 온 응답FString
+	TOptional<FEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
+	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
 };

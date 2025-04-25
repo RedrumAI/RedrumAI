@@ -10,7 +10,8 @@
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
 {
-
+	ScoreStruct.Reset();
+	ResponseString.Reset();
 }
 
 void ARAIGameMode::BeginPlay()
@@ -83,7 +84,7 @@ void ARAIGameMode::tmpTimerFunction1()
 
 void ARAIGameMode::AskSuspect(const FText& Text)
 {
-	if (IsValid(ChatManager) && HttpManager)
+	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
 		ChatManager->AddMessageArray(Text.ToString(), User);
 	}
@@ -114,6 +115,9 @@ void ARAIGameMode::SetScoreStruct(const FString& String)
 
 			FString Label;
 			double Score = 0;
+
+			ScoreStruct.Emplace(); //TOptional인 ScoreStruct의 오퍼레이터'->'를 사용하는 과정에서 IsSet을 사용하기에 빈 값을 넣어줘야 한다.
+
 			if (EmotionObject->TryGetStringField(TEXT("label"), Label) && EmotionObject->TryGetNumberField(TEXT("score"), Score))
 			{
 				if (Label == TEXT("love")) ScoreStruct->Love = Score;
@@ -160,6 +164,7 @@ void ARAIGameMode::BindCM()
 	if (IsValid(ChatManager))
 	{
 		ChatManager->SendMessageDelegate.AddDynamic(this, &ARAIGameMode::OnEventDelegate_SendMessageArray);
+
 		UE_LOG(LogTemp, Warning, TEXT("GM:BindCM Complete"));
 	}
 	else
@@ -181,15 +186,29 @@ void ARAIGameMode::OnEventDelegate_NLP(FString InJsonData)
 	//언리얼엔진의 멀티쓰레드 환경을 고려해 OnEventDelegate_OpenAI의 CM->AddMessageArray가 작동하는 것을 방지하기 위해 단일쓰레드 강제사용
 	AsyncTask(ENamedThreads::GameThread, [this, InJsonData]()
 	{
+		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_NLP"));
+
 		SetScoreStruct(InJsonData); //단일쓰레드에서 작동하기에 값중 하나만 설정돼도 이 함수가 전부 작동했음을 보장할 수 있다.
 
 		if (ScoreStruct.IsSet() && ResponseString.IsSet())
 		{
+			if (SendResponseDelegate.IsBound())
+			{
+				SendResponseDelegate.Broadcast(ResponseString.GetValue());
+			}
+			if (SendScoreDelegate.IsBound())
+			{
+				SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
+			}
+			//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
 			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), Assistant);
+
 			ScoreStruct.Reset();
 			ResponseString.Reset();
 		}
+		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_NLP finish"));
 	});
+
 }
 
 
@@ -198,18 +217,31 @@ void ARAIGameMode::OnEventDelegate_OpenAI(FString Message)
 	//언리얼엔진의 멀티쓰레드 환경을 고려해 OnEventDelegate_NLP의 CM->AddMessageArray가 작동하는 것을 방지하기 위해 단일쓰레드 강제사용
 	AsyncTask(ENamedThreads::GameThread, [this, Message]()
 	{
+		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_OpenAI"));
+
 		ResponseString = Message;
 
 		if (ScoreStruct.IsSet() && ResponseString.IsSet())
 		{
+			if (SendResponseDelegate.IsBound())
+			{
+				SendResponseDelegate.Broadcast(ResponseString.GetValue());
+			}
+			if (SendScoreDelegate.IsBound())
+			{
+				SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
+			}
+			//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
 			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), Assistant);
+
 			ScoreStruct.Reset();
 			ResponseString.Reset();
 		}
+		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_OpenAI finish"));
 	});
 }
 
 void ARAIGameMode::OnEventDelegate_SendMessageArray(FString MessageString)
-{
+{	//CM의 델리게이트(질문)를 받아 HM을 통해 OpenAI와 통신
 	HttpManager->SendRequestToOpenAI(MessageString);
 }

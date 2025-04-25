@@ -16,7 +16,6 @@ ARAIChatManager::ARAIChatManager()
 void ARAIChatManager::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame

@@ -9,7 +9,7 @@
 class UTextBlock;
 class UEditableTextBox;
 class UCircularThrobber;
-class ARAIGameMode;
+class ARAIPlayerController;
 
 
 UCLASS()
@@ -26,9 +26,12 @@ public:
 	TObjectPtr<UEditableTextBox> UserChat;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCircularThrobber> LoadingCircle;
-	
-	TObjectPtr<ARAIGameMode> RAIGameMode;
+
+	TObjectPtr<ARAIPlayerController> RAIPlayerController;
 
 	UFUNCTION()
 	void OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod);
+
+	void SetAIChat(FString String);
+	void AskSuspect(FText Text);
 };

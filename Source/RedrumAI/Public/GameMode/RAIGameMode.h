@@ -8,6 +8,10 @@
 #include "Data/EmotionScore.h"
 #include "RAIGameMode.generated.h"
 
+//AI응답의 문장이 필요할 경우 FReponseDelegate에, NLP점수가 필요할 경우 FScoreDelegate에 바인드할 것
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResponseDelegate, FString, Response);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FEmotionScore, Score);
+
 class ARAIHttpManager;
 class ARAIChatManager;
 
@@ -49,4 +53,9 @@ public:
 
 	TOptional<FEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
 	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
+
+	UPROPERTY()
+	FResponseDelegate SendResponseDelegate;
+	UPROPERTY()
+	FScoreDelegate SendScoreDelegate;
 };

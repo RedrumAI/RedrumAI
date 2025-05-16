@@ -144,3 +144,20 @@ void ARAIChatManager::ShowMessageArray()
 	UE_LOG(LogTemp, Warning, TEXT("<로그 출력 완료>"));
 }
 
+const TArray<TPair<FString, FString>> ARAIChatManager::GetChatLog()
+{
+	TArray<TPair<FString, FString>> ChatLogArray;
+
+	for (auto MessageOne : MessageArray)
+	{
+		FString MessageRole = MessageOne->AsObject()->GetStringField(TEXT("role"));
+		FString MessageContent = MessageOne->AsObject()->GetStringField(TEXT("content"));
+
+		ChatLogArray.Add(TPair<FString, FString>(MessageRole, MessageContent));
+	}
+
+	return ChatLogArray;
+}
+
+
+

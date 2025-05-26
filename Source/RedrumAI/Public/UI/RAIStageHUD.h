@@ -7,6 +7,7 @@
 #include "RAIStageHUD.generated.h"
 
 class URAIChatUI;
+class URAIChatLogUI;
 
 
 UCLASS()
@@ -19,5 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<URAIChatUI> ChatUI;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<URAIChatLogUI> ChatLogUI;
 
 };

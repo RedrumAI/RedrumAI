@@ -11,6 +11,7 @@
 //AI응답의 문장이 필요할 경우 FReponseDelegate에, NLP점수가 필요할 경우 FScoreDelegate에 바인드할 것
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResponseDelegate, FString, Response);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FEmotionScore, Score);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, Role, FString, Contents);
 
 class ARAIHttpManager;
 class ARAIChatManager;
@@ -36,14 +37,15 @@ public:
 	void OnEventDelegate_OpenAI(FString Message);
 	UFUNCTION()
 	void OnEventDelegate_SendMessageArray(FString MessageString);
+	UFUNCTION()
+	void UpdateChatLogUI();
 
 	void InitSettingOpenAI();
 	void tmpTimerFunction1();
 
-	void AskSuspect(const FText& Text);
+	void AskSuspect(const FText Text);
 
 	void SetScoreStruct(const FString& String);
-
 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -58,4 +60,6 @@ public:
 	FResponseDelegate SendResponseDelegate;
 	UPROPERTY()
 	FScoreDelegate SendScoreDelegate;
+	UPROPERTY()
+	FUpdateChatLogUIDelegate UpdateChatLogUIDelegate;
 };

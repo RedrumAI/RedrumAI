@@ -9,6 +9,7 @@
 #include "RAIChatManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendMessageDelegate, FString, MessageArray);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAddMessageArrayDelegate);
 
 UCLASS()
 class REDRUMAI_API ARAIChatManager : public AActor
@@ -45,6 +46,6 @@ public:
 
 	const TArray<TPair<FString, FString>> GetChatLog();
 
-
 	FOnSendMessageDelegate SendMessageDelegate;
+	FOnAddMessageArrayDelegate AddMessageArrayDelegate;
 };

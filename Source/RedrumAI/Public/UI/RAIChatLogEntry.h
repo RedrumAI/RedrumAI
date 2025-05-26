@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RAIChatLogEntry.generated.h"
 
-class UImage;
+class USizeBox;
 class UTextBlock;
 
 UCLASS()
@@ -17,14 +17,26 @@ class REDRUMAI_API URAIChatLogEntry : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	/* ChatLogEntry 화자 표시용 이미지 폐기로 삭제
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UImage> SuspectImage;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UImage> UserImage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UTextBlock> Chat;
 
 	void CollapseSuspectImage();
 	void CollapseUserImage();
+	*/
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USizeBox> SizeBox;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UTextBlock> Chat;
+
+	UFUNCTION(BlueprintCallable)
 	void SetChat(FString InChat);
+	UFUNCTION(BlueprintCallable)
+	void SetChatColor(FSlateColor InColor);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	float SizeBoxWidth = 800.f;
 };

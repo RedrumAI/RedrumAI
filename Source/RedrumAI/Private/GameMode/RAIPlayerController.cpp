@@ -4,6 +4,7 @@
 #include "GameMode/RAIPlayerController.h"
 #include "UI/RAIStageHUD.h"
 #include "UI/RAIChatUI.h"
+#include "UI/RAIChatLogUI.h"
 #include "GameMode/RAIGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -22,10 +23,18 @@ void ARAIPlayerController::BeginPlay()
 	StageHUD->AddToViewport();
 	//TODO:: StageHUD->ChatUI가 존재하는지 여부확인필요한데, 여기는 포인터라 그냥둬도 될지도?
 	ChatUI = StageHUD->ChatUI;
+	ChatLogUI = StageHUD->ChatLogUI;
 
+	BindGM();
+}
+
+void ARAIPlayerController::BindGM()
+{
 	RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 	ensure(RAIGameMode);
+
 	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::AddAIChat);
+	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
 }
 
 void ARAIPlayerController::AddAIChat(FString String)
@@ -34,6 +43,14 @@ void ARAIPlayerController::AddAIChat(FString String)
 	{
 		ChatUI->SetAIChat(String);
 	}	
+}
+
+void ARAIPlayerController::AddChatLogUI(FString InRole, FString InMessage)
+{
+	if (IsValid(ChatLogUI))
+	{
+		ChatLogUI->CreateChatLogEntry(InRole, InMessage);
+	}
 }
 
 void ARAIPlayerController::AskSuspect(FText Text)

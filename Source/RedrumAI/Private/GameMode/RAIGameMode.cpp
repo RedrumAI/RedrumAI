@@ -4,7 +4,7 @@
 #include "GameMode/RAIGameMode.h"
 #include "Manager/RAIHttpManager.h"
 #include "Manager/RAIChatManager.h"
-
+#include "Kismet/GameplayStatics.h"
 
 
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
@@ -65,7 +65,7 @@ void ARAIGameMode::InitSettingOpenAI()
 	);
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
-		ChatManager->AddMessageArray(SettingString, Developer);
+		ChatManager->AddMessageArray(SettingString, developer);
 	}
 }
 
@@ -78,15 +78,15 @@ void ARAIGameMode::tmpTimerFunction1()
 	);
 	if (IsValid(ChatManager) && HttpManager)
 	{
-		ChatManager->AddMessageArray(str, User);
+		ChatManager->AddMessageArray(str, user);
 	}
 }
 
-void ARAIGameMode::AskSuspect(const FText& Text)
+void ARAIGameMode::AskSuspect(const FText Text)
 {
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
-		ChatManager->AddMessageArray(Text.ToString(), User);
+		ChatManager->AddMessageArray(Text.ToString(), user);
 	}
 }
 
@@ -135,6 +135,17 @@ void ARAIGameMode::SetScoreStruct(const FString& String)
 	}
 }
 
+void ARAIGameMode::UpdateChatLogUI()
+{
+	TArray<TPair<FString, FString>> MessageArray;
+	MessageArray = ChatManager->GetChatLog();
+
+	FString LastRole = MessageArray[MessageArray.Num() - 1].Key;
+	FString LastMessage = MessageArray[MessageArray.Num() - 1].Value;
+
+	UpdateChatLogUIDelegate.Broadcast(LastRole, LastMessage);
+}
+
 
 void ARAIGameMode::BindHM()
 {
@@ -164,6 +175,7 @@ void ARAIGameMode::BindCM()
 	if (IsValid(ChatManager))
 	{
 		ChatManager->SendMessageDelegate.AddDynamic(this, &ARAIGameMode::OnEventDelegate_SendMessageArray);
+		ChatManager->AddMessageArrayDelegate.AddDynamic(this, &ARAIGameMode::UpdateChatLogUI);
 
 		UE_LOG(LogTemp, Warning, TEXT("GM:BindCM Complete"));
 	}
@@ -201,7 +213,7 @@ void ARAIGameMode::OnEventDelegate_NLP(FString InJsonData)
 				SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
 			}
 			//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
-			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), Assistant);
+			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), assistant);
 
 			ScoreStruct.Reset();
 			ResponseString.Reset();
@@ -232,7 +244,7 @@ void ARAIGameMode::OnEventDelegate_OpenAI(FString Message)
 				SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
 			}
 			//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
-			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), Assistant);
+			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), assistant);
 
 			ScoreStruct.Reset();
 			ResponseString.Reset();

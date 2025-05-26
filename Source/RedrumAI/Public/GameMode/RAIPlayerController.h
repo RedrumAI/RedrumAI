@@ -8,6 +8,7 @@
 
 class URAIStageHUD;
 class URAIChatUI;
+class URAIChatLogUI;
 class ARAIGameMode;
 
 UCLASS()
@@ -20,14 +21,20 @@ public:
 
 	TObjectPtr<URAIStageHUD> StageHUD;
 	TObjectPtr<URAIChatUI> ChatUI;
+	TObjectPtr<URAIChatLogUI>ChatLogUI;
 
 	UPROPERTY()
 	TObjectPtr<ARAIGameMode> RAIGameMode;
 
 	virtual void BeginPlay();
 
+	void BindGM();
+
 	UFUNCTION()
 	void AddAIChat(FString String);
+
+	UFUNCTION()
+	void AddChatLogUI(FString InRole, FString InMessage);
 	
 	void AskSuspect(FText Text);
 };

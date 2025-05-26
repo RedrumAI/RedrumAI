@@ -49,17 +49,17 @@ void ARAIChatManager::AddMessageArray(const FEmotionScore& EmotionStruct, FStrin
 	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
 	switch (MessageRole)
 	{
-	case EMessageRole::Developer:
+	case EMessageRole::developer:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::Developer. Use without InJsonData."));
 		break;
 	}
-	case EMessageRole::User:
+	case EMessageRole::user:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::User. Use without InJsonData."));
 		break;
 	}
-	case EMessageRole::Assistant:
+	case EMessageRole::assistant:
 	{
 		UserMessage->SetStringField("role", "assistant");
 
@@ -82,7 +82,10 @@ void ARAIChatManager::AddMessageArray(const FEmotionScore& EmotionStruct, FStrin
 	default:
 		break;
 	}
+
 	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+
+	AddMessageArrayDelegate.Broadcast();
 }
 
 void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
@@ -90,13 +93,13 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
 	switch (MessageRole)
 	{
-	case EMessageRole::Developer:
+	case EMessageRole::developer:
 	{
 		UserMessage->SetStringField("role", "developer"); //24년말부턴 system이 아닌 developer
 		UserMessage->SetStringField("content", Message); //Developer문장 추가 경우 InJsonData=NULL;
 		break;
 	}
-	case EMessageRole::User:
+	case EMessageRole::user:
 	{
 		UserMessage->SetStringField("role", "user");
 
@@ -107,7 +110,7 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 		UserMessage->SetStringField("content", ScoreAddedMessage);
 		break;
 	}
-	case EMessageRole::Assistant:
+	case EMessageRole::assistant:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::Assistant. Use with InJsonData."));
 		break;
@@ -119,6 +122,8 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
 	
 	SendMessageArrayToGM();
+
+	AddMessageArrayDelegate.Broadcast();
 }
 
 void ARAIChatManager::SendMessageArrayToGM()

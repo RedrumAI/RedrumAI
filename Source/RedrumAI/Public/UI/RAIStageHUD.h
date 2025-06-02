@@ -23,4 +23,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
 
+
+
+	UFUNCTION()	
+	void UpdateVisibilityChatUI(ESlateVisibility InState);
+	UFUNCTION()
+	void UpdateVisiblityChatLogUI(ESlateVisibility InState);
+
+	UFUNCTION()
+	void SetAIChat(FString String);
+	UFUNCTION()
+	void AddChatLogUI(FString InRole, FString InMessage);
 };

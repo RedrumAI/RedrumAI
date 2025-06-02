@@ -7,9 +7,9 @@
 #include "RAIPlayerController.generated.h"
 
 class URAIStageHUD;
-class URAIChatUI;
-class URAIChatLogUI;
 class ARAIGameMode;
+class UInputMappingContext;
+class UInputAction;
 
 UCLASS()
 class REDRUMAI_API ARAIPlayerController : public APlayerController
@@ -19,22 +19,35 @@ class REDRUMAI_API ARAIPlayerController : public APlayerController
 public:
 	ARAIPlayerController();
 
+	UPROPERTY()
 	TObjectPtr<URAIStageHUD> StageHUD;
-	TObjectPtr<URAIChatUI> ChatUI;
-	TObjectPtr<URAIChatLogUI>ChatLogUI;
-
 	UPROPERTY()
 	TObjectPtr<ARAIGameMode> RAIGameMode;
 
-	virtual void BeginPlay();
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputMappingContext> InputMapping;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> IA_Test;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> IA_Test2;
+
+	UFUNCTION()
+	void TestFunc1();
+	UFUNCTION()
+	void TestFunc2();
+
+	virtual void BeginPlay() override;
+
+	virtual void SetupInputComponent() override;
 
 	void BindGM();
 
 	UFUNCTION()
-	void AddAIChat(FString String);
+	void SetAIChat(FString String);
 
 	UFUNCTION()
 	void AddChatLogUI(FString InRole, FString InMessage);
 	
 	void AskSuspect(FText Text);
+
 };

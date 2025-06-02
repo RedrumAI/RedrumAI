@@ -57,5 +57,4 @@ void URAIChatUI::SetAIChat(FString String)
 void URAIChatUI::AskSuspect(FText Text)
 {
 	RAIPlayerController->AskSuspect(Text);
-	//TODO: UI를 소유하는 PC의 PC::AskSuspect() {GM::AskSuspect에 접근}
 }

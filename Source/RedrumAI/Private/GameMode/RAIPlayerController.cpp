@@ -3,10 +3,13 @@
 
 #include "GameMode/RAIPlayerController.h"
 #include "UI/RAIStageHUD.h"
-#include "UI/RAIChatUI.h"
-#include "UI/RAIChatLogUI.h"
 #include "GameMode/RAIGameMode.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
+#include "EnhancedInputComponent.h"
 
 ARAIPlayerController::ARAIPlayerController()
 {
@@ -21,11 +24,30 @@ void ARAIPlayerController::BeginPlay()
 	UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUD>();
 	StageHUD = CreateWidget<URAIStageHUD>(this, WidgetClass);
 	StageHUD->AddToViewport();
-	//TODO:: StageHUD->ChatUI가 존재하는지 여부확인필요한데, 여기는 포인터라 그냥둬도 될지도?
-	ChatUI = StageHUD->ChatUI;
-	ChatLogUI = StageHUD->ChatLogUI;
+
+	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
+	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))//현재 Controller에 연결된 Player가 LocalPlayer인지 확인하고
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) //그 로컬플레이어의 Subsystem가져오기
+		{
+			if (IsValid(InputMapping))
+			{
+				InputSystem->AddMappingContext(InputMapping, 0);
+			}
+		}
+	}
 
 	BindGM();
+}
+
+void ARAIPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
+	// 여기에서 'ETriggerEvent' 열거형 값을 변경하여 원하는 트리거 이벤트를 바인딩할 수 있습니다.
+	Input->BindAction(IA_Test, ETriggerEvent::Triggered, this, &ARAIPlayerController::TestFunc1);
+	Input->BindAction(IA_Test2, ETriggerEvent::Triggered, this, &ARAIPlayerController::TestFunc2);
 }
 
 void ARAIPlayerController::BindGM()
@@ -33,27 +55,37 @@ void ARAIPlayerController::BindGM()
 	RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 	ensure(RAIGameMode);
 
-	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::AddAIChat);
+	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::SetAIChat);
 	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
 }
 
-void ARAIPlayerController::AddAIChat(FString String)
+void ARAIPlayerController::SetAIChat(FString String)
 {
-	if (IsValid(ChatUI))
+	if (IsValid(StageHUD))
 	{
-		ChatUI->SetAIChat(String);
+		StageHUD->SetAIChat(String);
 	}	
 }
 
 void ARAIPlayerController::AddChatLogUI(FString InRole, FString InMessage)
 {
-	if (IsValid(ChatLogUI))
+	if (IsValid(StageHUD))
 	{
-		ChatLogUI->CreateChatLogEntry(InRole, InMessage);
+		StageHUD->AddChatLogUI(InRole, InMessage);
 	}
 }
 
 void ARAIPlayerController::AskSuspect(FText Text)
 {
 	RAIGameMode->AskSuspect(Text);
+}
+
+void ARAIPlayerController::TestFunc1()
+{
+	StageHUD->UpdateVisibilityChatUI(ESlateVisibility::Visible);
+}
+
+void ARAIPlayerController::TestFunc2()
+{
+	StageHUD->UpdateVisibilityChatUI(ESlateVisibility::Collapsed);
 }

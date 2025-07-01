@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RAIPlayerInteractableInterface.generated.h"
+#include "RAIInteractableInterface.generated.h"
 
 /*
 이 클래스는 수정할 필요가 없습니다.
@@ -11,13 +11,13 @@ UINTERFACE 매크로를 사용합니다.
 UInterface에서 상속합니다.
 */
 UINTERFACE(MinimalAPI, Blueprintable)
-class URAIPlayerInteractableInterface : public UInterface
+class URAIInteractableInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /* 실제 인터페이스 선언. */
-class IRAIPlayerInteractableInterface
+class IRAIInteractableInterface
 {
 	GENERATED_BODY()
 	

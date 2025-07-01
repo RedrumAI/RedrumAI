@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RAIPlayerInteractableInterface.h"
+#include "RAIInteractableInterface.h"
 #include "RAIInteractableActor.generated.h"
 
 class USphereComponent;
 
 UCLASS()
-class REDRUMAI_API ARAIInteractableActor : public AActor, public IRAIPlayerInteractableInterface
+class REDRUMAI_API ARAIInteractableActor : public AActor, public IRAIInteractableInterface
 {
 	GENERATED_BODY()
 	
@@ -40,6 +40,9 @@ public:
 
 	void EnableHighlight();
 	void DisableHighlight();
+	void EnablePlayerLinetrace();
+	void DIsablePlayerLinetrace();
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> HighlightMaterial;

@@ -3,6 +3,7 @@
 
 #include "Actors/RAIInteractableActor.h"
 #include "Components/SphereComponent.h"
+#include ""
 
 // Sets default values
 ARAIInteractableActor::ARAIInteractableActor()
@@ -39,7 +40,9 @@ void ARAIInteractableActor::Interacted()
 void ARAIInteractableActor::OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//if OhterActor 클래스가 RAIPlayerCharacter인지 확인(UClass이용하면 cast하지 않아도 될지도)
+
 	EnableHighlight();
+	CastedOtherActor->EnableLinetrace();
 }
 
 void ARAIInteractableActor::OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -54,5 +57,16 @@ void ARAIInteractableActor::EnableHighlight()
 
 void ARAIInteractableActor::DisableHighlight()
 {
+}
+
+void ARAIInteractableActor::EnablePlayerLinetrace()
+{
+	//접촉한 대상이 player인지 ? Linetrace On : NULL
+	
+}
+
+void ARAIInteractableActor::DIsablePlayerLinetrace()
+{
+	//접촉한 대상이 player인지 ? Linetrace Off : NULL
 }
 

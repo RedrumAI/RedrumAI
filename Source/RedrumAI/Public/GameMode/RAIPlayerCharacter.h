@@ -9,6 +9,7 @@
 
 class UInputMappingContext;
 class UInputAction;
+class USphereComponent;
 
 UCLASS()
 class REDRUMAI_API ARAIPlayerCharacter : public ACharacter
@@ -30,10 +31,31 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> IA_Move;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USphereComponent> InteractableSphere;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InteractableDistance = 500.f; //BP에서 상세설정
+
+	UPROPERTY(EditAnywhere)
+	TSet<AActor*> InteractableActors;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);
+	UFUNCTION()
+	void OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex	);
+	FTimerHandle LinetraceTimerHandle;
+	void DoLinetrace();
+
 
 	virtual void PossessedBy(AController* NewController) override;
 

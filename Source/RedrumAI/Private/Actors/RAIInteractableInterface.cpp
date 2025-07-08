@@ -2,6 +2,22 @@
 
 #include "Actors/RAIInteractableInterface.h"
 
+void IRAIInteractableInterface::BeginFocused()
+{
+}
+
+void IRAIInteractableInterface::EndFocused()
+{
+}
+
 void IRAIInteractableInterface::Interacted()
+{
+}
+
+void IRAIInteractableInterface::EnableHighlight()
+{
+}
+
+void IRAIInteractableInterface::DisableHighlight()
 {
 }

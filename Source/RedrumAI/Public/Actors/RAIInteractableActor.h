@@ -7,7 +7,6 @@
 #include "RAIInteractableInterface.h"
 #include "RAIInteractableActor.generated.h"
 
-class USphereComponent;
 
 UCLASS()
 class REDRUMAI_API ARAIInteractableActor : public AActor, public IRAIInteractableInterface
@@ -28,25 +27,11 @@ public:
 
 	virtual void Interacted() override;
 
-	void OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent, 
-		AActor* OtherActor, 
-		UPrimitiveComponent* OtherComp, 
-		int32 OtherBodyIndex, 
-		bool bFromSweep, 
-		const FHitResult& SweepResult
-	);
-	void OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex
-	);
-
 	void EnableHighlight();
-	void DisableHighlight();
-	void EnablePlayerLinetrace();
-	void DIsablePlayerLinetrace();
 
+	void DisableHighlight();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> HighlightMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<USphereComponent> SphereCollision;
 };

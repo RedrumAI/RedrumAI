@@ -23,9 +23,9 @@ class IRAIInteractableInterface
 	
 public:
 	// 여기에 인터페이스 함수 선언을 추가합니다
-	virtual void BeginFocused();
-	virtual void EndFocused();
-	virtual void Interacted();	
+	virtual void Interacted();
 	virtual void EnableHighlight();
 	virtual void DisableHighlight();
+	virtual void BeginFocused();
+	virtual void EndFocused();
 };

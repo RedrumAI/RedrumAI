@@ -24,7 +24,10 @@ void ARAIInteractableActor::Tick(float DeltaTime)
 
 }
 
-
+void ARAIInteractableActor::Interacted()
+{
+	UE_LOG(LogTemp, Log, TEXT("[%s] Interacted"), *this->GetName());
+}
 
 void ARAIInteractableActor::EnableHighlight()
 {
@@ -34,7 +37,13 @@ void ARAIInteractableActor::DisableHighlight()
 {
 }
 
-void ARAIInteractableActor::Interacted()
+void ARAIInteractableActor::BeginFocused()
 {
-	UE_LOG(LogTemp, Log, TEXT("[%s] Interacted"), *this->GetName());
+	UE_LOG(LogTemp, Log, TEXT("[%s] Begin Focused"), *this->GetName());
+
+}
+
+void ARAIInteractableActor::EndFocused()
+{
+	UE_LOG(LogTemp, Log, TEXT("[%s] End Focused"), *this->GetName());
 }

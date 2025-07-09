@@ -53,9 +53,10 @@ public:
 	);
 	UFUNCTION()
 	void OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex	);
-	FTimerHandle LinetraceTimerHandle;
-	void DoLinetrace();
 
+	void DoLinetrace();
+	FTimerHandle LinetraceTimerHandle;
+	AActor* CurrentlyFocusedActor = nullptr;
 
 	virtual void PossessedBy(AController* NewController) override;
 

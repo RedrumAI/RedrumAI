@@ -18,7 +18,7 @@ ARAIPlayerCharacter::ARAIPlayerCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	InteractableSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractableSphere"));
 	InteractableSphere->SetupAttachment(RootComponent); //SphereCollision Radius설정은 BP에서 직접 설정하자.
 	InteractableSphere->SetSphereRadius(InteractableDistance);
@@ -38,9 +38,10 @@ void ARAIPlayerCharacter::OnBeginOverlapped(UPrimitiveComponent* OverlappedCompo
 {
 	if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(OtherActor))
 	{
+		InteractableActor->EnableHighlight();
+
 		bool bWasEmpty = InteractableActors.IsEmpty();
 		InteractableActors.Add(OtherActor);
-
 		if (bWasEmpty && !(InteractableActors.IsEmpty())) //처음 추가됐다면
 		{
 			GetWorldTimerManager().SetTimer(LinetraceTimerHandle, this, &ARAIPlayerCharacter::DoLinetrace, 0.1f, true);
@@ -52,8 +53,9 @@ void ARAIPlayerCharacter::OnEndOverlapped(UPrimitiveComponent* OverlappedCompone
 {
 	if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(OtherActor))
 	{
-		InteractableActors.Remove(OtherActor);
+		InteractableActor->DisableHighlight();
 
+		InteractableActors.Remove(OtherActor);
 		if (InteractableActors.IsEmpty())
 		{
 			GetWorldTimerManager().ClearTimer(LinetraceTimerHandle);
@@ -73,19 +75,27 @@ void ARAIPlayerCharacter::DoLinetrace()
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //추후
-
-	//여기서부터 이전까지 linetrace맞추던 액터와 hit액터가 다르다면 새로운 액터는 BeginFocused를 예전 액터는 EndFocused를 해주는 기능을 만들자.
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //트레이스 채널을 바꿔 hit이벤트를 더줄일수 있겠다.
 	if (bHit)
 	{
-		UE_LOG(LogTemp, Log, TEXT("[%s] LineTrace Hit: %s"), *this->GetName(), *HitResult.GetActor()->GetName());
+		UE_LOG(LogTemp, Log, TEXT("[%s] LineTrace Hit: %s"), *this->GetName(), *(HitResult.GetActor()->GetName()));
+	}
 
-
-
-		if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
+	//이전까지 hit하던 액터와 새롭게 hit된 액터가 다르다면 = 조준하는 대상이 변경되었다
+	if (CurrentlyFocusedActor != HitResult.GetActor())
+	{
+		if (IRAIInteractableInterface* OldInteractableActor = Cast<IRAIInteractableInterface>(CurrentlyFocusedActor))
 		{
-			InteractableActor->BeginFocused();
+			OldInteractableActor->EndFocused();
 		}
+
+		if (IRAIInteractableInterface* NewInteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
+		{
+			NewInteractableActor->BeginFocused();
+		}
+
+		//갱신
+		CurrentlyFocusedActor = HitResult.GetActor();
 	}
 }
 

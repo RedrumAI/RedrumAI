@@ -53,6 +53,7 @@ void ARAIGameMode::BeginPlay()
 void ARAIGameMode::InitSettingOpenAI()
 {
 	FString SettingString;
+	/* 테스트 위해 잠시 삭제
 	SettingString = FString::Printf(
 		TEXT("우리는 역할극을 진행 중이야. 나는 형사이고 너는 살인범이야. ")
 		TEXT("앞으로 내 메시지에는 너의 감정 상태 점수가 반드시 대괄호로 표시되어 있을 거야. ")
@@ -62,6 +63,10 @@ void ARAIGameMode::InitSettingOpenAI()
 		TEXT("즉, 네 모든 응답은 감정 점수를 제거한 순수 텍스트만으로 이루어져야 해. ")
 		TEXT("이전 메시지에 감정 점수가 있었다 하더라도 반드시 무시하고, 오직 응답 내용만 보내줘. ")
 		TEXT("그리고 나의 첫 번째 시스템 메시지에 대해서는 응답으로 단지 \"!\"만 보내.")
+	);
+	*/
+	SettingString = FString::Printf(
+		TEXT("temp 안녕")
 	);
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{

@@ -27,9 +27,13 @@ public:
 
 	virtual void Interacted() override;
 
-	void EnableHighlight();
+	virtual void EnableHighlight() override;
 
-	void DisableHighlight();
+	virtual void DisableHighlight() override;
+
+	virtual void BeginFocused() override;
+
+	virtual void EndFocused() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> HighlightMaterial;

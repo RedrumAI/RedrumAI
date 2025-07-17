@@ -2,7 +2,7 @@
 
 
 #include "GameMode/RAIPlayerController.h"
-#include "UI/RAIStageHUD.h"
+#include "UI/RAIStageHUDWidget.h"
 #include "GameMode/RAIGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -20,9 +20,9 @@ void ARAIPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	//BP로 만들어진 StageHUD의 경로 하드코딩
-	FSoftClassPath StageHUDClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/YJ/Widget/WBP_StageHUD.WBP_StageHUD_C'"));
-	UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUD>();
-	StageHUD = CreateWidget<URAIStageHUD>(this, WidgetClass);
+	FSoftClassPath StageHUDClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/YJ/Widget/WBP_StageHUDWidget.WBP_StageHUDWidget_C'"));
+	UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUDWidget>();
+	StageHUD = CreateWidget<URAIStageHUDWidget>(this, WidgetClass);
 	StageHUD->AddToViewport();
 
 	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결

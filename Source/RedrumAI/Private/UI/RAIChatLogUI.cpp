@@ -14,8 +14,8 @@ void URAIChatLogUI::NativeConstruct()
 
 void URAIChatLogUI::CreateChatLogEntry(FString InRole, FString InMessage)
 {
-	/*UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUD>();
-	StageHUD = CreateWidget<URAIStageHUD>(this, WidgetClass);*/
+	/*UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUDWidget>();
+	StageHUD = CreateWidget<URAIStageHUDWidget>(this, WidgetClass);*/
 
 	URAIChatLogEntry* CreatedLogEntry = CreateWidget<URAIChatLogEntry>(this, ChatLogEntryBP);
 

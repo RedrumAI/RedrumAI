@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "RAIPlayerController.generated.h"
 
-class URAIStageHUD;
+class URAIStageHUDWidget;
 class ARAIGameMode;
 class UInputMappingContext;
 class UInputAction;
@@ -20,7 +20,7 @@ public:
 	ARAIPlayerController();
 
 	UPROPERTY()
-	TObjectPtr<URAIStageHUD> StageHUD;
+	TObjectPtr<URAIStageHUDWidget> StageHUD;
 	UPROPERTY()
 	TObjectPtr<ARAIGameMode> RAIGameMode;
 

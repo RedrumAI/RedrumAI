@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RAIStageHUD.generated.h"
+#include "RAIStageHUDWidget.generated.h"
 
 class URAIChatUI;
 class URAIChatLogUI;
 
 
 UCLASS()
-class REDRUMAI_API URAIStageHUD : public UUserWidget
+class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -22,7 +22,6 @@ public:
 	TObjectPtr<URAIChatUI> ChatUI;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
-
 
 
 	UFUNCTION()	

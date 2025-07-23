@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/RAIBaseWidget.h"
 #include "RAIChatUI.generated.h"
 
 class UTextBlock;
@@ -13,7 +13,7 @@ class ARAIPlayerController;
 
 
 UCLASS()
-class REDRUMAI_API URAIChatUI : public UUserWidget
+class REDRUMAI_API URAIChatUI : public URAIBaseWidget
 {
 	GENERATED_BODY()
 

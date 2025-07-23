@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/RAIBaseWidget.h"
 #include "Data/MessageRole.h"
 #include "RAIChatLogUI.generated.h"
 
@@ -11,7 +11,7 @@ class UScrollBox;
 class URAIChatLogEntry;
 
 UCLASS()
-class REDRUMAI_API URAIChatLogUI : public UUserWidget
+class REDRUMAI_API URAIChatLogUI : public URAIBaseWidget
 {
 	GENERATED_BODY()
 

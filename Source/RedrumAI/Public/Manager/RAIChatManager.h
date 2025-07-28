@@ -9,6 +9,7 @@
 #include "RAIChatManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendMessageDelegate, FString, MessageArray);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAddMessageArrayDelegate);
 
 UCLASS()
 class REDRUMAI_API ARAIChatManager : public AActor
@@ -29,20 +30,22 @@ public:
 
 	//추후 AI가 여러개가 된다면 TMap를 사용해 AI이름과 내역을 짝지어 관리하는게 좋겠다.
 	TArray<TSharedPtr<FJsonValue>> MessageArray;
-	
+
 	FEmotionScore EmotionScore;
 
-	UFUNCTION(BlueprintCallable)
-	void SetEmotionScore(FString EmotionJson);	
+	void SetEmotionScore(const FEmotionScore& InEmotionStruct);
+	void CalculateEmotion(float& EmotionScore, float Score);
 
-	void CalculateEmotion(float &EmotionScore,float Score);
 
-	virtual void AddMessageArray(FString InJsonData, FString Message, EMessageRole MessageRole);
+	virtual void AddMessageArray(const FEmotionScore& EmotionStruct, FString Message, EMessageRole MessageRole);
 	virtual void AddMessageArray(FString Message, EMessageRole MessageRole);
 
 	void SendMessageArrayToGM();
 
 	void ShowMessageArray();
 
+	const TArray<TPair<FString, FString>> GetChatLog();
+
 	FOnSendMessageDelegate SendMessageDelegate;
+	FOnAddMessageArrayDelegate AddMessageArrayDelegate;
 };

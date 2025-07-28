@@ -7,7 +7,7 @@
 UENUM(BlueprintType)
 enum EMessageRole : uint8
 {
-	Developer	UMETA(DisplayName = "Developer"),
-	User		UMETA(DisplayName = "User"),
-	Assistant	UMETA(DisplayName = "Assistant")
+	developer	UMETA(DisplayName = "developer"),
+	user		UMETA(DisplayName = "user"),
+	assistant	UMETA(DisplayName = "assistant")
 };

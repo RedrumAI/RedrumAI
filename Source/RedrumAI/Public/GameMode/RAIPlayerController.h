@@ -20,34 +20,32 @@ public:
 	ARAIPlayerController();
 
 	UPROPERTY()
-	TObjectPtr<URAIStageHUDWidget> StageHUD;
-	UPROPERTY()
 	TObjectPtr<ARAIGameMode> RAIGameMode;
 
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputMappingContext> InputMapping;
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> IA_Test;
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> IA_Test2;
-
-	UFUNCTION()
-	void TestFunc1();
-	UFUNCTION()
-	void TestFunc2();
-
 	virtual void BeginPlay() override;
+	void BindGM();
+	void AskSuspect(FText Text);
+
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputMappingContext> InputMapping;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_ToggleMouseCursor;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_CloseLastUI;
 
 	virtual void SetupInputComponent() override;
+	UFUNCTION()
+	void ToggleMouseCursor();
+	UFUNCTION()
+	void CloseLastUI();
 
-	void BindGM();
 
+	UPROPERTY()
+	TObjectPtr<URAIStageHUDWidget> StageHUD;
 	UFUNCTION()
 	void SetAIChat(FString String);
-
 	UFUNCTION()
-	void AddChatLogUI(FString InRole, FString InMessage);
-	
-	void AskSuspect(FText Text);
+	void AddChatLogUI(FString InRole, FString InMessage);	
 
 };

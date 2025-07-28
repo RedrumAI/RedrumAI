@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RAIChatLogUIButton.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRAIButtonClicked);
+
 class UButton;
 
 UCLASS()
@@ -23,6 +25,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customize")
 	float ButtonSizeY = 64.f;
 	*/
+
+	UFUNCTION()
+	void OnRAIButtonClicked();
+
 	UPROPERTY()
 	TObjectPtr<UButton> Button;
+	UPROPERTY()
+	FOnRAIButtonClicked RAIButtonClickedDelegate;
+
 };

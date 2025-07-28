@@ -15,6 +15,29 @@ ARAIPlayerController::ARAIPlayerController()
 {
 }
 
+void ARAIPlayerController::ToggleMouseCursor()
+{
+	switch (bShowMouseCursor)
+	{
+	case true:
+		SetShowMouseCursor(false);
+		break;
+	case false:
+		SetShowMouseCursor(true);
+		break;
+	default:
+		break;
+	}
+}
+
+void ARAIPlayerController::CloseLastUI()
+{
+	if (IsValid(StageHUD))
+	{
+		StageHUD->CloseLastUI();
+	}
+}
+
 void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -46,9 +69,9 @@ void ARAIPlayerController::SetupInputComponent()
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
 	// 여기에서 'ETriggerEvent' 열거형 값을 변경하여 원하는 트리거 이벤트를 바인딩할 수 있습니다.
-	Input->BindAction(IA_Test, ETriggerEvent::Triggered, this, &ARAIPlayerController::TestFunc1);
-	Input->BindAction(IA_Test2, ETriggerEvent::Triggered, this, &ARAIPlayerController::TestFunc2);
-}
+	Input->BindAction(IA_ToggleMouseCursor, ETriggerEvent::Triggered, this, &ARAIPlayerController::ToggleMouseCursor);
+	Input->BindAction(IA_CloseLastUI, ETriggerEvent::Triggered, this, &ARAIPlayerController::CloseLastUI);
+}\
 
 void ARAIPlayerController::BindGM()
 {
@@ -64,7 +87,7 @@ void ARAIPlayerController::SetAIChat(FString String)
 	if (IsValid(StageHUD))
 	{
 		StageHUD->SetAIChat(String);
-	}	
+	}
 }
 
 void ARAIPlayerController::AddChatLogUI(FString InRole, FString InMessage)
@@ -78,14 +101,4 @@ void ARAIPlayerController::AddChatLogUI(FString InRole, FString InMessage)
 void ARAIPlayerController::AskSuspect(FText Text)
 {
 	RAIGameMode->AskSuspect(Text);
-}
-
-void ARAIPlayerController::TestFunc1()
-{
-	StageHUD->UpdateVisibilityChatUI(ESlateVisibility::Visible);
-}
-
-void ARAIPlayerController::TestFunc2()
-{
-	StageHUD->UpdateVisibilityChatUI(ESlateVisibility::Collapsed);
 }

@@ -6,35 +6,39 @@
 #include "Components/CanvasPanelSlot.h"
 #include "UI/RAIChatUI.h"
 #include "UI/RAIChatLogUI.h"
+#include "UI/RAIChatLogUIButton.h"
 
 void URAIStageHUDWidget::NativeConstruct()
 {
 	CanvasPanel = Cast<UCanvasPanel>(GetWidgetFromName(TEXT("CanvasPanel")));
-	ChatUI = Cast<URAIChatUI>(GetWidgetFromName(TEXT("WBP_ChatUI")));
-	ChatLogUI = Cast<URAIChatLogUI>(GetWidgetFromName(TEXT("WBP_ChatLogUI")));
+	ChatUI = Cast<URAIChatUI>(GetWidgetFromName(TEXT("WBP_RAIChatUI")));
+	ChatLogUI = Cast<URAIChatLogUI>(GetWidgetFromName(TEXT("WBP_RAIChatLogUI")));
+	ChatLogUIButton = Cast<URAIChatLogUIButton>(GetWidgetFromName(TEXT("WBP_RAIChatLogUIButton")));
 
+	//ChatUI, LogUI, Button Valid검사. 불통과시 타이머로 다시돌리기
+	BindOwningUI();
 }
 
-void URAIStageHUDWidget::OnEventDelegate_LogUIButton()
+void URAIStageHUDWidget::BindOwningUI()
 {
-	if (ChatLogUI->GetVisibility() == ESlateVisibility::Visible)
+	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton))
 	{
-		ChatLogUI->SetVisibility(ESlateVisibility::Collapsed);
+		//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
+		ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
+		ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
+		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
 	}
 	else
 	{
-		ChatLogUI->SetVisibility(ESlateVisibility::Visible);
+		FTimerHandle TimerHandle_BindOwningUI;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_BindOwningUI,
+			this,
+			&URAIStageHUDWidget::BindOwningUI,
+			0.1f,
+			false
+		);
 	}
-}
-
-void URAIStageHUDWidget::UpdateVisibilityChatUI(ESlateVisibility InState)
-{
-	ChatUI->SetVisibility(InState);
-}
-
-void URAIStageHUDWidget::UpdateVisiblityChatLogUI(ESlateVisibility InState)
-{
-	ChatLogUI->SetVisibility(InState);
 }
 
 void URAIStageHUDWidget::OpenUI(UUserWidget* InUI)
@@ -48,7 +52,7 @@ void URAIStageHUDWidget::OpenUI(UUserWidget* InUI)
 		SavedLayout = OldSlot->GetLayout();
 		SavedAlignment = OldSlot->GetAlignment();
 		SavedZOrder = OldSlot->GetZOrder();
-	}	
+	}
 
 	//컴포넌트 구조 최하단으로 이동하여 HUD 맨앞에 표시
 	InUI->RemoveFromParent();
@@ -69,9 +73,9 @@ void URAIStageHUDWidget::OpenUI(UUserWidget* InUI)
 	if (UIStack.Find(InUI) != INDEX_NONE) //기존에 열려있던 UI라면 Stack에서 제거하고 다시 Push
 	{
 		UIStack.Remove(InUI);
-	}	
+	}
 	UIStack.Push(InUI);
-	
+
 }
 
 void URAIStageHUDWidget::CloseUI(UUserWidget* InUI)
@@ -91,9 +95,28 @@ void URAIStageHUDWidget::CloseLastUI()
 	}
 	else
 	{
-		// TODO : ESC메뉴창 출력
+		// TODO : ESC메뉴창 추가 예정
+		UE_LOG(LogTemp, Warning, TEXT("ESC Menu will be appear.(Now Testing at Q)"));
 	}
-	
+
+}
+
+void URAIStageHUDWidget::ToggleChatLogUI()
+{
+	switch (ChatLogUI->GetVisibility())
+	{
+	case ESlateVisibility::Visible:
+		CloseUI(ChatLogUI);
+		break;
+	case ESlateVisibility::Hidden:
+		//if(메뉴창 visible상태라면) closeUI(메뉴창)
+		OpenUI(ChatLogUI);
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("[StageHUDWidget] OpenChatLogUI failed, ChatLogUI->GetVisibility is '%s'"),
+			*StaticEnum<ESlateVisibility>()->GetNameStringByValue(static_cast<int64>(ChatLogUI->GetVisibility())));
+		break;
+	}
 }
 
 void URAIStageHUDWidget::SetAIChat(FString String)

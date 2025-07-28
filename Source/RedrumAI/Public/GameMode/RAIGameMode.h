@@ -47,7 +47,6 @@ public:
 
 	void SetScoreStruct(const FString& String);
 
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIHttpManager> HttpManager;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

@@ -29,14 +29,8 @@ void ARAIGameMode::BeginPlay()
 
 	BindHM();
 	BindCM();
-	FTimerHandle TimerHandle_tmp;
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle_tmp,
-		this,
-		&ARAIGameMode::InitSettingOpenAI,
-		1.0f,
-		false
-	);
+	InitSettingOpenAI();
+
 
 	/*
 	FTimerHandle TimerHandle1_tmp;
@@ -71,6 +65,17 @@ void ARAIGameMode::InitSettingOpenAI()
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
 		ChatManager->AddMessageArray(SettingString, developer);
+	}
+	else
+	{
+		FTimerHandle InitSettingOpenAITimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			InitSettingOpenAITimerHandle,
+			this,
+			&ARAIGameMode::InitSettingOpenAI,
+			1.0f,
+			false
+		);
 	}
 }
 
@@ -165,7 +170,7 @@ void ARAIGameMode::BindHM()
 	{
 		FTimerHandle TimerHandle_BindHM;
 		//TODO: 타이머를 통해 0.1초 뒤에 BindHM() 다시 실행.
-		GetWorldTimerManager().SetTimer(
+		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle_BindHM,
 			this,
 			&ARAIGameMode::BindHM,
@@ -188,7 +193,7 @@ void ARAIGameMode::BindCM()
 	{
 		FTimerHandle TimerHandle_BindCM;
 		//TODO: 타이머를 통해 0.1초 뒤에 BindHM() 다시 실행.
-		GetWorldTimerManager().SetTimer(
+		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle_BindCM,
 			this,
 			&ARAIGameMode::BindCM,

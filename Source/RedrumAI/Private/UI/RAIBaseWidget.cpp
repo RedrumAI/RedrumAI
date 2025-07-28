@@ -13,3 +13,11 @@ FReply URAIBaseWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, cons
 
     return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
+
+void URAIBaseWidget::OnOpened()
+{
+}
+
+void URAIBaseWidget::OnClosed()
+{
+}

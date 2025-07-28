@@ -17,4 +17,8 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 	FOnClickedWidget ClickedWidgetDelegate;
+
+	//가제: WhenOpened(), 해당UI가 OpenUI 되었을 때, 실행해야 하는 기능함수 (ex. InventoryWidget::DoAnimation)
+	virtual void OnOpened();
+	virtual void OnClosed();
 };

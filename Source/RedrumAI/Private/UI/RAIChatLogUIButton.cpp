@@ -15,4 +15,11 @@ void URAIChatLogUIButton::NativeConstruct()
 	Button->WidgetStyle.Hovered.SetImageSize(FVector2D(ButtonSizeX, ButtonSizeY));
 	Button->WidgetStyle.Pressed.SetImageSize(FVector2D(ButtonSizeX, ButtonSizeY));
 	*/
+	
+	Button->OnClicked.AddDynamic(this, &URAIChatLogUIButton::OnRAIButtonClicked);
+}
+
+void URAIChatLogUIButton::OnRAIButtonClicked()
+{
+	RAIButtonClickedDelegate.Broadcast();
 }

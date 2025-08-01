@@ -38,7 +38,7 @@ void ARAIChatManager::SetEmotionScore(const FEmotionScore& InEmotionStruct)
 void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
 {
 	//한번 질문마다 감정의 사그라짐 = (-0.1) 더함
-	Emotion = Emotion - 0.1f + Score;
+	Emotion = (Emotion - 0.1f + Score) / 2;
 	//Emotion을 0.XX 형태로 만든다.
 	Emotion = FMath::Clamp(Emotion, 0.00f, 0.99f); //0.88;
 	Emotion = FMath::FloorToFloat(Emotion * 100) / 100; //0.XXXXX -> XX.XXXX -> XX -> 0.XX

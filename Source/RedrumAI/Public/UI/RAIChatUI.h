@@ -20,11 +20,11 @@ class REDRUMAI_API URAIChatUI : public URAIBaseWidget
 public:
 	virtual void NativeConstruct() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY()
 	TObjectPtr<UTextBlock> AIChat;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY()
 	TObjectPtr<UEditableTextBox> UserChat;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY()
 	TObjectPtr<UCircularThrobber> LoadingCircle;
 
 	TObjectPtr<ARAIPlayerController> RAIPlayerController;

@@ -4,7 +4,7 @@
 #include "UI/RAIChatUI.h"
 #include "Components/TextBlock.h"
 #include "Components/EditableTextBox.h"
-#include "Components/CircularThrobber.h"
+#include "Components/Image.h"
 #include "GameMode/RAIPlayerController.h"
 
 
@@ -14,7 +14,7 @@ void URAIChatUI::NativeConstruct()
 
 	AIChat = Cast<UTextBlock>(GetWidgetFromName(TEXT("AIChat")));
 	UserChat = Cast<UEditableTextBox>(GetWidgetFromName(TEXT("UserChat")));
-	LoadingCircle = Cast<UCircularThrobber>(GetWidgetFromName(TEXT("LoadingCircle")));
+	LoadingImage = Cast<UImage>(GetWidgetFromName(TEXT("LoadingImage")));
 
 	if (UserChat)
 	{
@@ -33,9 +33,9 @@ void URAIChatUI::OnCommittedText(const FText& Text, ETextCommit::Type CommitMeth
 		AskSuspect(Text);
 		//2. UserChat이 지워질것
 		UserChat->SetText(FText::FromString(TEXT("")));
-		//3. 이전 AIChat을 지우고 LoadingCircle활성화 -> 추후 AIChat이 들어올때 LoadingCircle비활성화
+		//3. 이전 AIChat을 지우고 LoadingImage활성화 -> 추후 AIChat이 들어올때 LoadingImage비활성화
 		SetAIChat((TEXT("")));
-		LoadingCircle->SetVisibility(ESlateVisibility::Visible);
+		LoadingImage->SetVisibility(ESlateVisibility::Visible);
 		break;
 	}
 	case ETextCommit::OnCleared:
@@ -48,7 +48,7 @@ void URAIChatUI::OnCommittedText(const FText& Text, ETextCommit::Type CommitMeth
 }
 void URAIChatUI::SetAIChat(FString String)
 {
-	LoadingCircle->SetVisibility(ESlateVisibility::Collapsed);
+	LoadingImage->SetVisibility(ESlateVisibility::Collapsed);
 	AIChat->SetText(FText::FromString(String));
 	//나중에 타이핑 애니메이션을 넣어보면 어떨까? 타이머를 통해서 목표 문장까지 한글자씩 채워지는 배열문장을 사용하면 될 것 같다.
 }

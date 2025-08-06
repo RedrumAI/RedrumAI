@@ -19,11 +19,11 @@ class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	UPROPERTY()
 	TObjectPtr<URAIChatUI> ChatUI;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	UPROPERTY()
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	UPROPERTY()
 	TObjectPtr<URAIChatLogUIButton> ChatLogUIButton;
 
 	TObjectPtr<UCanvasPanel> CanvasPanel;

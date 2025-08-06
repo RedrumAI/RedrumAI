@@ -8,7 +8,7 @@
 
 class UTextBlock;
 class UEditableTextBox;
-class UCircularThrobber;
+class UImage;
 class ARAIPlayerController;
 
 
@@ -25,7 +25,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UEditableTextBox> UserChat;
 	UPROPERTY()
-	TObjectPtr<UCircularThrobber> LoadingCircle;
+	TObjectPtr<UImage> LoadingImage;
 
 	TObjectPtr<ARAIPlayerController> RAIPlayerController;
 

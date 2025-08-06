@@ -38,13 +38,14 @@ void URAIChatLogUI::SetChatLogEntrySetting(TObjectPtr<URAIChatLogEntry> InChatLo
 		EntryAsSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Right);
 
 		InChatLogEntry->SetChat(InMessage);
-		InChatLogEntry->SetChatColor(EntryBlueColor);
+		InChatLogEntry->SetChatColor(EntryChatPlayerColor);
 	}
 	else if (InRole == TEXT("assistant"))
 	{
 		UScrollBoxSlot* EntryAsSlot = Cast<UScrollBoxSlot>(InChatLogEntry->Slot);
 		EntryAsSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Left);
+
 		InChatLogEntry->SetChat(InMessage);
-		InChatLogEntry->SetChatColor(EntryRedColor);
+		InChatLogEntry->SetChatColor(EntryChatSuspectColor);
 	}
 }

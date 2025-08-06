@@ -27,9 +27,9 @@ public:
 	void CollapseUserImage();
 	*/
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY()
 	TObjectPtr<USizeBox> SizeBox;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY()
 	TObjectPtr<UTextBlock> Chat;
 
 	UFUNCTION(BlueprintCallable)
@@ -37,6 +37,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetChatColor(FSlateColor InColor);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
 	float SizeBoxWidth = 800.f;
 };

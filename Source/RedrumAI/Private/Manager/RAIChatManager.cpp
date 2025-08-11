@@ -25,7 +25,7 @@ void ARAIChatManager::Tick(float DeltaTime)
 
 }
 
-void ARAIChatManager::SetEmotionScore(const FEmotionScore& InEmotionStruct)
+void ARAIChatManager::SetEmotionScore(const FRAIEmotionScore& InEmotionStruct)
 {
 	CalculateEmotion(EmotionScore.Anger, InEmotionStruct.Anger);
 	CalculateEmotion(EmotionScore.Fear, InEmotionStruct.Fear);
@@ -44,22 +44,22 @@ void ARAIChatManager::CalculateEmotion(float& Emotion, float Score)
 	Emotion = FMath::FloorToFloat(Emotion * 100) / 100; //0.XXXXX -> XX.XXXX -> XX -> 0.XX
 }
 
-void ARAIChatManager::AddMessageArray(const FEmotionScore& EmotionStruct, FString Message, EMessageRole MessageRole)
+void ARAIChatManager::AddMessageArray(const FRAIEmotionScore& EmotionStruct, FString Message, ERAIMessageRole MessageRole)
 {
 	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
 	switch (MessageRole)
 	{
-	case EMessageRole::developer:
+	case ERAIMessageRole::developer:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::Developer. Use without InJsonData."));
 		break;
 	}
-	case EMessageRole::user:
+	case ERAIMessageRole::user:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::User. Use without InJsonData."));
 		break;
 	}
-	case EMessageRole::assistant:
+	case ERAIMessageRole::assistant:
 	{
 		UserMessage->SetStringField("role", "assistant");
 
@@ -88,18 +88,18 @@ void ARAIChatManager::AddMessageArray(const FEmotionScore& EmotionStruct, FStrin
 	AddMessageArrayDelegate.Broadcast();
 }
 
-void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
+void ARAIChatManager::AddMessageArray(FString Message, ERAIMessageRole MessageRole)
 {
 	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
 	switch (MessageRole)
 	{
-	case EMessageRole::developer:
+	case ERAIMessageRole::developer:
 	{
 		UserMessage->SetStringField("role", "developer"); //24년말부턴 system이 아닌 developer
 		UserMessage->SetStringField("content", Message); //Developer문장 추가 경우 InJsonData=NULL;
 		break;
 	}
-	case EMessageRole::user:
+	case ERAIMessageRole::user:
 	{
 		UserMessage->SetStringField("role", "user");
 
@@ -110,7 +110,7 @@ void ARAIChatManager::AddMessageArray(FString Message, EMessageRole MessageRole)
 		UserMessage->SetStringField("content", ScoreAddedMessage);
 		break;
 	}
-	case EMessageRole::assistant:
+	case ERAIMessageRole::assistant:
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You used Wrong virtaul function with Role::Assistant. Use with InJsonData."));
 		break;

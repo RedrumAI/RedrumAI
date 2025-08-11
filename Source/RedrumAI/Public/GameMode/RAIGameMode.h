@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Data/MessageRole.h"
-#include "Data/EmotionScore.h"
+#include "Data/RAIMessageRole.h"
+#include "Data/RAIEmotionScore.h"
 #include "RAIGameMode.generated.h"
 
 //AI응답의 문장이 필요할 경우 FReponseDelegate에, NLP점수가 필요할 경우 FScoreDelegate에 바인드할 것
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResponseDelegate, FString, Response);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FEmotionScore, Score);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FRAIEmotionScore, Score);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, Role, FString, Contents);
 
 class ARAIHttpManager;
@@ -52,7 +52,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIChatManager> ChatManager;
 
-	TOptional<FEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
+	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
 	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
 
 	UPROPERTY()

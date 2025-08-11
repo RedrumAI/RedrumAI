@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EmotionScore.generated.h"
+#include "RAIEmotionScore.generated.h"
 
 USTRUCT(BlueprintType)
-struct FEmotionScore
+struct FRAIEmotionScore
 {
 	GENERATED_BODY()
 
 public:
 
-	FEmotionScore();
-	~FEmotionScore();
+	FRAIEmotionScore();
+	~FRAIEmotionScore();
 
 	//¹üÀ§ = clamp(9.99, 0.00)
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Data/EmotionScore.h"
+#include "Data/RAIEmotionScore.h"
 
-FEmotionScore::FEmotionScore()
+FRAIEmotionScore::FRAIEmotionScore()
 {
 	Love = 0.5;
 	Joy = 0.5;
@@ -13,6 +13,6 @@ FEmotionScore::FEmotionScore()
 	Sadness = 0.5;
 }
 
-FEmotionScore::~FEmotionScore()
+FRAIEmotionScore::~FRAIEmotionScore()
 {
 }

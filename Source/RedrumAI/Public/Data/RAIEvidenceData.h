@@ -4,29 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"  
-#include "RAIEmotionScore.generated.h"
+#include "Data/RAIEvidenceType.h"
+#include "RAIEvidenceData.generated.h"
+
+class ARAIEvidenceActor;
 
 USTRUCT(BlueprintType)
-struct FRAIEmotionScore : public FTableRowBase
+struct FRAIEvidenceData : public FTableRowBase
 {
 	GENERATED_BODY()
 
 public:
+	FRAIEvidenceData();
+	~FRAIEvidenceData();
 
-	FRAIEmotionScore();
-	~FRAIEmotionScore();
-
-	//¹üÀ§ = clamp(9.99, 0.00)
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Love;
+	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Joy;
+	ERAIEvidenceType EvidenceType;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Surprise;
+	FText DisplayName;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Anger;
+	FText Description;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Fear;
+	TObjectPtr<UStaticMesh> Mesh;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Sadness;
+	TObjectPtr<UTexture2D> EvidenceImage;
+	
 };

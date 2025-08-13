@@ -7,6 +7,7 @@
 #include "RAIInteractableInterface.h"
 #include "RAIInteractableActor.generated.h"
 
+class UBoxComponent;
 
 UCLASS()
 class REDRUMAI_API ARAIInteractableActor : public AActor, public IRAIInteractableInterface
@@ -38,4 +39,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UMaterial> HighlightMaterial;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> CollisionBox;
 };

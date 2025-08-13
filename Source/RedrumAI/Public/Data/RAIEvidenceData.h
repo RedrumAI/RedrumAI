@@ -18,17 +18,16 @@ public:
 	FRAIEvidenceData();
 	~FRAIEvidenceData();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	ERAIEvidenceType EvidenceType;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	FText DisplayName;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	FText Description;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	TObjectPtr<UStaticMesh> Mesh;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	TObjectPtr<UTexture2D> EvidenceImage;
-	
 };

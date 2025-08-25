@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,7 +8,7 @@
 #include "Data/RAIEmotionScore.h"
 #include "RAIGameMode.generated.h"
 
-//AIÀÀ´äÀÇ ¹®ÀåÀÌ ÇÊ¿äÇÒ °æ¿ì FReponseDelegate¿¡, NLPÁ¡¼ö°¡ ÇÊ¿äÇÒ °æ¿ì FScoreDelegate¿¡ ¹ÙÀÎµåÇÒ °Í
+//AIì‘ë‹µì˜ ë¬¸ì¥ í˜¹ì€ NLPì ìˆ˜ê°€ í•„ìš”í•  ê²½ìš°, í•´ë‹¹ í´ë˜ìŠ¤ì—ì„œ ARAIGameMode::FResponseDelegate, FScoreDelegateì— ë°”ì¸ë“œí• ê²ƒ
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResponseDelegate, FString, Response);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FRAIEmotionScore, Score);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, Role, FString, Contents);
@@ -52,8 +52,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<ARAIChatManager> ChatManager;
 
-	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP¿¡¼­ ¿Â Á¡¼ö FStruct
-	TOptional<FString> ResponseString;		//OpenAI¿¡¼­ ¿Â ÀÀ´ä FString
+	TOptional<FRAIEmotionScore> ScoreStruct;	//NLPì—ì„œ ì˜¨ ì ìˆ˜ FStruct
+	TOptional<FString> ResponseString;		//OpenAIì—ì„œ ì˜¨ ì‘ë‹µ FString
 
 	UPROPERTY()
 	FResponseDelegate SendResponseDelegate;

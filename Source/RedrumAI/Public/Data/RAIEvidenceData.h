@@ -18,16 +18,16 @@ public:
 	FRAIEvidenceData();
 	~FRAIEvidenceData();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	ERAIEvidenceType EvidenceType;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FText DisplayName;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FText Description;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMesh> Mesh;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UTexture2D> EvidenceImage;
 };

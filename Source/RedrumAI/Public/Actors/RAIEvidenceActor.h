@@ -8,8 +8,6 @@
 #include "Engine/DataTable.h"
 #include "RAIEvidenceActor.generated.h"
 
-class FDataTableRowHandle;
-
 UCLASS()
 class REDRUMAI_API ARAIEvidenceActor : public ARAIInteractableActor
 {

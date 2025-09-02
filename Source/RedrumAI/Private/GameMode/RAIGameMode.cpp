@@ -4,6 +4,7 @@
 #include "GameMode/RAIGameMode.h"
 #include "Manager/RAIHttpManager.h"
 #include "Manager/RAIChatManager.h"
+#include "Manager/RAIInventoryManager.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -25,6 +26,10 @@ void ARAIGameMode::BeginPlay()
 	if (!IsValid(ChatManager))
 	{
 		ChatManager = GetWorld()->SpawnActor<ARAIChatManager>(ARAIChatManager::StaticClass());
+	}
+	if (!IsValid(InventoryManager))
+	{
+		InventoryManager = GetWorld()->SpawnActor<ARAIInventoryManager>(ARAIChatManager::StaticClass());
 	}
 
 	BindHM();
@@ -143,6 +148,11 @@ void ARAIGameMode::SetScoreStruct(const FString& String)
 	{
 		UE_LOG(LogTemp, Error, TEXT("CM: Failed to parse JSON string: %s"), *String);
 	}
+}
+
+void ARAIGameMode::AddEvidence(FName EvidenceRowName)
+{
+	InventoryManager->AddEvidence(EvidenceRowName);
 }
 
 void ARAIGameMode::UpdateChatLogUI()

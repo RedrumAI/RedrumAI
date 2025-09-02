@@ -20,7 +20,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "RAI", meta = (RowType = "RAIEvidenceData"))
 	FDataTableRowHandle EvidenceDataRow;
-
+	
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
 	UPROPERTY(VisibleAnywhere)
@@ -46,4 +46,6 @@ public:
 	FText GetDescription() const { return Description; };
 	TSoftObjectPtr<UStaticMesh> GetMesh() const { return MeshComponent->GetStaticMesh(); };
 	TObjectPtr<UTexture2D> GetEvidenceImage() const { return EvidenceImage; };		
+
+	virtual void Interacted() override;
 };

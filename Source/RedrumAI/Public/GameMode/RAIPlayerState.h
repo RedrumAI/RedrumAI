@@ -16,8 +16,15 @@ class REDRUMAI_API ARAIPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 protected:
-	TArray<FRAIEvidenceData> CollectedEvidences;
+	UPROPERTY(EditDefaultsOnly, Category = "RAI")
+	TObjectPtr<UDataTable> EvidenceDataTable;
 
-	//InventoryManager에 구현해야할 기능
-	void AddCollectedEvidences();
+	TArray<FName> EvidenceRows;
+
+public:
+	void AddEvidence(FName EvidenceRowName);
+	void RemoveEvidence();
+	TArray<FRAIEvidenceData> GetEvidences();
+
+	FRAIEvidenceData* FindEvidenceData(FName RowName);
 };

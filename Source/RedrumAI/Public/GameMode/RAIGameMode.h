@@ -15,6 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, 
 
 class ARAIHttpManager;
 class ARAIChatManager;
+class ARAIInventoryManager;
 
 UCLASS()
 class REDRUMAI_API ARAIGameMode : public AGameModeBase
@@ -47,10 +48,14 @@ public:
 
 	void SetScoreStruct(const FString& String);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	void AddEvidence(FName EvidenceRowName);
+
+	UPROPERTY()
 	TObjectPtr<ARAIHttpManager> HttpManager;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY()
 	TObjectPtr<ARAIChatManager> ChatManager;
+	UPROPERTY()
+	TObjectPtr<ARAIInventoryManager> InventoryManager;
 
 	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
 	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString

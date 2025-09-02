@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Actors/RAIEvidenceActor.h"
 #include "Data/RAIEvidenceData.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameMode/RAIGameMode.h"
 
 ARAIEvidenceActor::ARAIEvidenceActor()
 {
@@ -26,4 +27,11 @@ void ARAIEvidenceActor::OnConstruction(const FTransform& Transform)
 		EvidenceImage = EvidenceData->EvidenceImage;
 		MeshComponent->SetStaticMesh(EvidenceData->Mesh);
 	}
+}
+
+void ARAIEvidenceActor::Interacted()
+{
+	//TODO: 플레이어의 IM에게 신호보내는 함수 호출, 인자로 EvidenceDataRow.RowName 보내기
+	ARAIGameMode* RAIGameMode= Cast<ARAIGameMode>(GetWorld()->GetAuthGameMode());
+	RAIGameMode->AddEvidence(EvidenceDataRow.RowName);
 }

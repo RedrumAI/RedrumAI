@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Data/RAIEvidenceData.h"
 #include "RAISlideInventoryUI.generated.h"
 
 class UButton;
@@ -24,8 +25,11 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UButton> Button_bottom;
 
+	FRAIEvidenceData* EvidenceData_top;
+	FRAIEvidenceData* EvidenceData_middle;
+	FRAIEvidenceData* EvidenceData_bottom;
+
 public:
 	void OnOpened();
 	void OnClosed();
-
 };

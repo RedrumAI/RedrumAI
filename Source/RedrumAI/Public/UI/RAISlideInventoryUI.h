@@ -8,6 +8,7 @@
 #include "RAISlideInventoryUI.generated.h"
 
 class UButton;
+class ARAIPlayerState;
 
 UCLASS()
 class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
@@ -29,7 +30,13 @@ protected:
 	FRAIEvidenceData* EvidenceData_middle;
 	FRAIEvidenceData* EvidenceData_bottom;
 
+	TObjectPtr<ARAIPlayerState> RAIPlayerState;
+
 public:
+	void InitSlideInventoryUI();
+	void UpdateEvidenceData();
+	void UpdateButtonThumbnail();
+
 	void OnOpened();
 	void OnClosed();
 };

@@ -7,9 +7,8 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAIPlayerState.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateEvidenceRowsDelegate);
+
 UCLASS()
 class REDRUMAI_API ARAIPlayerState : public APlayerState
 {
@@ -24,7 +23,10 @@ protected:
 public:
 	void AddEvidence(FName EvidenceRowName);
 	void RemoveEvidence();
-	TArray<FRAIEvidenceData> GetEvidences();
 
+	TArray<FName> GetEvidenceRows();
 	FRAIEvidenceData* FindEvidenceData(FName RowName);
+	
+	UPROPERTY()
+	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;
 };

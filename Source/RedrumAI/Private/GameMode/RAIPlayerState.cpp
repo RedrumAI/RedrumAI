@@ -13,15 +13,20 @@ void ARAIPlayerState::AddEvidence(FName EvidenceRowName)
 	}
 
 	//TODO : EvidenceRow가 변경되었음을 방송. SlideInventory는 이 때 업데이트
+	UpdateEvidenceRowsDelegate.Broadcast();	
 }
 
 void ARAIPlayerState::RemoveEvidence()
 {
+
+
+	UpdateEvidenceRowsDelegate.Broadcast();
 }
 
-TArray<FRAIEvidenceData> ARAIPlayerState::GetEvidences()
+
+TArray<FName> ARAIPlayerState::GetEvidenceRows()
 {
-	return TArray<FRAIEvidenceData>();
+	return EvidenceRows;
 }
 
 FRAIEvidenceData* ARAIPlayerState::FindEvidenceData(FName RowName)

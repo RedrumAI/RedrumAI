@@ -2,14 +2,16 @@
 
 
 #include "UI/RAISlideInventoryUI.h"
+#include "Components/VerticalBox.h"
 #include "Components/Button.h"
 #include "GameMode/RAIPlayerState.h"
 
 void URAISlideInventoryUI::NativeConstruct()
 {
-	Button_top = Cast<UButton>(GetWidgetFromName(TEXT("Button_top")));
-	Button_middle = Cast<UButton>(GetWidgetFromName(TEXT("Button_middle")));
-	Button_bottom = Cast<UButton>(GetWidgetFromName(TEXT("Button_bottom")));
+	VerticalBox_Button = Cast<UVerticalBox>(GetWidgetFromName(TEXT("VerticalBox_Button")));
+
+	int32 EvidenceDataCount = VerticalBox_Button->GetChildrenCount();
+	EvidenceData.SetNum(EvidenceDataCount);
 
 	InitSlideInventoryUI();
 }
@@ -37,52 +39,58 @@ void URAISlideInventoryUI::InitSlideInventoryUI()
 void URAISlideInventoryUI::UpdateEvidenceData()
 {
 	TArray<FName> EvidenceRows = RAIPlayerState->GetEvidenceRows();
-	for (auto EachRow : EvidenceRows)
+
+	for (int i = 0;i < EvidenceRows.Num();++i)
 	{
-		FRAIEvidenceData* RowData = RAIPlayerState->FindEvidenceData(EachRow);
+		FRAIEvidenceData* RowData = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
+		EvidenceData[i] = RowData;
 
-		//만약 데이터 수정을 한다고하면?
-		/*
-		FindEvidenceInInventory(이름) = RowData;
-		*/
-
-		//TODO: 일단 top부터 비어있으면 들어가는 코드. 그런데 3칸이니까 이렇게쓰지, 확장성을 위한 코드리팩토링이 필요해보인다.
-		if (EvidenceData_top)
+		if (RowData) //EvidenceRows[i]가 데이터가 있는값이라면(=NAME_None이 아니라면)
 		{
-			EvidenceData_top = RowData;
+			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));			
+			UpdateButtonThumbnail(EvidenceButton, RowData->EvidenceImage);
 		}
-		else if (EvidenceData_middle)
+		else
 		{
-			EvidenceData_middle = RowData;
-		}
-		else if (EvidenceData_bottom)
-		{
-			EvidenceData_bottom = RowData;
+			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
+			UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
 		}
 	}
-
-	//데이터 수정되었으니 UI에 반영
-	UpdateButtonThumbnail();
 }
 
-void URAISlideInventoryUI::UpdateButtonThumbnail()
+void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail)
 {
-	// TODO : 모든 버튼 이미지 업데이트.
-	/*
-	if(EvidenceData_Top.Thumbnail) //EvidenceData_top이 null값이면 버튼 업데이트 시 터질 수도 있기에 예외처리 해주자.
+	if (!InButton || !InThumbnail)
 	{
-		ButtonTop.SetImage( EvidenceData_top.Thumbnail )
-	}	
-	if(EvidenceData_Middle.Thumbnail)
-	{
-		ButtonMiddle.SetImage( EvidenceData_Middle.Thumbnail ) 
+		UE_LOG(LogTemp, Warning, TEXT("[%s]:UpdateButtonThumbnail Failed"), *GetName());
+		return;
 	}
-	if(EvidenceData_Bottom.Thumbnail)
+	FButtonStyle NewStyle = InButton->WidgetStyle;
+
+	FSlateBrush NormalBrush;
+	NormalBrush.SetResourceObject(InThumbnail);
+	NormalBrush.ImageSize = FVector2D(InThumbnail->GetSizeX(), InThumbnail->GetSizeY());
+
+	FSlateBrush HoveredBrush = NormalBrush;
+	HoveredBrush.TintColor = FSlateColor(FLinearColor(0.5f, 0.5f, 0.5f, 1.f));
+
+	FSlateBrush PressedBrush = NormalBrush;
+	PressedBrush.TintColor = FSlateColor(FLinearColor(0.1f, 0.1f, 0.1f, 1.f));
+
+	//EmptyThumbnail 경우 Hoverer, Pressed Tint 원상복귀
+	if (InThumbnail == EmptyThunmbnail)
 	{
-		ButtonBottom.SetImage( EvidenceData_Bottom.Thumbnail )
+		HoveredBrush.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
+		PressedBrush.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
 	}
-	*/
+
+	NewStyle.SetNormal(NormalBrush);
+	NewStyle.SetHovered(HoveredBrush);
+	NewStyle.SetPressed(PressedBrush);
+
+	InButton->SetStyle(NewStyle);
 }
+
 
 void URAISlideInventoryUI::OnOpened()
 {

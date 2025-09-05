@@ -8,6 +8,7 @@
 #include "RAISlideInventoryUI.generated.h"
 
 class UButton;
+class UVerticalBox;
 class ARAIPlayerState;
 
 UCLASS()
@@ -20,22 +21,18 @@ public:
 
 protected:
 	UPROPERTY()
-	TObjectPtr<UButton> Button_top;
-	UPROPERTY()
-	TObjectPtr<UButton> Button_middle;
-	UPROPERTY()
-	TObjectPtr<UButton> Button_bottom;
+	TObjectPtr<UVerticalBox> VerticalBox_Button;
 
-	FRAIEvidenceData* EvidenceData_top;
-	FRAIEvidenceData* EvidenceData_middle;
-	FRAIEvidenceData* EvidenceData_bottom;
+	TArray<FRAIEvidenceData*> EvidenceData;
+
+	UTexture2D* EmptyThunmbnail;
 
 	TObjectPtr<ARAIPlayerState> RAIPlayerState;
 
 public:
 	void InitSlideInventoryUI();
 	void UpdateEvidenceData();
-	void UpdateButtonThumbnail();
+	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
 
 	void OnOpened();
 	void OnClosed();

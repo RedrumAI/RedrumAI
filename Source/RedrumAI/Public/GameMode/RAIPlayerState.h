@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -14,6 +14,9 @@ class REDRUMAI_API ARAIPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
+public:
+	ARAIPlayerState();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "RAI")
 	TObjectPtr<UDataTable> EvidenceDataTable;
@@ -24,7 +27,7 @@ public:
 	void AddEvidence(FName EvidenceRowName);
 	void RemoveEvidence();
 
-	TArray<FName> GetEvidenceRows();
+	TArray<FName> GetEvidenceRows() const;
 	FRAIEvidenceData* FindEvidenceData(FName RowName);
 	
 	UPROPERTY()

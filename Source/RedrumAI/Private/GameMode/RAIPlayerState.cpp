@@ -3,16 +3,28 @@
 
 #include "GameMode/RAIPlayerState.h"
 
+ARAIPlayerState::ARAIPlayerState()
+{
+	int32 EvidenceRowsCount = EvidenceDataTable->GetRowMap().Num();
+	EvidenceRows.SetNum(EvidenceRowsCount);
+}
+
 void ARAIPlayerState::AddEvidence(FName EvidenceRowName)
 {
 	FString DebugContext = FString::Printf(TEXT("[%s] : AddEvidence FindRow Called"), *GetName());
 	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(EvidenceRowName, DebugContext);
 	if (FindingData)
 	{
-		EvidenceRows.Add(EvidenceRowName);
+		for (int i = 0; i < EvidenceRows.Num(); ++i)
+		{
+			if (EvidenceRows[i] == NAME_None)
+			{
+				EvidenceRows[i] = EvidenceRowName;
+				break;
+			}
+		}
 	}
 
-	//TODO : EvidenceRow가 변경되었음을 방송. SlideInventory는 이 때 업데이트
 	UpdateEvidenceRowsDelegate.Broadcast();	
 }
 
@@ -23,8 +35,7 @@ void ARAIPlayerState::RemoveEvidence()
 	UpdateEvidenceRowsDelegate.Broadcast();
 }
 
-
-TArray<FName> ARAIPlayerState::GetEvidenceRows()
+TArray<FName> ARAIPlayerState::GetEvidenceRows() const
 {
 	return EvidenceRows;
 }

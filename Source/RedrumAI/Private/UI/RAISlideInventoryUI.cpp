@@ -10,9 +10,6 @@ void URAISlideInventoryUI::NativeConstruct()
 {
 	VerticalBox_Button = Cast<UVerticalBox>(GetWidgetFromName(TEXT("VerticalBox_Button")));
 
-	int32 EvidenceDataCount = VerticalBox_Button->GetChildrenCount();
-	EvidenceData.SetNum(EvidenceDataCount);
-
 	InitSlideInventoryUI();
 }
 
@@ -22,6 +19,13 @@ void URAISlideInventoryUI::InitSlideInventoryUI()
 	if (IsValid(RAIPlayerState))
 	{
 		RAIPlayerState->UpdateEvidenceRowsDelegate.AddDynamic(this, &URAISlideInventoryUI::UpdateEvidenceData);
+
+		//SlideInventory 썸네일 초기화
+		for(int i=0;i< VerticalBox_Button->GetChildrenCount();++i)
+		{
+			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
+			UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
+		}
 	}
 	else
 	{
@@ -42,18 +46,20 @@ void URAISlideInventoryUI::UpdateEvidenceData()
 
 	for (int i = 0;i < EvidenceRows.Num();++i)
 	{
-		FRAIEvidenceData* RowData = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
-		EvidenceData[i] = RowData;
+		InventoryData[i] = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
 
-		if (RowData) //EvidenceRows[i]가 데이터가 있는값이라면(=NAME_None이 아니라면)
+		if (i < VerticalBox_Button->GetChildrenCount())
 		{
-			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));			
-			UpdateButtonThumbnail(EvidenceButton, RowData->EvidenceImage);
-		}
-		else
-		{
-			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
-			UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
+			if (InventoryData[i])
+			{
+				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
+				UpdateButtonThumbnail(EvidenceButton, InventoryData[i]->EvidenceImage);
+			}
+			else
+			{
+				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
+				UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
+			}
 		}
 	}
 }

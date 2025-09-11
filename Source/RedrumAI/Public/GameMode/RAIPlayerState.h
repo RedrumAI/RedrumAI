@@ -14,9 +14,6 @@ class REDRUMAI_API ARAIPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
-public:
-	ARAIPlayerState();
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "RAI")
 	TObjectPtr<UDataTable> EvidenceDataTable;
@@ -24,11 +21,13 @@ protected:
 	TArray<FName> EvidenceRows;
 
 public:
+	virtual void PostInitializeComponents() override;
+
 	void AddEvidence(FName EvidenceRowName);
 	void RemoveEvidence();
 
 	TArray<FName> GetEvidenceRows() const;
-	FRAIEvidenceData* FindEvidenceData(FName RowName);
+	FRAIEvidenceData* FindEvidenceData(FName RowName) const;
 	
 	UPROPERTY()
 	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;

@@ -1,12 +1,23 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GameMode/RAIPlayerState.h"
 
-ARAIPlayerState::ARAIPlayerState()
+void ARAIPlayerState::PostInitializeComponents()
 {
-	int32 EvidenceRowsCount = EvidenceDataTable->GetRowMap().Num();
+	Super::PostInitializeComponents();
+
+	//BP 생성용 EvidenceRowsCount 임시지정
+	int32 EvidenceRowsCount = 0;
+	if (EvidenceDataTable)
+	{
+		EvidenceRowsCount = EvidenceDataTable->GetRowMap().Num();
+	}
 	EvidenceRows.SetNum(EvidenceRowsCount);
+	UE_LOG(LogTemp, Warning, TEXT("!! : %d"), EvidenceRowsCount);
+	for (int i = 0; i < EvidenceRows.Num(); ++i)
+	{
+		EvidenceRows[i] = NAME_None;	//초기화하지 않아도 0이지만, 명시용
+	}
 }
 
 void ARAIPlayerState::AddEvidence(FName EvidenceRowName)
@@ -30,7 +41,7 @@ void ARAIPlayerState::AddEvidence(FName EvidenceRowName)
 
 void ARAIPlayerState::RemoveEvidence()
 {
-
+	//TODO::인자로 받은 이름을 EvidenceRows에서 찾아 NAME_None으로 바꿔주기.
 
 	UpdateEvidenceRowsDelegate.Broadcast();
 }
@@ -40,7 +51,7 @@ TArray<FName> ARAIPlayerState::GetEvidenceRows() const
 	return EvidenceRows;
 }
 
-FRAIEvidenceData* ARAIPlayerState::FindEvidenceData(FName RowName)
+FRAIEvidenceData* ARAIPlayerState::FindEvidenceData(FName RowName) const
 {
 	FString DebugContext = FString::Printf(TEXT("[%s] : AddEvidence FindRow Called"), *GetName());
 	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(RowName, DebugContext);

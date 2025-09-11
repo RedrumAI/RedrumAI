@@ -29,7 +29,7 @@ void ARAIGameMode::BeginPlay()
 	}
 	if (!IsValid(InventoryManager))
 	{
-		InventoryManager = GetWorld()->SpawnActor<ARAIInventoryManager>(ARAIChatManager::StaticClass());
+		InventoryManager = GetWorld()->SpawnActor<ARAIInventoryManager>(ARAIInventoryManager::StaticClass());
 	}
 
 	BindHM();

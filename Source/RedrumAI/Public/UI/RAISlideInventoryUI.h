@@ -23,14 +23,16 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> VerticalBox_Button;
 
-	TArray<FRAIEvidenceData*> EvidenceData;
+	TArray<FRAIEvidenceData*> InventoryData;
 
+	UPROPERTY(EditAnywhere, Category = "RAI")
 	UTexture2D* EmptyThunmbnail;
 
 	TObjectPtr<ARAIPlayerState> RAIPlayerState;
 
 public:
 	void InitSlideInventoryUI();
+	UFUNCTION()
 	void UpdateEvidenceData();
 	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
 

@@ -14,9 +14,11 @@ void ARAIPlayerState::PostInitializeComponents()
 	}
 	EvidenceRows.SetNum(EvidenceRowsCount);
 	UE_LOG(LogTemp, Warning, TEXT("!! : %d"), EvidenceRowsCount);
+	
+	//초기화하지 않아도 0이지만, 명시용
 	for (int i = 0; i < EvidenceRows.Num(); ++i)
 	{
-		EvidenceRows[i] = NAME_None;	//초기화하지 않아도 0이지만, 명시용
+		EvidenceRows[i] = NAME_None;	
 	}
 }
 

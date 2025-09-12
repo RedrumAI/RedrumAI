@@ -16,9 +16,6 @@ class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
-	virtual void NativeConstruct() override;
-
 protected:
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> VerticalBox_Button;
@@ -31,6 +28,8 @@ protected:
 	TObjectPtr<ARAIPlayerState> RAIPlayerState;
 
 public:
+	virtual void NativeConstruct() override;
+
 	void InitSlideInventoryUI();
 	UFUNCTION()
 	void UpdateEvidenceData();

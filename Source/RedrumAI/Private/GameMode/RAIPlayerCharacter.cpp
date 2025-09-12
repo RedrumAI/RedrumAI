@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameMode/RAIPlayerCharacter.h"
@@ -20,7 +20,7 @@ ARAIPlayerCharacter::ARAIPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	InteractableSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractableSphere"));
-	InteractableSphere->SetupAttachment(RootComponent); //SphereCollision Radius¼³Á¤Àº BP¿¡¼­ Á÷Á¢ ¼³Á¤ÇÏÀÚ.
+	InteractableSphere->SetupAttachment(RootComponent); //SphereCollision Radiusì„¤ì •ì€ BPì—ì„œ ì§ì ‘ ì„¤ì •í•˜ì.
 	InteractableSphere->SetSphereRadius(InteractableDistance);
 }
 
@@ -29,103 +29,14 @@ void ARAIPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
 	InteractableSphere->OnComponentBeginOverlap.AddDynamic(this, &ARAIPlayerCharacter::OnBeginOverlapped);
 	InteractableSphere->OnComponentEndOverlap.AddDynamic(this, &ARAIPlayerCharacter::OnEndOverlapped);
-}
-
-void ARAIPlayerCharacter::OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(OtherActor))
-	{
-		InteractableActor->EnableHighlight();
-
-		bool bWasEmpty = InteractableActors.IsEmpty();
-		InteractableActors.Add(OtherActor);
-		if (bWasEmpty && !(InteractableActors.IsEmpty())) //Ã³À½ Ãß°¡µÆ´Ù¸é
-		{
-			GetWorldTimerManager().SetTimer(LinetraceTimerHandle, this, &ARAIPlayerCharacter::DoLinetrace, 0.1f, true);
-		}
-	}
-}
-
-void ARAIPlayerCharacter::OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(OtherActor))
-	{
-		InteractableActor->DisableHighlight();
-
-		InteractableActors.Remove(OtherActor);
-		if (InteractableActors.IsEmpty())
-		{
-			GetWorldTimerManager().ClearTimer(LinetraceTimerHandle);
-		}
-	}
-
-}
-
-void ARAIPlayerCharacter::DoLinetrace()
-{
-	// ÃßÈÄ Linetrace ½ÃÀÛ, ³¡ ÁöÁ¡ »ó¼¼¼³Á¤ ÇÊ¿ä
-	FVector Start = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector() * InteractableDistance;
-	FVector End = Start + ForwardVector;
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //Æ®·¹ÀÌ½º Ã¤³ÎÀ» ¹Ù²ã hitÀÌº¥Æ®¸¦ ´õÁÙÀÏ¼ö ÀÖ°Ú´Ù.
-	if (bHit)
-	{
-		UE_LOG(LogTemp, Log, TEXT("[%s] LineTrace Hit: %s"), *this->GetName(), *(HitResult.GetActor()->GetName()));
-	}
-
-	//ÀÌÀü±îÁö hitÇÏ´ø ¾×ÅÍ¿Í »õ·Ó°Ô hitµÈ ¾×ÅÍ°¡ ´Ù¸£´Ù¸é = Á¶ÁØÇÏ´Â ´ë»óÀÌ º¯°æµÇ¾ú´Ù
-	if (CurrentlyFocusedActor != HitResult.GetActor())
-	{
-		if (IRAIInteractableInterface* OldInteractableActor = Cast<IRAIInteractableInterface>(CurrentlyFocusedActor))
-		{
-			OldInteractableActor->EndFocused();
-		}
-
-		if (IRAIInteractableInterface* NewInteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
-		{
-			NewInteractableActor->BeginFocused();
-		}
-
-		//°»½Å
-		CurrentlyFocusedActor = HitResult.GetActor();
-	}
-}
-
-void ARAIPlayerCharacter::Move(const FInputActionInstance& Instance)
-{
-	FVector2D InputValue = Instance.GetValue().Get<FVector2D>();
-
-	FRotator ControllerRotation = GetControlRotation();
-	FRotator YawRotator(0, ControllerRotation.Yaw, 0);
-	FVector FowardDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::X); //¼Ò½ºÄÚµå´Â FVector FowardDirection = YawRotator.Vector();
-	FVector RightDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::Y);
-
-	AddMovementInput(FowardDirection, InputValue.Y);
-	AddMovementInput(RightDirection, InputValue.X);
 }
 
 // Called every frame
 void ARAIPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void ARAIPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	Input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ARAIPlayerCharacter::Move);
 }
 
 void ARAIPlayerCharacter::PossessedBy(AController* NewController)
@@ -166,3 +77,118 @@ void ARAIPlayerCharacter::UnPossessed()
 	}
 }
 
+// Called to bind functionality to input
+void ARAIPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	Input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ARAIPlayerCharacter::Move);
+	Input->BindAction(IA_TriggerInteractableActor, ETriggerEvent::Triggered, this, &ARAIPlayerCharacter::TriggerInteractableActor);
+}
+
+void ARAIPlayerCharacter::OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(OtherActor))
+	{
+		InteractableActor->EnableHighlight();
+
+		bool bWasEmpty = InteractableActors.IsEmpty();
+		InteractableActors.Add(OtherActor);
+		if (bWasEmpty && !(InteractableActors.IsEmpty())) //ì²˜ìŒ ì¶”ê°€ëë‹¤ë©´
+		{
+			GetWorldTimerManager().SetTimer(
+				LinetraceTimerHandle,
+				this,
+				&ARAIPlayerCharacter::TraceInteractableActor,
+				0.1f,
+				true
+			);
+		}
+	}
+}
+
+void ARAIPlayerCharacter::OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(OtherActor))
+	{
+		InteractableActor->DisableHighlight();
+
+		InteractableActors.Remove(OtherActor);
+		if (InteractableActors.IsEmpty())
+		{
+			GetWorldTimerManager().ClearTimer(LinetraceTimerHandle);
+		}
+	}
+}
+
+void ARAIPlayerCharacter::TraceInteractableActor()
+{
+	// Linetrace ì‹œì‘, ë ì§€ì  ìƒì„¸ì„¤ì • í•„ìš” (ì‹œì‘: ì¹´ë©”ë¼ìœ„ì¹˜, ë:ì¹´ë©”ë¼ForwardVector*N)
+	FVector Start = GetActorLocation();
+	FVector ForwardVector = GetActorForwardVector() * InteractableDistance;
+	FVector End = Start + ForwardVector;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //íŠ¸ë ˆì´ìŠ¤ ì±„ë„ì„ ë°”ê¿” hitì´ë²¤íŠ¸ë¥¼ ë”ì¤„ì¼ìˆ˜ ìˆê² ë‹¤.
+	if (bHit)
+	{
+		//UE_LOG(LogTemp, Log, TEXT("[%s] LineTrace Hit: %s"), *this->GetName(), *(HitResult.GetActor()->GetName()));
+	}
+
+	//ì´ì „ê¹Œì§€ hití•˜ë˜ ì•¡í„°ì™€ ìƒˆë¡­ê²Œ hitëœ ì•¡í„°ê°€ ë‹¤ë¥´ë‹¤ë©´ = ì¡°ì¤€í•˜ëŠ” ëŒ€ìƒì´ ë³€ê²½ë˜ì—ˆë‹¤
+	if (CurrentlyFocusedActor != HitResult.GetActor())
+	{
+		if (IRAIInteractableInterface* OldInteractableActor = Cast<IRAIInteractableInterface>(CurrentlyFocusedActor))
+		{
+			//OldInteractableActor->EndFocused();
+		}
+
+		if (IRAIInteractableInterface* NewInteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
+		{
+			//NewInteractableActor->BeginFocused();
+		}
+
+		//ê°±ì‹ 
+		CurrentlyFocusedActor = HitResult.GetActor();
+	}
+}
+
+void ARAIPlayerCharacter::TriggerInteractableActor()
+{
+	// Linetrace ì‹œì‘, ë ì§€ì  ìƒì„¸ì„¤ì • í•„ìš” (ì‹œì‘: ì¹´ë©”ë¼ìœ„ì¹˜, ë:ì¹´ë©”ë¼ForwardVector*N)
+	FVector Start = GetActorLocation();
+	FVector ForwardVector = GetActorForwardVector() * InteractableDistance;
+	FVector End = Start + ForwardVector;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr bHit triggered"));
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //íŠ¸ë ˆì´ìŠ¤ ì±„ë„ì„ ë°”ê¿” hitì´ë²¤íŠ¸ë¥¼ ë”ì¤„ì¼ìˆ˜ ìˆê² ë‹¤.
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.2f);
+	if (bHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr Success!"));
+		IRAIInteractableInterface* InteractableActor =Cast<IRAIInteractableInterface>(HitResult.GetActor());
+		InteractableActor->Interacted();
+	}
+}
+
+void ARAIPlayerCharacter::Move(const FInputActionInstance& Instance)
+{
+	FVector2D InputValue = Instance.GetValue().Get<FVector2D>();
+
+	FRotator ControllerRotation = GetControlRotation();
+	FRotator YawRotator(0, ControllerRotation.Yaw, 0);
+	FVector FowardDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::X); //ì†ŒìŠ¤ì½”ë“œëŠ” FVector FowardDirection = YawRotator.Vector();
+	FVector RightDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::Y);
+
+	AddMovementInput(FowardDirection, InputValue.Y);
+	AddMovementInput(RightDirection, InputValue.X);
+}

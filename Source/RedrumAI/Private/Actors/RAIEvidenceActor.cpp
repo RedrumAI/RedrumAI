@@ -31,7 +31,9 @@ void ARAIEvidenceActor::OnConstruction(const FTransform& Transform)
 
 void ARAIEvidenceActor::Interacted()
 {
-	//TODO: 플레이어의 IM에게 신호보내는 함수 호출, 인자로 EvidenceDataRow.RowName 보내기
 	ARAIGameMode* RAIGameMode= Cast<ARAIGameMode>(GetWorld()->GetAuthGameMode());
-	RAIGameMode->AddEvidence(EvidenceDataRow.RowName);
+	if (IsValid(RAIGameMode))
+	{
+		RAIGameMode->AddEvidence(EvidenceDataRow.RowName);
+	}	
 }

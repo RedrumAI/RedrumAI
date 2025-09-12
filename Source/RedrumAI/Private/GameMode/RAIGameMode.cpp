@@ -152,7 +152,10 @@ void ARAIGameMode::SetScoreStruct(const FString& String)
 
 void ARAIGameMode::AddEvidence(FName EvidenceRowName)
 {
-	InventoryManager->AddEvidence(EvidenceRowName);
+	if (IsValid(InventoryManager))
+	{
+		InventoryManager->AddEvidence(EvidenceRowName);
+	}	
 }
 
 void ARAIGameMode::UpdateChatLogUI()

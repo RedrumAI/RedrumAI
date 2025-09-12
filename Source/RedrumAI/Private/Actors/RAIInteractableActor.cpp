@@ -33,14 +33,6 @@ void ARAIInteractableActor::Interacted()
 	UE_LOG(LogTemp, Log, TEXT("[%s] Interacted"), *this->GetName());
 }
 
-void ARAIInteractableActor::EnableHighlight()
-{
-}
-
-void ARAIInteractableActor::DisableHighlight()
-{
-}
-
 void ARAIInteractableActor::BeginFocused()
 {
 	UE_LOG(LogTemp, Log, TEXT("[%s] Begin Focused"), *this->GetName());
@@ -50,4 +42,12 @@ void ARAIInteractableActor::BeginFocused()
 void ARAIInteractableActor::EndFocused()
 {
 	UE_LOG(LogTemp, Log, TEXT("[%s] End Focused"), *this->GetName());
+}
+
+void ARAIInteractableActor::EnableHighlight()
+{
+}
+
+void ARAIInteractableActor::DisableHighlight()
+{
 }

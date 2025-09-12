@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -21,27 +21,31 @@ public:
 	ARAIPlayerCharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	void Move(const FInputActionInstance& Instance);
-
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputMappingContext> InputMapping;
-	UPROPERTY(EditAnywhere, Category = "Input")
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_TriggerInteractableActor;
+	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputAction> IA_Move;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
 	TObjectPtr<USphereComponent> InteractableSphere;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractableDistance = 500.f; //BPø°º≠ ªÛººº≥¡§
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
+	float InteractableDistance = 500.f; //BPÏóêÏÑú ÏÉÅÏÑ∏ÏÑ§Ï†ï
 	UPROPERTY(EditAnywhere)
 	TSet<AActor*> InteractableActors;
 
-public:	
-	// Called every frame
+	AActor* CurrentlyFocusedActor = nullptr;
+	FTimerHandle LinetraceTimerHandle;
+
+public:
+	virtual void BeginPlay() override;
+
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
 	void OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent,
@@ -52,17 +56,14 @@ public:
 		const FHitResult& SweepResult
 	);
 	UFUNCTION()
-	void OnEndOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex	);
+	void OnEndOverlapped(UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex
+	);
 
-	void DoLinetrace();
-	FTimerHandle LinetraceTimerHandle;
-	AActor* CurrentlyFocusedActor = nullptr;
+	void TraceInteractableActor();
+	void TriggerInteractableActor();
 
-	virtual void PossessedBy(AController* NewController) override;
-
-	virtual void UnPossessed() override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	void Move(const FInputActionInstance& Instance);	
 };

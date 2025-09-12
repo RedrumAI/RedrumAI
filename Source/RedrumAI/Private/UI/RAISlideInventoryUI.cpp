@@ -20,6 +20,10 @@ void URAISlideInventoryUI::InitSlideInventoryUI()
 	{
 		RAIPlayerState->UpdateEvidenceRowsDelegate.AddDynamic(this, &URAISlideInventoryUI::UpdateEvidenceData);
 
+		//InventoryData 크기 초기화
+		int32 EvidenceRowLength = RAIPlayerState->GetEvidenceRows().Num();
+		InventoryData.SetNum(EvidenceRowLength);
+		
 		//SlideInventory 썸네일 초기화
 		for(int i=0;i< VerticalBox_Button->GetChildrenCount();++i)
 		{

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -10,6 +10,7 @@
 class UButton;
 class UVerticalBox;
 class ARAIPlayerState;
+class UWidgetAnimation;
 
 UCLASS()
 class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
@@ -20,12 +21,14 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> VerticalBox_Button;
 
+	TObjectPtr<ARAIPlayerState> RAIPlayerState;
 	TArray<FRAIEvidenceData*> InventoryData;
-
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	UTexture2D* EmptyThunmbnail;
 
-	TObjectPtr<ARAIPlayerState> RAIPlayerState;
+	bool SlideShowState = false;
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> SlideRight; //변수명과 같은 이름의 애니메이션이 자동할당
 
 public:
 	virtual void NativeConstruct() override;
@@ -34,6 +37,9 @@ public:
 	UFUNCTION()
 	void UpdateEvidenceData();
 	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
+
+	UFUNCTION()
+	void CallMoveAnimation();
 
 	void OnOpened();
 	void OnClosed();

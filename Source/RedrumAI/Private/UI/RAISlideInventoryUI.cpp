@@ -5,12 +5,18 @@
 #include "Components/VerticalBox.h"
 #include "Components/Button.h"
 #include "GameMode/RAIPlayerState.h"
+#include "GameMode/RAIPlayerController.h"
+#include "Animation/WidgetAnimation.h"
 
 void URAISlideInventoryUI::NativeConstruct()
 {
 	VerticalBox_Button = Cast<UVerticalBox>(GetWidgetFromName(TEXT("VerticalBox_Button")));
 
 	InitSlideInventoryUI();
+
+	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
+	RAIPlayerController->MoveSlideInventoryDelegate.AddDynamic(this, &URAISlideInventoryUI::CallMoveAnimation);
+	SlideShowState = false;
 }
 
 void URAISlideInventoryUI::InitSlideInventoryUI()
@@ -23,9 +29,9 @@ void URAISlideInventoryUI::InitSlideInventoryUI()
 		//InventoryData 크기 초기화
 		int32 EvidenceRowLength = RAIPlayerState->GetEvidenceRows().Num();
 		InventoryData.SetNum(EvidenceRowLength);
-		
+
 		//SlideInventory 썸네일 초기화
-		for(int i=0;i< VerticalBox_Button->GetChildrenCount();++i)
+		for (int i = 0;i < VerticalBox_Button->GetChildrenCount();++i)
 		{
 			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
 			UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
@@ -101,6 +107,24 @@ void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* 
 	InButton->SetStyle(NewStyle);
 }
 
+void URAISlideInventoryUI::CallMoveAnimation()
+{
+	if (IsPlayingAnimation())
+	{
+		return;
+	}
+
+	if (SlideShowState == true)
+	{
+		PlayAnimation(SlideRight, 0.0f, 1, EUMGSequencePlayMode::Reverse);
+		SlideShowState = false;
+	}
+	else
+	{
+		PlayAnimation(SlideRight);
+		SlideShowState = true;
+	}
+}
 
 void URAISlideInventoryUI::OnOpened()
 {

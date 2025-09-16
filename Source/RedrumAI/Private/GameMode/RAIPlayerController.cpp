@@ -15,29 +15,6 @@ ARAIPlayerController::ARAIPlayerController()
 {
 }
 
-void ARAIPlayerController::ToggleMouseCursor()
-{
-	switch (bShowMouseCursor)
-	{
-	case true:
-		SetShowMouseCursor(false);
-		break;
-	case false:
-		SetShowMouseCursor(true);
-		break;
-	default:
-		break;
-	}
-}
-
-void ARAIPlayerController::CloseLastUI()
-{
-	if (IsValid(StageHUD))
-	{
-		StageHUD->CloseLastUI();
-	}
-}
-
 void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -63,6 +40,15 @@ void ARAIPlayerController::BeginPlay()
 	BindGM();
 }
 
+void ARAIPlayerController::BindGM()
+{
+	RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
+	ensure(RAIGameMode);
+
+	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::SetAIChat);
+	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
+}
+
 void ARAIPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -71,15 +57,42 @@ void ARAIPlayerController::SetupInputComponent()
 	// 여기에서 'ETriggerEvent' 열거형 값을 변경하여 원하는 트리거 이벤트를 바인딩할 수 있습니다.
 	Input->BindAction(IA_ToggleMouseCursor, ETriggerEvent::Triggered, this, &ARAIPlayerController::ToggleMouseCursor);
 	Input->BindAction(IA_CloseLastUI, ETriggerEvent::Triggered, this, &ARAIPlayerController::CloseLastUI);
-}\
+	Input->BindAction(IA_MoveSlideInventory, ETriggerEvent::Triggered, this, &ARAIPlayerController::MoveSlideInventory);
+}
 
-void ARAIPlayerController::BindGM()
+void ARAIPlayerController::ToggleMouseCursor()
 {
-	RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
-	ensure(RAIGameMode);
+	if (bShowMouseCursor)
+	{
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
 
-	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::SetAIChat);
-	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
+		SetShowMouseCursor(false);
+
+		GetPawn()->EnableInput(this);
+	}
+	else
+	{
+		FInputModeGameAndUI InputMode;
+		SetInputMode(InputMode);
+
+		SetShowMouseCursor(true);
+
+		GetPawn()->DisableInput(this);
+	}
+}
+
+void ARAIPlayerController::CloseLastUI()
+{
+	if (IsValid(StageHUD))
+	{
+		StageHUD->CloseLastUI();
+	}
+}
+
+void ARAIPlayerController::MoveSlideInventory()
+{
+	MoveSlideInventoryDelegate.Broadcast();
 }
 
 void ARAIPlayerController::SetAIChat(FString String)

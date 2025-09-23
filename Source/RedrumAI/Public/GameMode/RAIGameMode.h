@@ -1,20 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Data/MessageRole.h"
-#include "Data/EmotionScore.h"
+#include "Data/RAIMessageRole.h"
+#include "Data/RAIEmotionScore.h"
 #include "RAIGameMode.generated.h"
 
-//AIÀÀ´äÀÇ ¹®ÀåÀÌ ÇÊ¿äÇÒ °æ¿ì FReponseDelegate¿¡, NLPÁ¡¼ö°¡ ÇÊ¿äÇÒ °æ¿ì FScoreDelegate¿¡ ¹ÙÀÎµåÇÒ °Í
+//AIì‘ë‹µì˜ ë¬¸ì¥ í˜¹ì€ NLPì ìˆ˜ê°€ í•„ìš”í•  ê²½ìš°, í•´ë‹¹ í´ë˜ìŠ¤ì—ì„œ ARAIGameMode::FResponseDelegate, FScoreDelegateì— ë°”ì¸ë“œí• ê²ƒ
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FResponseDelegate, FString, Response);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FEmotionScore, Score);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreDelegate, FRAIEmotionScore, Score);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, Role, FString, Contents);
 
 class ARAIHttpManager;
 class ARAIChatManager;
+class ARAIInventoryManager;
 
 UCLASS()
 class REDRUMAI_API ARAIGameMode : public AGameModeBase
@@ -47,13 +48,17 @@ public:
 
 	void SetScoreStruct(const FString& String);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<ARAIHttpManager> HttpManager;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TObjectPtr<ARAIChatManager> ChatManager;
+	void AddEvidence(FName EvidenceRowName);
 
-	TOptional<FEmotionScore> ScoreStruct;	//NLP¿¡¼­ ¿Â Á¡¼ö FStruct
-	TOptional<FString> ResponseString;		//OpenAI¿¡¼­ ¿Â ÀÀ´ä FString
+	UPROPERTY()
+	TObjectPtr<ARAIHttpManager> HttpManager;
+	UPROPERTY()
+	TObjectPtr<ARAIChatManager> ChatManager;
+	UPROPERTY()
+	TObjectPtr<ARAIInventoryManager> InventoryManager;
+
+	TOptional<FRAIEmotionScore> ScoreStruct;	//NLPì—ì„œ ì˜¨ ì ìˆ˜ FStruct
+	TOptional<FString> ResponseString;		//OpenAIì—ì„œ ì˜¨ ì‘ë‹µ FString
 
 	UPROPERTY()
 	FResponseDelegate SendResponseDelegate;

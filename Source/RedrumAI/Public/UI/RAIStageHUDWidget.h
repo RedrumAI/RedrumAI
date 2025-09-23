@@ -7,9 +7,11 @@
 #include "RAIStageHUDWidget.generated.h"
 
 class UCanvasPanel;
+class URAIBaseWidget;
 class URAIChatUI;
 class URAIChatLogUI;
 class URAIChatLogUIButton;
+class URAISlideInventoryUI;
 
 UCLASS()
 class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
@@ -19,24 +21,26 @@ class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	UPROPERTY()
 	TObjectPtr<URAIChatUI> ChatUI;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	UPROPERTY()
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	UPROPERTY()
 	TObjectPtr<URAIChatLogUIButton> ChatLogUIButton;
+	UPROPERTY()
+	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
 
 	TObjectPtr<UCanvasPanel> CanvasPanel;
-	TArray<UUserWidget*> UIStack;
+	TArray<URAIBaseWidget*> UIStack;
 
 	UFUNCTION()
 	void BindOwningUI();
 
 	//UI 열면 맨위에 나오게하는 로직
 	UFUNCTION()
-	void OpenUI(UUserWidget* InUI);
+	void OpenUI(URAIBaseWidget* InUI);
 	UFUNCTION()
-	void CloseUI(UUserWidget* InUI);
+	void CloseUI(URAIBaseWidget* InUI);
 	//ESC 누르면 맨위 UI삭제하다가 ESC메뉴 표시
 	UFUNCTION()
 	void CloseLastUI();

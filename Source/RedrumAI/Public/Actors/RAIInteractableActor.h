@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,7 @@
 #include "RAIInteractableInterface.h"
 #include "RAIInteractableActor.generated.h"
 
+class UBoxComponent;
 
 UCLASS()
 class REDRUMAI_API ARAIInteractableActor : public AActor, public IRAIInteractableInterface
@@ -14,28 +15,25 @@ class REDRUMAI_API ARAIInteractableActor : public AActor, public IRAIInteractabl
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARAIInteractableActor();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UMaterial> HighlightMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UBoxComponent> CollisionBox;
+
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interacted() override;
-
-	virtual void EnableHighlight() override;
-
-	virtual void DisableHighlight() override;
-
+	
+	//캐릭터 Focus시, 관련 함수
 	virtual void BeginFocused() override;
-
 	virtual void EndFocused() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UMaterial> HighlightMaterial;
-
+	virtual void EnableHighlight() override;
+	virtual void DisableHighlight() override;
 };

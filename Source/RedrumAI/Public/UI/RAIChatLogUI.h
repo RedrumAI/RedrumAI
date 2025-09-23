@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UI/RAIBaseWidget.h"
-#include "Data/MessageRole.h"
+#include "Data/RAIMessageRole.h"
 #include "RAIChatLogUI.generated.h"
 
 class UScrollBox;

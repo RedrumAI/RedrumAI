@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "RAIBaseWidget.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedWidget, UUserWidget*, ClickedWidget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedWidget, URAIBaseWidget*, ClickedWidget);
 
 UCLASS()
 class REDRUMAI_API URAIBaseWidget : public UUserWidget

@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RAIPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveSlideInventoryDelegate);
+
 class URAIStageHUDWidget;
 class ARAIGameMode;
 class UInputMappingContext;
@@ -19,13 +21,11 @@ class REDRUMAI_API ARAIPlayerController : public APlayerController
 public:
 	ARAIPlayerController();
 
+protected:
 	UPROPERTY()
 	TObjectPtr<ARAIGameMode> RAIGameMode;
-
-	virtual void BeginPlay() override;
-	void BindGM();
-	void AskSuspect(FText Text);
-
+	UPROPERTY()
+	TObjectPtr<URAIStageHUDWidget> StageHUD;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputMappingContext> InputMapping;
@@ -33,19 +33,25 @@ public:
 	TObjectPtr<UInputAction> IA_ToggleMouseCursor;
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputAction> IA_CloseLastUI;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_MoveSlideInventory;
 
-	virtual void SetupInputComponent() override;
-	UFUNCTION()
-	void ToggleMouseCursor();
-	UFUNCTION()
-	void CloseLastUI();
-
-
+public:
 	UPROPERTY()
-	TObjectPtr<URAIStageHUDWidget> StageHUD;
+	FMoveSlideInventoryDelegate MoveSlideInventoryDelegate;
+
+public:
+	virtual void BeginPlay() override;
+	void BindGM();
+	virtual void SetupInputComponent() override;
+
+	void ToggleMouseCursor();
+	void CloseLastUI();
+	void MoveSlideInventory();
 	UFUNCTION()
 	void SetAIChat(FString String);
 	UFUNCTION()
-	void AddChatLogUI(FString InRole, FString InMessage);	
+	void AddChatLogUI(FString InRole, FString InMessage);
 
+	void AskSuspect(FText Text);
 };

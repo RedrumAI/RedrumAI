@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Data/EmotionScore.h"
-#include "Data/MessageRole.h"
+#include "Data/RAIEmotionScore.h"
+#include "Data/RAIMessageRole.h"
 #include "RAIChatManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendMessageDelegate, FString, MessageArray);
@@ -31,14 +31,14 @@ public:
 	//추후 AI가 여러개가 된다면 TMap를 사용해 AI이름과 내역을 짝지어 관리하는게 좋겠다.
 	TArray<TSharedPtr<FJsonValue>> MessageArray;
 
-	FEmotionScore EmotionScore;
+	FRAIEmotionScore EmotionScore;
 
-	void SetEmotionScore(const FEmotionScore& InEmotionStruct);
+	void SetEmotionScore(const FRAIEmotionScore& InEmotionStruct);
 	void CalculateEmotion(float& EmotionScore, float Score);
 
 
-	virtual void AddMessageArray(const FEmotionScore& EmotionStruct, FString Message, EMessageRole MessageRole);
-	virtual void AddMessageArray(FString Message, EMessageRole MessageRole);
+	virtual void AddMessageArray(const FRAIEmotionScore& EmotionStruct, FString Message, ERAIMessageRole MessageRole);
+	virtual void AddMessageArray(FString Message, ERAIMessageRole MessageRole);
 
 	void SendMessageArrayToGM();
 

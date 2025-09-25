@@ -7,10 +7,13 @@
 #include "GameMode/RAIPlayerState.h"
 #include "GameMode/RAIPlayerController.h"
 #include "Animation/WidgetAnimation.h"
+#include "UI/RAIActionList.h"
+#include "Components/CanvasPanelSlot.h"
 
 void URAISlideInventoryUI::NativeConstruct()
 {
 	VerticalBox_Button = Cast<UVerticalBox>(GetWidgetFromName(TEXT("VerticalBox_Button")));
+	ActionList = Cast<URAIActionList>(GetWidgetFromName(TEXT("WBP_RAIActionList")));
 
 	InitSlideInventoryUI();
 
@@ -30,11 +33,15 @@ void URAISlideInventoryUI::InitSlideInventoryUI()
 		int32 EvidenceRowLength = RAIPlayerState->GetEvidenceRows().Num();
 		InventoryData.SetNum(EvidenceRowLength);
 
-		//SlideInventory 썸네일 초기화
 		for (int i = 0;i < VerticalBox_Button->GetChildrenCount();++i)
 		{
 			UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
+
+			//SlideInventory 썸네일 초기화
 			UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
+
+			//버튼과 버튼클릭함수 연결
+			EvidenceButton->OnClicked.AddDynamic(this, &URAISlideInventoryUI::OnEvidenceButtonClicked);
 		}
 	}
 	else
@@ -107,6 +114,24 @@ void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* 
 	InButton->SetStyle(NewStyle);
 }
 
+void URAISlideInventoryUI::OnEvidenceButtonClicked()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[%s] clicked"), *GetName())
+
+		// Show ActionList
+		ActionList->SetVisibleState(ESlateVisibility::Visible);
+
+	// Move ActionList to CursorPos
+	const FVector2D CursorPos = FSlateApplication::Get().GetCursorPos();
+	const FGeometry InventoryGeo = GetCachedGeometry();
+	const FVector2D LocalPos = InventoryGeo.AbsoluteToLocal(CursorPos);
+	if (UCanvasPanelSlot* ActionListSlot = Cast<UCanvasPanelSlot>(ActionList->Slot))
+	{
+		ActionListSlot->SetPosition(LocalPos);
+	}
+	ActionList->SetFocus();
+}
+
 void URAISlideInventoryUI::CallMoveAnimation()
 {
 	if (IsPlayingAnimation())
@@ -123,6 +148,8 @@ void URAISlideInventoryUI::CallMoveAnimation()
 	{
 		PlayAnimation(SlideRight);
 		SlideShowState = true;
+
+		ActionList->SetVisibleState(ESlateVisibility::Collapsed);
 	}
 }
 
@@ -133,3 +160,4 @@ void URAISlideInventoryUI::OnOpened()
 void URAISlideInventoryUI::OnClosed()
 {
 }
+

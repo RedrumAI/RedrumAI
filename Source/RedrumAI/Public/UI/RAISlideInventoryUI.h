@@ -11,6 +11,7 @@ class UButton;
 class UVerticalBox;
 class ARAIPlayerState;
 class UWidgetAnimation;
+class URAIActionList;
 
 UCLASS()
 class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
@@ -24,12 +25,16 @@ protected:
 	TObjectPtr<ARAIPlayerState> RAIPlayerState;
 	TArray<FRAIEvidenceData*> InventoryData;
 	UPROPERTY(EditAnywhere, Category = "RAI")
-	UTexture2D* EmptyThunmbnail;
+	TObjectPtr<UTexture2D> EmptyThunmbnail;
+	UPROPERTY()
+	TObjectPtr<URAIActionList> ActionList;
 
 	bool SlideShowState = false;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> SlideRight; //변수명과 같은 이름의 애니메이션이 자동할당
 
+	
+	
 public:
 	virtual void NativeConstruct() override;
 
@@ -37,10 +42,13 @@ public:
 	UFUNCTION()
 	void UpdateEvidenceData();
 	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
+	UFUNCTION()
+	void OnEvidenceButtonClicked();
 
 	UFUNCTION()
 	void CallMoveAnimation();
 
 	void OnOpened();
 	void OnClosed();
+
 };

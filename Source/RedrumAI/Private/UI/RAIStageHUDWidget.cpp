@@ -4,7 +4,7 @@
 #include "UI/RAIStageHUDWidget.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
-#include "UI/RAIBaseWidget.h"
+#include "UI/RAIStackWidget.h"
 #include "UI/RAIChatUI.h"
 #include "UI/RAIChatLogUI.h"
 #include "UI/RAIChatLogUIButton.h"
@@ -44,7 +44,7 @@ void URAIStageHUDWidget::BindOwningUI()
 	}
 }
 
-void URAIStageHUDWidget::OpenUI(URAIBaseWidget* InUI)
+void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 {
 	//OldSlot 저장
 	FAnchorData SavedLayout;
@@ -81,7 +81,7 @@ void URAIStageHUDWidget::OpenUI(URAIBaseWidget* InUI)
 
 }
 
-void URAIStageHUDWidget::CloseUI(URAIBaseWidget* InUI)
+void URAIStageHUDWidget::CloseUI(URAIStackWidget* InUI)
 {
 	//UI 숨김 (Collapse의 경우 Slot정보가 지워질까 염려하여 Hidden으로 사용)
 	InUI->OnClosed();

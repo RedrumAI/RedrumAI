@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/RAIBaseWidget.h"
+#include "UI/RAIStackWidget.h"
 
-FReply URAIBaseWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply URAIStackWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
-        ClickedWidgetDelegate.Broadcast(Cast<URAIBaseWidget>(this));
+        ClickedWidgetDelegate.Broadcast(Cast<URAIStackWidget>(this));
         return FReply::Handled(); // 이벤트 핸들링 완료
     }
 
     return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-void URAIBaseWidget::OnOpened()
+void URAIStackWidget::OnOpened()
 {
     if (GetVisibility() == ESlateVisibility::Hidden)
     {
@@ -24,7 +24,7 @@ void URAIBaseWidget::OnOpened()
     SetVisibility(ESlateVisibility::Visible);
 }
 
-void URAIBaseWidget::OnClosed()
+void URAIStackWidget::OnClosed()
 {
     if (GetVisibility() == ESlateVisibility::Visible)
     {

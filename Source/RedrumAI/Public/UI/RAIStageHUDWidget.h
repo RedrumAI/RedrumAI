@@ -7,7 +7,7 @@
 #include "RAIStageHUDWidget.generated.h"
 
 class UCanvasPanel;
-class URAIBaseWidget;
+class URAIStackWidget;
 class URAIChatUI;
 class URAIChatLogUI;
 class URAIChatLogUIButton;
@@ -31,16 +31,16 @@ public:
 	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
 
 	TObjectPtr<UCanvasPanel> CanvasPanel;
-	TArray<URAIBaseWidget*> UIStack;
+	TArray<URAIStackWidget*> UIStack;
 
 	UFUNCTION()
 	void BindOwningUI();
 
 	//UI 열면 맨위에 나오게하는 로직
 	UFUNCTION()
-	void OpenUI(URAIBaseWidget* InUI);
+	void OpenUI(URAIStackWidget* InUI);
 	UFUNCTION()
-	void CloseUI(URAIBaseWidget* InUI);
+	void CloseUI(URAIStackWidget* InUI);
 	//ESC 누르면 맨위 UI삭제하다가 ESC메뉴 표시
 	UFUNCTION()
 	void CloseLastUI();

@@ -116,10 +116,13 @@ void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* 
 
 void URAISlideInventoryUI::OnEvidenceButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[%s] clicked"), *GetName())
+	if (SlideShowState == false)
+	{
+		return;
+	}
 
-		// Show ActionList
-		ActionList->SetVisibleState(ESlateVisibility::Visible);
+	// Show ActionList
+	ActionList->SetVisibleState(ESlateVisibility::Visible);
 
 	// Move ActionList to CursorPos
 	const FVector2D CursorPos = FSlateApplication::Get().GetCursorPos();
@@ -148,9 +151,9 @@ void URAISlideInventoryUI::CallMoveAnimation()
 	{
 		PlayAnimation(SlideRight);
 		SlideShowState = true;
-
-		ActionList->SetVisibleState(ESlateVisibility::Collapsed);
 	}
+
+	ActionList->SetVisibleState(ESlateVisibility::Collapsed);
 }
 
 void URAISlideInventoryUI::OnOpened()

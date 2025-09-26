@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -36,12 +36,12 @@ public:
 	UFUNCTION()
 	void BindOwningUI();
 
-	//UI ¿­¸é ¸ÇÀ§¿¡ ³ª¿À°ÔÇÏ´Â ·ÎÁ÷
+	//UI ì—´ë©´ ë§¨ìœ„ì— ë‚˜ì˜¤ê²Œí•˜ëŠ” ë¡œì§
 	UFUNCTION()
 	void OpenUI(URAIStackWidget* InUI);
 	UFUNCTION()
 	void CloseUI(URAIStackWidget* InUI);
-	//ESC ´©¸£¸é ¸ÇÀ§ UI»èÁ¦ÇÏ´Ù°¡ ESC¸Ş´º Ç¥½Ã
+	//ESC ëˆ„ë¥´ë©´ ë§¨ìœ„ UIì‚­ì œí•˜ë‹¤ê°€ ESCë©”ë‰´ í‘œì‹œ
 	UFUNCTION()
 	void CloseLastUI();
 	UFUNCTION()

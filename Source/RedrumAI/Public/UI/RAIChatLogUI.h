@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UScrollBox> ScrollBox;
 
-	//»ı¼ºÇÒ ChatLongEntry BP¹öÀü »ğÀÔ
+	//ìƒì„±í•  ChatLongEntry BPë²„ì „ ì‚½ì…
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
 	TSubclassOf<URAIChatLogEntry> ChatLogEntryBP;
 

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -16,7 +16,7 @@ public:
 	FRAIEmotionScore();
 	~FRAIEmotionScore();
 
-	//¹üÀ§ = clamp(9.99, 0.00)
+	//ë²”ìœ„ = clamp(9.99, 0.00)
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Love;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

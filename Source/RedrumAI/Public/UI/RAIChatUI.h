@@ -19,6 +19,7 @@ class REDRUMAI_API URAIChatUI : public URAIStackWidget
 
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 	UPROPERTY()
 	TObjectPtr<UTextBlock> AIChat;
@@ -34,4 +35,6 @@ public:
 
 	void SetAIChat(FString String);
 	void AskSuspect(FText Text);
+
+	virtual void OnClosed() override;
 };

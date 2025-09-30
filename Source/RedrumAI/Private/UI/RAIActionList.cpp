@@ -5,7 +5,7 @@
 
 void URAIActionList::NativeConstruct()
 {
-	bIsFocusable = true;
+	SetIsFocusable(true);
 }
 
 void URAIActionList::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)

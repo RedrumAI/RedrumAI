@@ -10,6 +10,8 @@
 
 void URAIChatUI::NativeConstruct()
 {
+	Super::NativeConstruct();
+
 	RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 
 	AIChat = Cast<UTextBlock>(GetWidgetFromName(TEXT("AIChat")));
@@ -18,8 +20,19 @@ void URAIChatUI::NativeConstruct()
 
 	if (UserChat)
 	{
+		//bUserChat->OnTextCommitted.RemoveDynamic(this, &URAIChatUI::OnCommittedText); // 중복 제거
 		UserChat->OnTextCommitted.AddDynamic(this, &URAIChatUI::OnCommittedText);
 	}
+}
+
+void URAIChatUI::NativeDestruct()
+{
+	if (UserChat)
+	{
+		UserChat->OnTextCommitted.RemoveDynamic(this, &URAIChatUI::OnCommittedText);
+	}
+
+	Super::NativeDestruct();
 }
 
 void URAIChatUI::OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod)
@@ -57,4 +70,11 @@ void URAIChatUI::SetAIChat(FString String)
 void URAIChatUI::AskSuspect(FText Text)
 {
 	RAIPlayerController->AskSuspect(Text);
+}
+
+void URAIChatUI::OnClosed()
+{
+	Super::OnClosed();
+
+	RAIPlayerController->SetTalkingState(false);
 }

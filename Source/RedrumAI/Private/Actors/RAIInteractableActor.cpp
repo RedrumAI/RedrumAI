@@ -13,6 +13,8 @@ ARAIInteractableActor::ARAIInteractableActor()
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	SetRootComponent(CollisionBox);
 	//추후 Collision Preset 설정해주기
+
+	EvidenceType = ERAIEvidenceType::NotEvidence;
 }
 
 // Called when the game starts or when spawned
@@ -33,6 +35,10 @@ void ARAIInteractableActor::Interacted()
 	UE_LOG(LogTemp, Log, TEXT("[%s] Interacted"), *this->GetName());
 }
 
+void ARAIInteractableActor::Interacted(AController* InController)
+{
+}
+
 void ARAIInteractableActor::BeginFocused()
 {
 	UE_LOG(LogTemp, Log, TEXT("[%s] Begin Focused"), *this->GetName());
@@ -50,4 +56,9 @@ void ARAIInteractableActor::EnableHighlight()
 
 void ARAIInteractableActor::DisableHighlight()
 {
+}
+
+ERAIEvidenceType ARAIInteractableActor::GetEvidenceType()
+{
+	return EvidenceType;
 }

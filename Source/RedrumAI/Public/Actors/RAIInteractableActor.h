@@ -25,15 +25,21 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UBoxComponent> CollisionBox;
+	
+	UPROPERTY(EditAnywhere)
+	ERAIEvidenceType EvidenceType;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interacted() override;
-	
+	virtual void Interacted(AController* InController) override;
+
 	//캐릭터 Focus시, 관련 함수
 	virtual void BeginFocused() override;
 	virtual void EndFocused() override;
 	virtual void EnableHighlight() override;
 	virtual void DisableHighlight() override;
+
+	virtual ERAIEvidenceType GetEvidenceType() override;
 };

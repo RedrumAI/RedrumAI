@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Actors/RAIInteractableActor.h"
-#include "Data/RAIEvidenceType.h"
 #include "Engine/DataTable.h"
 #include "RAIEvidenceActor.generated.h"
 
@@ -24,8 +23,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
 	UPROPERTY(VisibleAnywhere)
-	ERAIEvidenceType EvidenceType;
-	UPROPERTY(VisibleAnywhere)
 	FText DisplayName;
 	UPROPERTY(VisibleAnywhere)
 	FText Description;
@@ -41,7 +38,6 @@ protected:
 
 public:
 	TSubclassOf<ARAIEvidenceActor> GetEvidenceClass() const { return EvidenceClass; };
-	ERAIEvidenceType GetEvidenceType() const { return EvidenceType; };
 	FText GetDisplayName() const { return DisplayName; };
 	FText GetDescription() const { return Description; };
 	TSoftObjectPtr<UStaticMesh> GetMesh() const { return MeshComponent->GetStaticMesh(); };

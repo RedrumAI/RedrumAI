@@ -10,6 +10,7 @@
 #include "Components/SphereComponent.h"
 #include "Actors/RAIInteractableInterface.h"
 
+
 // Sets default values
 ARAIPlayerCharacter::ARAIPlayerCharacter()
 {
@@ -172,8 +173,17 @@ void ARAIPlayerCharacter::TriggerInteractableActor()
 	if (bHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr Success!"));
-		IRAIInteractableInterface* InteractableActor =Cast<IRAIInteractableInterface>(HitResult.GetActor());
-		InteractableActor->Interacted();
+		if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
+		{
+			if (InteractableActor->GetEvidenceType() == ERAIEvidenceType::NotEvidence)
+			{
+				InteractableActor->Interacted(Controller);
+			}
+			else
+			{
+				InteractableActor->Interacted();
+			}
+		}		
 	}
 }
 

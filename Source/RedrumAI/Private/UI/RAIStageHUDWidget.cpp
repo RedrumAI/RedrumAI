@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/RAIStageHUDWidget.h"
@@ -18,7 +18,7 @@ void URAIStageHUDWidget::NativeConstruct()
 	ChatLogUIButton = Cast<URAIChatLogUIButton>(GetWidgetFromName(TEXT("WBP_RAIChatLogUIButton")));
 	SlideInventoryUI = Cast<URAISlideInventoryUI>(GetWidgetFromName(TEXT("WBP_RAISlideInventoryUI")));
 
-	//ChatUI, LogUI, Button Valid∞ÀªÁ. ∫“≈Î∞˙Ω√ ≈∏¿Ã∏”∑Œ ¥ŸΩ√µπ∏Æ±‚
+	//ChatUI, LogUI, Button ValidÍ≤ÄÏÇ¨. Î∂àÌÜµÍ≥ºÏãú ÌÉÄÏù¥Î®∏Î°ú Îã§ÏãúÎèåÎ¶¨Í∏∞
 	BindOwningUI();
 }
 
@@ -26,7 +26,7 @@ void URAIStageHUDWidget::BindOwningUI()
 {
 	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton))
 	{
-		//¿Œ∫•≈‰∏ÆTab¿« ∞ÊøÏ Open»§¿∫ Close«œ∏È æ»µ«±‚ø° ¡¶ø‹
+		//Ïù∏Î≤§ÌÜ†Î¶¨TabÏùò Í≤ΩÏö∞ OpenÌòπÏùÄ CloseÌïòÎ©¥ ÏïàÎêòÍ∏∞Ïóê Ï†úÏô∏
 		ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
 		ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
 		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
@@ -46,7 +46,7 @@ void URAIStageHUDWidget::BindOwningUI()
 
 void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 {
-	//OldSlot ¿˙¿Â
+	//OldSlot Ï†ÄÏû•
 	FAnchorData SavedLayout;
 	FVector2D SavedAlignment;
 	int32 SavedZOrder;
@@ -57,11 +57,11 @@ void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 		SavedZOrder = OldSlot->GetZOrder();
 	}
 
-	//ƒƒ∆˜≥Õ∆Æ ±∏¡∂ √÷«œ¥‹¿∏∑Œ ¿Ãµø«œø© HUD ∏«æ’ø° «•Ω√
+	//Ïª¥Ìè¨ÎÑåÌä∏ Íµ¨Ï°∞ ÏµúÌïòÎã®ÏúºÎ°ú Ïù¥ÎèôÌïòÏó¨ HUD Îß®ÏïûÏóê ÌëúÏãú
 	InUI->RemoveFromParent();
 	CanvasPanel->AddChild(InUI);
 
-	//SavedData ¿˚øÎ
+	//SavedData Ï†ÅÏö©
 	if (UCanvasPanelSlot* NewSlot = Cast<UCanvasPanelSlot>(InUI->Slot))
 	{
 		NewSlot->SetLayout(SavedLayout);
@@ -69,11 +69,11 @@ void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 		NewSlot->SetZOrder(SavedZOrder);
 	}
 
-	//UI «•Ω√
+	//UI ÌëúÏãú
 	InUI->OnOpened();
 
-	//UIStack √ﬂ∞°
-	if (UIStack.Find(InUI) != INDEX_NONE) //±‚¡∏ø° ø≠∑¡¿÷¥¯ UI∂Û∏È Stackø°º≠ ¡¶∞≈«œ∞Ì ¥ŸΩ√ Push
+	//UIStack Ï∂îÍ∞Ä
+	if (UIStack.Find(InUI) != INDEX_NONE) //Í∏∞Ï°¥Ïóê Ïó¥Î†§ÏûàÎçò UIÎùºÎ©¥ StackÏóêÏÑú Ï†úÍ±∞ÌïòÍ≥† Îã§Ïãú Push
 	{
 		UIStack.Remove(InUI);
 	}
@@ -83,10 +83,10 @@ void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 
 void URAIStageHUDWidget::CloseUI(URAIStackWidget* InUI)
 {
-	//UI º˚±Ë (Collapse¿« ∞ÊøÏ Slot¡§∫∏∞° ¡ˆøˆ¡˙±Ó ø∞∑¡«œø© Hidden¿∏∑Œ ªÁøÎ)
+	//UI Ïà®ÍπÄ (CollapseÏùò Í≤ΩÏö∞ SlotÏ†ïÎ≥¥Í∞Ä ÏßÄÏõåÏßàÍπå ÏóºÎ†§ÌïòÏó¨ HiddenÏúºÎ°ú ÏÇ¨Ïö©)
 	InUI->OnClosed();
 
-	//UIStack √ﬂ∞°
+	//UIStack Ï∂îÍ∞Ä
 	UIStack.Remove(InUI);
 }
 
@@ -98,10 +98,21 @@ void URAIStageHUDWidget::CloseLastUI()
 	}
 	else
 	{
-		// TODO : ESC∏ﬁ¥∫√¢ √ﬂ∞° øπ¡§
+		// TODO : ESCÎ©îÎâ¥Ï∞Ω Ï∂îÍ∞Ä ÏòàÏ†ï
 		UE_LOG(LogTemp, Warning, TEXT("ESC Menu will be appear.(Now Testing at Q)"));
 	}
+}
 
+void URAIStageHUDWidget::SwitchChatUI(bool bIsTalking)
+{
+	if (bIsTalking)
+	{
+		OpenUI(ChatUI);
+	}
+	else
+	{
+		CloseUI(ChatUI);
+	}
 }
 
 void URAIStageHUDWidget::ToggleChatLogUI()
@@ -112,7 +123,7 @@ void URAIStageHUDWidget::ToggleChatLogUI()
 		CloseUI(ChatLogUI);
 		break;
 	case ESlateVisibility::Hidden:
-		//if(∏ﬁ¥∫√¢ visibleªÛ≈¬∂Û∏È) closeUI(∏ﬁ¥∫√¢)
+		//if(Î©îÎâ¥Ï∞Ω visibleÏÉÅÌÉúÎùºÎ©¥) closeUI(Î©îÎâ¥Ï∞Ω)
 		OpenUI(ChatLogUI);
 		break;
 	default:

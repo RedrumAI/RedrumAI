@@ -44,6 +44,9 @@ public:
 	//ESC 누르면 맨위 UI삭제하다가 ESC메뉴 표시
 	UFUNCTION()
 	void CloseLastUI();
+
+	UFUNCTION()
+	void SwitchChatUI(bool bIsTalking);
 	UFUNCTION()
 	void ToggleChatLogUI();
 

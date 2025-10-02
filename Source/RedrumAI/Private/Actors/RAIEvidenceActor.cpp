@@ -20,8 +20,9 @@ void ARAIEvidenceActor::OnConstruction(const FTransform& Transform)
 	const FRAIEvidenceData* EvidenceData = EvidenceDataRow.GetRow<FRAIEvidenceData>(DebugContext);
 	if (EvidenceData != nullptr)
 	{
-		EvidenceClass = EvidenceData->EvidenceClass;
 		InteractType = EvidenceData->InteractType;
+
+		EvidenceClass = EvidenceData->EvidenceClass;
 		DisplayName = EvidenceData->DisplayName;
 		Description = EvidenceData->Description;
 		EvidenceImage = EvidenceData->EvidenceImage;

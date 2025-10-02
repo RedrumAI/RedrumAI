@@ -29,7 +29,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URAIActionList> ActionList;
 
-	bool SlideShowState = false;
+	bool bSlideShowState = false;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> SlideRight; //변수명과 같은 이름의 애니메이션이 자동할당
 
@@ -44,7 +44,10 @@ public:
 	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
 	UFUNCTION()
 	void OnEvidenceButtonClicked();
-
+	
+	//값을 찾지못하면 return -1
+	int32 FindClickedButtonIndex(); 
+	void ShowActionList();
 	UFUNCTION()
 	void CallMoveAnimation();
 

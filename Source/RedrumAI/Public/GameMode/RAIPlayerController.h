@@ -7,7 +7,7 @@
 #include "RAIPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveSlideInventoryDelegate);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateTalkingState, bool, bIsTalking);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateTalkingStateDelegate, bool, bIsTalking);
 
 class URAIStageHUDWidget;
 class ARAIGameMode;
@@ -43,7 +43,7 @@ public:
 	UPROPERTY()
 	FMoveSlideInventoryDelegate MoveSlideInventoryDelegate;
 	UPROPERTY()
-	FOnUpdateTalkingState UpdateTalkingState;
+	FOnUpdateTalkingStateDelegate UpdateTalkingStateDelegate;
 
 public:
 	virtual void BeginPlay() override;
@@ -59,6 +59,7 @@ public:
 	UFUNCTION()
 	void AddChatLogUI(FString InRole, FString InMessage);
 
+	bool GetTalkingState() const;
 	void SetTalkingState(bool InBool);
 	UFUNCTION()
 	void SwitchTalkingMode(bool InBool);

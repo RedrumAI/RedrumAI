@@ -39,7 +39,7 @@ void ARAIPlayerController::BeginPlay()
 
 	BindGM();
 	BindHUD();
-	UpdateTalkingState.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
+	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
 }
 
 void ARAIPlayerController::BindGM()
@@ -55,7 +55,7 @@ void ARAIPlayerController::BindHUD()
 {
 	if (IsValid(StageHUD))
 	{
-		UpdateTalkingState.AddDynamic(StageHUD, &URAIStageHUDWidget::SwitchChatUI);
+		UpdateTalkingStateDelegate.AddDynamic(StageHUD, &URAIStageHUDWidget::SwitchChatUI);
 	}
 	else
 	{
@@ -136,13 +136,18 @@ void ARAIPlayerController::AddChatLogUI(FString InRole, FString InMessage)
 	}
 }
 
+bool ARAIPlayerController::GetTalkingState() const
+{
+	return bIsTalking;
+}
+
 void ARAIPlayerController::SetTalkingState(bool InBool)
 {
 	//변경될 경우에만 broadcast
 	if (bIsTalking != InBool)
 	{
 		bIsTalking = InBool;
-		UpdateTalkingState.Broadcast(bIsTalking);
+		UpdateTalkingStateDelegate.Broadcast(bIsTalking);
 	}	
 }
 

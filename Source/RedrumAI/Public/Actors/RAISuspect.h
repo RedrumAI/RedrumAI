@@ -19,7 +19,6 @@ public:
 
 protected:
 
-	
 public:
 	virtual void Interacted(AController* InController) override;
 };

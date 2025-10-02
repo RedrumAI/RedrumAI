@@ -19,7 +19,7 @@ void URAISlideInventoryUI::NativeConstruct()
 
 	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 	RAIPlayerController->MoveSlideInventoryDelegate.AddDynamic(this, &URAISlideInventoryUI::CallMoveAnimation);
-	SlideShowState = false;
+	bSlideShowState = false;
 }
 
 void URAISlideInventoryUI::InitSlideInventoryUI()
@@ -116,11 +116,36 @@ void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* 
 
 void URAISlideInventoryUI::OnEvidenceButtonClicked()
 {
-	if (SlideShowState == false)
+	if (bSlideShowState == false)
 	{
 		return;
 	}
 
+	int32 ClickedIndex = FindClickedButtonIndex();
+	if ( ClickedIndex != -1)
+	{		
+		ActionList->SetEvidenceData(InventoryData[ClickedIndex]);
+		ShowActionList();
+	}	
+}
+
+int32 URAISlideInventoryUI::FindClickedButtonIndex()
+{
+	for (int32 i = 0;i < VerticalBox_Button->GetChildrenCount();++i)
+	{
+		UButton* Button = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
+		if(Button->HasUserFocus(GetOwningPlayer()))
+		{
+			return i;
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[SlideInventoryUI] : FindClickedButtonIndex Failed"));
+	return -1;
+}
+
+void URAISlideInventoryUI::ShowActionList()
+{
 	// Show ActionList
 	ActionList->SetVisibleState(ESlateVisibility::Visible);
 
@@ -142,15 +167,15 @@ void URAISlideInventoryUI::CallMoveAnimation()
 		return;
 	}
 
-	if (SlideShowState == true)
+	if (bSlideShowState == true)
 	{
 		PlayAnimation(SlideRight, 0.0f, 1, EUMGSequencePlayMode::Reverse);
-		SlideShowState = false;
+		bSlideShowState = false;
 	}
 	else
 	{
 		PlayAnimation(SlideRight);
-		SlideShowState = true;
+		bSlideShowState = true;
 	}
 
 	ActionList->SetVisibleState(ESlateVisibility::Collapsed);

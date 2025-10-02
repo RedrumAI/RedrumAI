@@ -13,7 +13,6 @@ void ARAIPlayerState::PostInitializeComponents()
 		EvidenceRowsCount = EvidenceDataTable->GetRowMap().Num();
 	}
 	EvidenceRows.SetNum(EvidenceRowsCount);
-	UE_LOG(LogTemp, Warning, TEXT("!! : %d"), EvidenceRowsCount);
 	
 	//초기화하지 않아도 0이지만, 명시용
 	for (int i = 0; i < EvidenceRows.Num(); ++i)

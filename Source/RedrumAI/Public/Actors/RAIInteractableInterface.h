@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "Data/RAIEvidenceType.h"
+#include "Data/RAIInteractType.h"
 #include "RAIInteractableInterface.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -25,5 +25,5 @@ public:
 	virtual void BeginFocused();
 	virtual void EndFocused();
 
-	virtual ERAIEvidenceType GetEvidenceType();
+	virtual ERAIInteractType GetInteractType();
 };

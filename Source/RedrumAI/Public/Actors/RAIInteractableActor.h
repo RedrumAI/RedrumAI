@@ -27,7 +27,7 @@ protected:
 	TObjectPtr<UBoxComponent> CollisionBox;
 	
 	UPROPERTY(EditAnywhere)
-	ERAIEvidenceType EvidenceType;
+	ERAIInteractType InteractType;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -41,5 +41,5 @@ public:
 	virtual void EnableHighlight() override;
 	virtual void DisableHighlight() override;
 
-	virtual ERAIEvidenceType GetEvidenceType() override;
+	virtual ERAIInteractType GetInteractType() override;
 };

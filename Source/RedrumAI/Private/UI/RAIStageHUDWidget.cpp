@@ -78,16 +78,16 @@ void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 		UIStack.Remove(InUI);
 	}
 	UIStack.Push(InUI);
-
 }
 
 void URAIStageHUDWidget::CloseUI(URAIStackWidget* InUI)
 {
-	//UI 숨김 (Collapse의 경우 Slot정보가 지워질까 염려하여 Hidden으로 사용)
-	InUI->OnClosed();
-
-	//UIStack 추가
-	UIStack.Remove(InUI);
+	//UIStack 제거
+	if (UIStack.Remove(InUI))
+	{
+		//제거 성공했다면 제거시 기능 호출
+		InUI->OnClosed();
+	}
 }
 
 void URAIStageHUDWidget::CloseLastUI()

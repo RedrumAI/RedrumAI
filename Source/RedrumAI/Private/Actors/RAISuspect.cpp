@@ -6,7 +6,7 @@
 
 ARAISuspect::ARAISuspect()
 {
-	EvidenceType = ERAIEvidenceType::NotEvidence;
+	InteractType = ERAIInteractType::Suspect;
 }
 
 void ARAISuspect::Interacted(AController* InController)

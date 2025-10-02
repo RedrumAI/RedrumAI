@@ -21,7 +21,7 @@ void ARAIEvidenceActor::OnConstruction(const FTransform& Transform)
 	if (EvidenceData != nullptr)
 	{
 		EvidenceClass = EvidenceData->EvidenceClass;
-		EvidenceType = EvidenceData->EvidenceType;
+		InteractType = EvidenceData->InteractType;
 		DisplayName = EvidenceData->DisplayName;
 		Description = EvidenceData->Description;
 		EvidenceImage = EvidenceData->EvidenceImage;

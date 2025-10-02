@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Actors/RAIInteractableActor.h"
@@ -12,9 +12,9 @@ ARAIInteractableActor::ARAIInteractableActor()
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	SetRootComponent(CollisionBox);
-	//ÃßÈÄ Collision Preset ¼³Á¤ÇØÁÖ±â
+	//ì¶”í›„ Collision Preset ì„¤ì •í•´ì£¼ê¸°
 
-	EvidenceType = ERAIEvidenceType::NotEvidence;
+	InteractType = ERAIInteractType::Unknown;
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +58,7 @@ void ARAIInteractableActor::DisableHighlight()
 {
 }
 
-ERAIEvidenceType ARAIInteractableActor::GetEvidenceType()
+ERAIInteractType ARAIInteractableActor::GetInteractType()
 {
-	return EvidenceType;
+	return InteractType;
 }

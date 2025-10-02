@@ -77,4 +77,6 @@ void URAIChatUI::OnClosed()
 	Super::OnClosed();
 
 	RAIPlayerController->SetTalkingState(false);
+
+	UE_LOG(LogTemp, Warning, TEXT("ChatUI OnClosed called!"));
 }

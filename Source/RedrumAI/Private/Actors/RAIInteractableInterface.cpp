@@ -26,7 +26,7 @@ void IRAIInteractableInterface::EndFocused()
 {
 }
 
-ERAIEvidenceType IRAIInteractableInterface::GetEvidenceType()
+ERAIInteractType IRAIInteractableInterface::GetInteractType()
 {
-	return ERAIEvidenceType();
+	return ERAIInteractType();
 }

@@ -7,6 +7,8 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAISlideInventoryUI.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResponseActionTextDelegate, FText, ActionText);
+
 class UButton;
 class UVerticalBox;
 class ARAIPlayerState;
@@ -33,12 +35,16 @@ protected:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> SlideRight; //변수명과 같은 이름의 애니메이션이 자동할당
 
-	
+public:
+	UPROPERTY()
+	FOnResponseActionTextDelegate ResponseActionTextDelegate;
 	
 public:
 	virtual void NativeConstruct() override;
 
-	void InitSlideInventoryUI();
+	void InitSettingSlideInventory();
+	void SetupEvidenceData();
+
 	UFUNCTION()
 	void UpdateEvidenceData();
 	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
@@ -54,4 +60,6 @@ public:
 	void OnOpened();
 	void OnClosed();
 
+	UFUNCTION()
+	void ResponseActionText(FText ActionText);
 };

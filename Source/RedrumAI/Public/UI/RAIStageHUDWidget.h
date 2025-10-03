@@ -18,9 +18,7 @@ class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
-	virtual void NativeConstruct() override;
-
+protected:
 	UPROPERTY()
 	TObjectPtr<URAIChatUI> ChatUI;
 	UPROPERTY()
@@ -32,6 +30,9 @@ public:
 
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 	TArray<URAIStackWidget*> UIStack;
+	
+public:
+	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void BindOwningUI();

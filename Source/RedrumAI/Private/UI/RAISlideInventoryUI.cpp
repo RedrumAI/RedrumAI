@@ -15,16 +15,37 @@ void URAISlideInventoryUI::NativeConstruct()
 	VerticalBox_Button = Cast<UVerticalBox>(GetWidgetFromName(TEXT("VerticalBox_Button")));
 	ActionList = Cast<URAIActionList>(GetWidgetFromName(TEXT("WBP_RAIActionList")));
 
-	InitSlideInventoryUI();
+	InitSettingSlideInventory();
 
 	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 	RAIPlayerController->MoveSlideInventoryDelegate.AddDynamic(this, &URAISlideInventoryUI::CallMoveAnimation);
 	bSlideShowState = false;
 }
 
-void URAISlideInventoryUI::InitSlideInventoryUI()
+void URAISlideInventoryUI::InitSettingSlideInventory()
 {
 	RAIPlayerState = GetOwningPlayerState<ARAIPlayerState>();
+	if (IsValid(RAIPlayerState) && IsValid(ActionList))
+	{
+		SetupEvidenceData();
+
+		ActionList->SendActionTextDelegate.AddDynamic(this, &URAISlideInventoryUI::ResponseActionText);
+	}
+	else
+	{
+		FTimerHandle TimerHandle_InitSettingSlideInventory;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_InitSettingSlideInventory,
+			this,
+			&URAISlideInventoryUI::InitSettingSlideInventory,
+			0.1f,
+			false
+		);
+	}
+}
+
+void URAISlideInventoryUI::SetupEvidenceData()
+{
 	if (IsValid(RAIPlayerState))
 	{
 		RAIPlayerState->UpdateEvidenceRowsDelegate.AddDynamic(this, &URAISlideInventoryUI::UpdateEvidenceData);
@@ -43,17 +64,6 @@ void URAISlideInventoryUI::InitSlideInventoryUI()
 			//버튼과 버튼클릭함수 연결
 			EvidenceButton->OnClicked.AddDynamic(this, &URAISlideInventoryUI::OnEvidenceButtonClicked);
 		}
-	}
-	else
-	{
-		FTimerHandle TimerHandle_InitSlideInventoryUI;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_InitSlideInventoryUI,
-			this,
-			&URAISlideInventoryUI::InitSlideInventoryUI,
-			0.1f,
-			false
-		);
 	}
 }
 
@@ -187,5 +197,10 @@ void URAISlideInventoryUI::OnOpened()
 
 void URAISlideInventoryUI::OnClosed()
 {
+}
+
+void URAISlideInventoryUI::ResponseActionText(FText ActionText)
+{
+	ResponseActionTextDelegate.Broadcast(ActionText);
 }
 

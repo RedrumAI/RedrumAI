@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/RAIChatUI.h"
@@ -20,7 +20,7 @@ void URAIChatUI::NativeConstruct()
 
 	if (UserChat)
 	{
-		//bUserChat->OnTextCommitted.RemoveDynamic(this, &URAIChatUI::OnCommittedText); // Áßº¹ Á¦°Å
+		//bUserChat->OnTextCommitted.RemoveDynamic(this, &URAIChatUI::OnCommittedText); // ì¤‘ë³µ ì œê±°
 		UserChat->OnTextCommitted.AddDynamic(this, &URAIChatUI::OnCommittedText);
 	}
 }
@@ -35,26 +35,26 @@ void URAIChatUI::NativeDestruct()
 	Super::NativeDestruct();
 }
 
+void URAIChatUI::SubmitExternalMessage(FText Text)
+{
+	OnCommittedText(Text, ETextCommit::OnEnter);
+}
+
 void URAIChatUI::OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod)
 {
 	switch (CommitMethod)
 	{
-
 	case ETextCommit::OnEnter:
 	{
-		//TODO:: 1. UserChatÀÇ ³»¿ë GM¿¡°Ô Àü´Þ. ±× ÈÄ´Â GMÀÌ ¾Ë¾Æ¼­ Ã³¸®
+		//TODO:: 1. UserChatì˜ ë‚´ìš© GMì—ê²Œ ì „ë‹¬. ê·¸ í›„ëŠ” GMì´ ì•Œì•„ì„œ ì²˜ë¦¬
 		AskSuspect(Text);
-		//2. UserChatÀÌ Áö¿öÁú°Í
+		//2. UserChatì´ ì§€ì›Œì§ˆê²ƒ
 		UserChat->SetText(FText::FromString(TEXT("")));
-		//3. ÀÌÀü AIChatÀ» Áö¿ì°í LoadingImageÈ°¼ºÈ­ -> ÃßÈÄ AIChatÀÌ µé¾î¿Ã¶§ LoadingImageºñÈ°¼ºÈ­
+		//3. ì´ì „ AIChatì„ ì§€ìš°ê³  LoadingImageí™œì„±í™” -> ì¶”í›„ AIChatì´ ë“¤ì–´ì˜¬ë•Œ LoadingImageë¹„í™œì„±í™”
 		SetAIChat((TEXT("")));
 		LoadingImage->SetVisibility(ESlateVisibility::Visible);
 		break;
 	}
-	case ETextCommit::OnCleared:
-		UserChat->SetUserFocus(GetOwningPlayer());
-		break;
-
 	default:
 		break;
 	}
@@ -63,10 +63,9 @@ void URAIChatUI::SetAIChat(FString String)
 {
 	LoadingImage->SetVisibility(ESlateVisibility::Collapsed);
 	AIChat->SetText(FText::FromString(String));
-	//³ªÁß¿¡ Å¸ÀÌÇÎ ¾Ö´Ï¸ÞÀÌ¼ÇÀ» ³Ö¾îº¸¸é ¾î¶³±î? Å¸ÀÌ¸Ó¸¦ ÅëÇØ¼­ ¸ñÇ¥ ¹®Àå±îÁö ÇÑ±ÛÀÚ¾¿ Ã¤¿öÁö´Â ¹è¿­¹®ÀåÀ» »ç¿ëÇÏ¸é µÉ °Í °°´Ù.
+	//ë‚˜ì¤‘ì— íƒ€ì´í•‘ ì• ë‹ˆë©”ì´ì…˜ì„ ë„£ì–´ë³´ë©´ ì–´ë–¨ê¹Œ? íƒ€ì´ë¨¸ë¥¼ í†µí•´ì„œ ëª©í‘œ ë¬¸ìž¥ê¹Œì§€ í•œê¸€ìžì”© ì±„ì›Œì§€ëŠ” ë°°ì—´ë¬¸ìž¥ì„ ì‚¬ìš©í•˜ë©´ ë  ê²ƒ ê°™ë‹¤.
 }
 
-//¿£ÅÍ¸¦ ´©¸¥´Ù -> HUD¿¡¼­ ÇÔ¼ö(ChatUIÀÛµ¿)È£Ãâ -> ChatUI::ÅØ½ºÆ®¸¦ GMÀ¸·Î Àü¼Û -> GMÀº CMÀ¸·Î Àü¼Û ->¿©±â¼­ºÎÅÍ´Â ¿Ï¼º
 void URAIChatUI::AskSuspect(FText Text)
 {
 	RAIPlayerController->AskSuspect(Text);
@@ -77,6 +76,4 @@ void URAIChatUI::OnClosed()
 	Super::OnClosed();
 
 	RAIPlayerController->SetTalkingState(false);
-
-	UE_LOG(LogTemp, Warning, TEXT("ChatUI OnClosed called!"));
 }

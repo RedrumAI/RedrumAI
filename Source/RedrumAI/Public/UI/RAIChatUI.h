@@ -17,10 +17,7 @@ class REDRUMAI_API URAIChatUI : public URAIStackWidget
 {
 	GENERATED_BODY()
 
-public:
-	virtual void NativeConstruct() override;
-	virtual void NativeDestruct() override;
-	
+protected:
 	UPROPERTY()
 	TObjectPtr<UTextBlock> AIChat;
 	UPROPERTY()
@@ -29,7 +26,13 @@ public:
 	TObjectPtr<UImage> LoadingImage;
 
 	TObjectPtr<ARAIPlayerController> RAIPlayerController;
+	
+public:
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
+	UFUNCTION()
+	void SubmitExternalMessage(FText Text);
 	UFUNCTION()
 	void OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod);
 

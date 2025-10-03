@@ -24,12 +24,15 @@ void URAIStageHUDWidget::NativeConstruct()
 
 void URAIStageHUDWidget::BindOwningUI()
 {
-	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton))
+	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton) && IsValid(SlideInventoryUI))
 	{
 		//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
 		ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
 		ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
 		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
+
+		//UI간 바인드 연결
+		SlideInventoryUI->ResponseActionTextDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
 	}
 	else
 	{

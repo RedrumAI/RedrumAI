@@ -11,8 +11,6 @@ ARAISuspect::ARAISuspect()
 
 void ARAISuspect::Interacted(AController* InController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("!"));
-
 	ARAIPlayerController* InPC = Cast<ARAIPlayerController>(InController);
 	InPC->SetTalkingState(true);
 }

@@ -7,6 +7,8 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAIActionList.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendActionTextDelegate, FText, ActionText);
+
 class UVerticalBox;
 class UButton;
 
@@ -24,6 +26,10 @@ protected:
 	TObjectPtr<UButton> Button_Inspect;
 
 	FRAIEvidenceData* EvidenceData;
+
+public:
+	UPROPERTY()
+	FOnSendActionTextDelegate SendActionTextDelegate;
 
 public:
 	virtual void NativeConstruct() override;

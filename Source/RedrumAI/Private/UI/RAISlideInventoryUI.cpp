@@ -17,7 +17,7 @@ void URAISlideInventoryUI::NativeConstruct()
 
 	InitSettingSlideInventory();
 
-	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
+	RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 	RAIPlayerController->MoveSlideInventoryDelegate.AddDynamic(this, &URAISlideInventoryUI::CallMoveAnimation);
 	bSlideShowState = false;
 }
@@ -29,7 +29,7 @@ void URAISlideInventoryUI::InitSettingSlideInventory()
 	{
 		SetupEvidenceData();
 
-		ActionList->SendActionTextDelegate.AddDynamic(this, &URAISlideInventoryUI::ResponseActionText);
+		ActionList->UseButtonClickedDelegate.AddDynamic(this, &URAISlideInventoryUI::UseEvidence);
 	}
 	else
 	{
@@ -52,7 +52,7 @@ void URAISlideInventoryUI::SetupEvidenceData()
 
 		//InventoryData 크기 초기화
 		int32 EvidenceRowLength = RAIPlayerState->GetEvidenceRows().Num();
-		InventoryData.SetNum(EvidenceRowLength);
+		InventoryRowData.SetNum(EvidenceRowLength);
 
 		for (int i = 0;i < VerticalBox_Button->GetChildrenCount();++i)
 		{
@@ -73,19 +73,20 @@ void URAISlideInventoryUI::UpdateEvidenceData()
 
 	for (int i = 0;i < EvidenceRows.Num();++i)
 	{
-		InventoryData[i] = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
+		InventoryRowData[i].Key = EvidenceRows[i];
+		InventoryRowData[i].Value = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
 
 		if (i < VerticalBox_Button->GetChildrenCount())
 		{
-			if (InventoryData[i])
+			if (InventoryRowData[i].Key == NAME_None)
 			{
 				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
-				UpdateButtonThumbnail(EvidenceButton, InventoryData[i]->EvidenceImage);
+				UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
 			}
 			else
 			{
 				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
-				UpdateButtonThumbnail(EvidenceButton, EmptyThunmbnail);
+				UpdateButtonThumbnail(EvidenceButton, InventoryRowData[i].Value->EvidenceImage);
 			}
 		}
 	}
@@ -131,12 +132,12 @@ void URAISlideInventoryUI::OnEvidenceButtonClicked()
 		return;
 	}
 
-	int32 ClickedIndex = FindClickedButtonIndex();
-	if ( ClickedIndex != -1)
-	{		
-		ActionList->SetEvidenceData(InventoryData[ClickedIndex]);
+	ClickedIndex = FindClickedButtonIndex();
+	if ( ClickedIndex != -1 && InventoryRowData[ClickedIndex].Key!=NAME_None)
+	{
+		ActionList->SetEvidenceData(InventoryRowData[ClickedIndex].Value);
 		ShowActionList();
-	}	
+	}
 }
 
 int32 URAISlideInventoryUI::FindClickedButtonIndex()
@@ -199,8 +200,28 @@ void URAISlideInventoryUI::OnClosed()
 {
 }
 
-void URAISlideInventoryUI::ResponseActionText(FText ActionText)
+
+void URAISlideInventoryUI::UseEvidence()
 {
-	ResponseActionTextDelegate.Broadcast(ActionText);
+	FText ActionText = MakeActionText(ClickedIndex);
+	SendActionTextDelegate.Broadcast(ActionText);
+
+	//누구를 보내야하나?
+	//RAIPlayerState->RemoveEvidence(InventoryRowData[ClickedIndex].Key);
+	//RAIPlayerController->GM의 RemoveEvidence부르는 함수만들어서 거기다가 요청.
+	RAIPlayerController->UseEvidence(InventoryRowData[ClickedIndex].Key);
+
+
+
+}
+
+FText URAISlideInventoryUI::MakeActionText(int32 InIndex)
+{
+	//MakeActionText
+	FString ActionString = FString::Printf(TEXT("['%s'을/를 제출했다.]"), *InventoryRowData[InIndex].Value->DisplayName.ToString());
+	FText ActionText = FText::FromString(ActionString);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *ActionString);
+
+	return ActionText;
 }
 

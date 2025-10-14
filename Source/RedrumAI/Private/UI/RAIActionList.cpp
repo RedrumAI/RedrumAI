@@ -44,12 +44,9 @@ void URAIActionList::SwitchUseButton(bool bIsTalking)
 
 void URAIActionList::OnUseButtonClicked()
 {	
-	FString ActionString = FString::Printf(TEXT("['%s'을/를 제출했다.]"), *EvidenceData->DisplayName.ToString());
-	FText ActionText = FText::FromString(ActionString);
-	UE_LOG(LogTemp, Warning, TEXT("UseButton Used"));
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *ActionString);
+	SetVisibleState(ESlateVisibility::Collapsed);
 
-	SendActionTextDelegate.Broadcast(ActionText);
+	UseButtonClickedDelegate.Broadcast();
 }
 
 void URAIActionList::OnInspectButtonClicked()

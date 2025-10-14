@@ -21,17 +21,17 @@ void ARAIPlayerState::PostInitializeComponents()
 	}
 }
 
-void ARAIPlayerState::AddEvidence(FName EvidenceRowName)
+void ARAIPlayerState::AddEvidence(FName InRowName)
 {
 	FString DebugContext = FString::Printf(TEXT("[%s] : AddEvidence FindRow Called"), *GetName());
-	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(EvidenceRowName, DebugContext);
+	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(InRowName, DebugContext);
 	if (FindingData)
 	{
 		for (int i = 0; i < EvidenceRows.Num(); ++i)
 		{
 			if (EvidenceRows[i] == NAME_None)
 			{
-				EvidenceRows[i] = EvidenceRowName;
+				EvidenceRows[i] = InRowName;
 				break;
 			}
 		}
@@ -40,9 +40,16 @@ void ARAIPlayerState::AddEvidence(FName EvidenceRowName)
 	UpdateEvidenceRowsDelegate.Broadcast();	
 }
 
-void ARAIPlayerState::RemoveEvidence()
+void ARAIPlayerState::RemoveEvidence(FName InRowName)
 {
-	//TODO::인자로 받은 이름을 EvidenceRows에서 찾아 NAME_None으로 바꿔주기.
+	for (int i = 0; i < EvidenceRows.Num(); ++i)
+	{
+		if (EvidenceRows[i] == InRowName)
+		{
+			EvidenceRows[i] = NAME_None;
+			break;
+		}
+	}
 
 	UpdateEvidenceRowsDelegate.Broadcast();
 }

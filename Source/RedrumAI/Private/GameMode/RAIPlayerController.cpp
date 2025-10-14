@@ -167,3 +167,8 @@ void ARAIPlayerController::AskSuspect(FText Text)
 {
 	RAIGameMode->AskSuspect(Text);
 }
+
+void ARAIPlayerController::UseEvidence(FName InRowName)
+{
+	RAIGameMode->UpdateEvidence(InRowName, EUpdateType::Remove);
+}

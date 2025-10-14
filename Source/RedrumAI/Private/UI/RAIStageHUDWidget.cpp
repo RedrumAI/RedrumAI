@@ -32,7 +32,7 @@ void URAIStageHUDWidget::BindOwningUI()
 		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
 
 		//UI간 바인드 연결
-		SlideInventoryUI->ResponseActionTextDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
+		SlideInventoryUI->SendActionTextDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
 	}
 	else
 	{

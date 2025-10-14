@@ -32,4 +32,5 @@ public:
 
 public:
 	void AddEvidence(FName EvidenceRowName);
+	void RemoveEvidence(FName EvidenceRowName);
 };

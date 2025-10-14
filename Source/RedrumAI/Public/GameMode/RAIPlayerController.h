@@ -65,4 +65,6 @@ public:
 	void SwitchTalkingMode(bool InBool);
 
 	void AskSuspect(FText Text);
+
+	void UseEvidence(FName InRowName);
 };

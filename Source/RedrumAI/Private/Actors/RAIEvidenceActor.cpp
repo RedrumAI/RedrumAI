@@ -35,6 +35,6 @@ void ARAIEvidenceActor::Interacted()
 	ARAIGameMode* RAIGameMode= Cast<ARAIGameMode>(GetWorld()->GetAuthGameMode());
 	if (IsValid(RAIGameMode))
 	{
-		RAIGameMode->AddEvidence(EvidenceDataRow.RowName);
+		RAIGameMode->UpdateEvidence(EvidenceDataRow.RowName, EUpdateType::Add);
 	}	
 }

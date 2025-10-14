@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Manager/RAIInventoryManager.h"
@@ -23,7 +23,7 @@ void ARAIInventoryManager::BeginPlay()
 
 void ARAIInventoryManager::InitInventoryManager()
 {
-	// RAIPlayerState Á¶È¸ ÈÄ ÇÒ´ç
+	// RAIPlayerState ì¡°íšŒ í›„ í• ë‹¹
 	RAIPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<ARAIPlayerState>();
 	if (!IsValid(RAIPlayerState))
 	{
@@ -47,6 +47,10 @@ void ARAIInventoryManager::Tick(float DeltaTime)
 
 void ARAIInventoryManager::AddEvidence(FName EvidenceRowName)
 {
-	//TODO: PSÀÇ ÄÁÅ×ÀÌ³Ê¿¡ AddÇÔ¼ö Æ®¸®°Å
 	RAIPlayerState->AddEvidence(EvidenceRowName);
+}
+
+void ARAIInventoryManager::RemoveEvidence(FName EvidenceRowName)
+{
+	RAIPlayerState->RemoveEvidence(EvidenceRowName);
 }

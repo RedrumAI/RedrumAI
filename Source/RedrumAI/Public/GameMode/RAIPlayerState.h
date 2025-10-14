@@ -23,8 +23,8 @@ protected:
 public:
 	virtual void PostInitializeComponents() override;
 
-	void AddEvidence(FName EvidenceRowName);
-	void RemoveEvidence();
+	void AddEvidence(FName InRowName);
+	void RemoveEvidence(FName InRowName);
 
 	TArray<FName> GetEvidenceRows() const;
 	FRAIEvidenceData* FindEvidenceData(FName RowName) const;

@@ -7,13 +7,15 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAISlideInventoryUI.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnResponseActionTextDelegate, FText, ActionText);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendActionTextDelegate, FText, ActionText);
 
 class UButton;
 class UVerticalBox;
 class ARAIPlayerState;
 class UWidgetAnimation;
 class URAIActionList;
+
+class ARAIPlayerController;
 
 UCLASS()
 class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
@@ -25,7 +27,8 @@ protected:
 	TObjectPtr<UVerticalBox> VerticalBox_Button;
 
 	TObjectPtr<ARAIPlayerState> RAIPlayerState;
-	TArray<FRAIEvidenceData*> InventoryData;
+	TArray<TPair <FName, FRAIEvidenceData*>> InventoryRowData;
+
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UTexture2D> EmptyThunmbnail;
 	UPROPERTY()
@@ -35,9 +38,12 @@ protected:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> SlideRight; //변수명과 같은 이름의 애니메이션이 자동할당
 
+	TObjectPtr<ARAIPlayerController> RAIPlayerController;
+	int32 ClickedIndex = -1;
+
 public:
 	UPROPERTY()
-	FOnResponseActionTextDelegate ResponseActionTextDelegate;
+	FOnSendActionTextDelegate SendActionTextDelegate;
 	
 public:
 	virtual void NativeConstruct() override;
@@ -61,5 +67,6 @@ public:
 	void OnClosed();
 
 	UFUNCTION()
-	void ResponseActionText(FText ActionText);
+	void UseEvidence();
+	FText MakeActionText(int32 InIndex);
 };

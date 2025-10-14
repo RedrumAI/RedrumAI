@@ -150,12 +150,30 @@ void ARAIGameMode::SetScoreStruct(const FString& String)
 	}
 }
 
-void ARAIGameMode::AddEvidence(FName EvidenceRowName)
+void ARAIGameMode::UpdateEvidence(FName EvidenceRowName, EUpdateType InType)
 {
-	if (IsValid(InventoryManager))
+	switch (InType)
 	{
-		InventoryManager->AddEvidence(EvidenceRowName);
-	}	
+	case EUpdateType::Add :
+		{
+			if (IsValid(InventoryManager))
+			{
+				InventoryManager->AddEvidence(EvidenceRowName);
+			}
+		}
+		break;
+	case EUpdateType::Remove:
+		{
+			if (IsValid(InventoryManager))
+			{
+				InventoryManager->RemoveEvidence(EvidenceRowName);
+			}
+		}
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("[GM]: UpdateEvidence Failed. Use correct UpdateType"));
+		break;
+	}
 }
 
 void ARAIGameMode::UpdateChatLogUI()

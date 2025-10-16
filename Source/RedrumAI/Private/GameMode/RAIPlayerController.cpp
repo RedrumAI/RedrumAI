@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameMode/RAIPlayerController.h"
@@ -19,16 +19,16 @@ void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//BP·Î ¸¸µé¾îÁø StageHUDÀÇ °æ·Î ÇÏµåÄÚµù
+	//BPë¡œ ë§Œë“¤ì–´ì§„ StageHUDì˜ ê²½ë¡œ í•˜ë“œì½”ë”©
 	FSoftClassPath StageHUDClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/YJ/Widget/WBP_StageHUDWidget.WBP_StageHUDWidget_C'"));
 	UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUDWidget>();
 	StageHUD = CreateWidget<URAIStageHUDWidget>(this, WidgetClass);
 	StageHUD->AddToViewport();
 
-	//EnhancedInputLocalPlayerSubsystem°ú InputMapping ¿¬°á
-	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))//ÇöÀç Controller¿¡ ¿¬°áµÈ Player°¡ LocalPlayerÀÎÁö È®ÀÎÇÏ°í
+	//EnhancedInputLocalPlayerSubsystemê³¼ InputMapping ì—°ê²°
+	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))//í˜„ì¬ Controllerì— ì—°ê²°ëœ Playerê°€ LocalPlayerì¸ì§€ í™•ì¸í•˜ê³ 
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) //±× ·ÎÄÃÇÃ·¹ÀÌ¾îÀÇ Subsystem°¡Á®¿À±â
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>()) //ê·¸ ë¡œì»¬í”Œë ˆì´ì–´ì˜ Subsystemê°€ì ¸ì˜¤ê¸°
 		{
 			if (IsValid(InputMapping))
 			{
@@ -38,6 +38,8 @@ void ARAIPlayerController::BeginPlay()
 	}
 
 	BindGM();
+	BindHUD();
+	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
 }
 
 void ARAIPlayerController::BindGM()
@@ -49,12 +51,32 @@ void ARAIPlayerController::BindGM()
 	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
 }
 
+void ARAIPlayerController::BindHUD()
+{
+	if (IsValid(StageHUD))
+	{
+		UpdateTalkingStateDelegate.AddDynamic(StageHUD, &URAIStageHUDWidget::SwitchChatUI);
+	}
+	else
+	{
+		FTimerHandle TimerHandle_BindHUD;
+		//TODO: íƒ€ì´ë¨¸ë¥¼ í†µí•´ 0.1ì´ˆ ë’¤ì— BindHM() ë‹¤ì‹œ ì‹¤í–‰.
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle_BindHUD,
+			this,
+			&ARAIPlayerController::BindHUD,
+			0.1f,
+			false
+		);
+	}
+}
+
 void ARAIPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
-	// ¿©±â¿¡¼­ 'ETriggerEvent' ¿­°ÅÇü °ªÀ» º¯°æÇÏ¿© ¿øÇÏ´Â Æ®¸®°Å ÀÌº¥Æ®¸¦ ¹ÙÀÎµùÇÒ ¼ö ÀÖ½À´Ï´Ù.
+	// ì—¬ê¸°ì—ì„œ 'ETriggerEvent' ì—´ê±°í˜• ê°’ì„ ë³€ê²½í•˜ì—¬ ì›í•˜ëŠ” íŠ¸ë¦¬ê±° ì´ë²¤íŠ¸ë¥¼ ë°”ì¸ë”©í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
 	Input->BindAction(IA_ToggleMouseCursor, ETriggerEvent::Triggered, this, &ARAIPlayerController::ToggleMouseCursor);
 	Input->BindAction(IA_CloseLastUI, ETriggerEvent::Triggered, this, &ARAIPlayerController::CloseLastUI);
 	Input->BindAction(IA_MoveSlideInventory, ETriggerEvent::Triggered, this, &ARAIPlayerController::MoveSlideInventory);
@@ -69,7 +91,10 @@ void ARAIPlayerController::ToggleMouseCursor()
 
 		SetShowMouseCursor(false);
 
-		GetPawn()->EnableInput(this);
+		if (!bIsTalking)
+		{
+			GetPawn()->EnableInput(this);
+		}		
 	}
 	else
 	{
@@ -111,7 +136,39 @@ void ARAIPlayerController::AddChatLogUI(FString InRole, FString InMessage)
 	}
 }
 
+bool ARAIPlayerController::GetTalkingState() const
+{
+	return bIsTalking;
+}
+
+void ARAIPlayerController::SetTalkingState(bool InBool)
+{
+	//ë³€ê²½ë  ê²½ìš°ì—ë§Œ broadcast
+	if (bIsTalking != InBool)
+	{
+		bIsTalking = InBool;
+		UpdateTalkingStateDelegate.Broadcast(bIsTalking);
+	}	
+}
+
+void ARAIPlayerController::SwitchTalkingMode(bool InBool)
+{
+	if (InBool)
+	{
+		GetPawn()->DisableInput(this);
+	}
+	else
+	{
+		GetPawn()->EnableInput(this);
+	}
+}
+
 void ARAIPlayerController::AskSuspect(FText Text)
 {
 	RAIGameMode->AskSuspect(Text);
+}
+
+void ARAIPlayerController::UseEvidence(FName InRowName)
+{
+	RAIGameMode->UpdateEvidence(InRowName, EUpdateType::Remove);
 }

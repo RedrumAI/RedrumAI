@@ -7,6 +7,7 @@
 #include "RAIPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveSlideInventoryDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateTalkingStateDelegate, bool, bIsTalking);
 
 class URAIStageHUDWidget;
 class ARAIGameMode;
@@ -36,13 +37,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputAction> IA_MoveSlideInventory;
 
+	bool bIsTalking = false;
+
 public:
 	UPROPERTY()
 	FMoveSlideInventoryDelegate MoveSlideInventoryDelegate;
+	UPROPERTY()
+	FOnUpdateTalkingStateDelegate UpdateTalkingStateDelegate;
 
 public:
 	virtual void BeginPlay() override;
 	void BindGM();
+	void BindHUD();
 	virtual void SetupInputComponent() override;
 
 	void ToggleMouseCursor();
@@ -53,5 +59,12 @@ public:
 	UFUNCTION()
 	void AddChatLogUI(FString InRole, FString InMessage);
 
+	bool GetTalkingState() const;
+	void SetTalkingState(bool InBool);
+	UFUNCTION()
+	void SwitchTalkingMode(bool InBool);
+
 	void AskSuspect(FText Text);
+
+	void UseEvidence(FName InRowName);
 };

@@ -6,6 +6,10 @@ void IRAIInteractableInterface::Interacted()
 {
 }
 
+void IRAIInteractableInterface::Interacted(AController* InController)
+{
+}
+
 void IRAIInteractableInterface::EnableHighlight()
 {
 }
@@ -20,4 +24,9 @@ void IRAIInteractableInterface::BeginFocused()
 
 void IRAIInteractableInterface::EndFocused()
 {
+}
+
+ERAIInteractType IRAIInteractableInterface::GetInteractType()
+{
+	return ERAIInteractType();
 }

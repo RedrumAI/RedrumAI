@@ -7,10 +7,15 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAISlideInventoryUI.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendActionTextDelegate, FText, ActionText);
+
 class UButton;
 class UVerticalBox;
 class ARAIPlayerState;
 class UWidgetAnimation;
+class URAIActionList;
+
+class ARAIPlayerController;
 
 UCLASS()
 class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
@@ -22,25 +27,46 @@ protected:
 	TObjectPtr<UVerticalBox> VerticalBox_Button;
 
 	TObjectPtr<ARAIPlayerState> RAIPlayerState;
-	TArray<FRAIEvidenceData*> InventoryData;
-	UPROPERTY(EditAnywhere, Category = "RAI")
-	UTexture2D* EmptyThunmbnail;
+	TArray<TPair <FName, FRAIEvidenceData*>> InventoryRowData;
 
-	bool SlideShowState = false;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UTexture2D> EmptyThunmbnail;
+	UPROPERTY()
+	TObjectPtr<URAIActionList> ActionList;
+
+	bool bSlideShowState = false;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<UWidgetAnimation> SlideRight; //변수명과 같은 이름의 애니메이션이 자동할당
 
+	TObjectPtr<ARAIPlayerController> RAIPlayerController;
+	int32 ClickedIndex = -1;
+
+public:
+	UPROPERTY()
+	FOnSendActionTextDelegate SendActionTextDelegate;
+	
 public:
 	virtual void NativeConstruct() override;
 
-	void InitSlideInventoryUI();
+	void InitSettingSlideInventory();
+	void SetupEvidenceData();
+
 	UFUNCTION()
 	void UpdateEvidenceData();
 	void UpdateButtonThumbnail(UButton* InButton, UTexture2D* InThumbnail);
-
+	UFUNCTION()
+	void OnEvidenceButtonClicked();
+	
+	//값을 찾지못하면 return -1
+	int32 FindClickedButtonIndex(); 
+	void ShowActionList();
 	UFUNCTION()
 	void CallMoveAnimation();
 
 	void OnOpened();
 	void OnClosed();
+
+	UFUNCTION()
+	void UseEvidence();
+	FText MakeActionText(int32 InIndex);
 };

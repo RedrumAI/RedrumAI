@@ -4,14 +4,12 @@
 #include "GameMode/RAIPlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
-
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
-#include "EnhancedInputComponent.h"
-
 #include "Components/SphereComponent.h"
 #include "Actors/RAIInteractableInterface.h"
+
 
 // Sets default values
 ARAIPlayerCharacter::ARAIPlayerCharacter()
@@ -175,8 +173,17 @@ void ARAIPlayerCharacter::TriggerInteractableActor()
 	if (bHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr Success!"));
-		IRAIInteractableInterface* InteractableActor =Cast<IRAIInteractableInterface>(HitResult.GetActor());
-		InteractableActor->Interacted();
+		if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
+		{
+			if (InteractableActor->GetInteractType() == ERAIInteractType::Suspect)
+			{
+				InteractableActor->Interacted(Controller);
+			}
+			else
+			{
+				InteractableActor->Interacted();
+			}
+		}		
 	}
 }
 

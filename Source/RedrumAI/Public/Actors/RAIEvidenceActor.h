@@ -1,10 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Actors/RAIInteractableActor.h"
-#include "Data/RAIEvidenceType.h"
 #include "Engine/DataTable.h"
 #include "RAIEvidenceActor.generated.h"
 
@@ -24,8 +23,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
 	UPROPERTY(VisibleAnywhere)
-	ERAIEvidenceType EvidenceType;
-	UPROPERTY(VisibleAnywhere)
 	FText DisplayName;
 	UPROPERTY(VisibleAnywhere)
 	FText Description;
@@ -34,14 +31,13 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
 	/*
-	MeshComponent·Î »ç¿ë
+	MeshComponentë¡œ ì‚¬ìš©
 	UPROPERTY(VisibleAnywhere)
 	TSoftObjectPtr<UStaticMesh> Mesh;
 	*/
 
 public:
 	TSubclassOf<ARAIEvidenceActor> GetEvidenceClass() const { return EvidenceClass; };
-	ERAIEvidenceType GetEvidenceType() const { return EvidenceType; };
 	FText GetDisplayName() const { return DisplayName; };
 	FText GetDescription() const { return Description; };
 	TSoftObjectPtr<UStaticMesh> GetMesh() const { return MeshComponent->GetStaticMesh(); };

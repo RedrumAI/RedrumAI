@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/RAIBaseWidget.h"
+#include "UI/RAIStackWidget.h"
 #include "RAIChatUI.generated.h"
 
 class UTextBlock;
@@ -13,13 +13,11 @@ class ARAIPlayerController;
 
 
 UCLASS()
-class REDRUMAI_API URAIChatUI : public URAIBaseWidget
+class REDRUMAI_API URAIChatUI : public URAIStackWidget
 {
 	GENERATED_BODY()
 
-public:
-	virtual void NativeConstruct() override;
-	
+protected:
 	UPROPERTY()
 	TObjectPtr<UTextBlock> AIChat;
 	UPROPERTY()
@@ -28,10 +26,18 @@ public:
 	TObjectPtr<UImage> LoadingImage;
 
 	TObjectPtr<ARAIPlayerController> RAIPlayerController;
+	
+public:
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
+	UFUNCTION()
+	void SubmitExternalMessage(FText Text);
 	UFUNCTION()
 	void OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod);
 
 	void SetAIChat(FString String);
 	void AskSuspect(FText Text);
+
+	virtual void OnClosed() override;
 };

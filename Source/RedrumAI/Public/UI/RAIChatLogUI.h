@@ -1,9 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UI/RAIBaseWidget.h"
+#include "UI/RAIStackWidget.h"
 #include "Data/RAIMessageRole.h"
 #include "RAIChatLogUI.generated.h"
 
@@ -11,7 +11,7 @@ class UScrollBox;
 class URAIChatLogEntry;
 
 UCLASS()
-class REDRUMAI_API URAIChatLogUI : public URAIBaseWidget
+class REDRUMAI_API URAIChatLogUI : public URAIStackWidget
 {
 	GENERATED_BODY()
 
@@ -21,7 +21,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<UScrollBox> ScrollBox;
 
-	//ª˝º∫«“ ChatLongEntry BPπˆ¿¸ ª¿‘
+	//ÏÉùÏÑ±Ìï† ChatLongEntry BPÎ≤ÑÏ†Ñ ÏÇΩÏûÖ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
 	TSubclassOf<URAIChatLogEntry> ChatLogEntryBP;
 

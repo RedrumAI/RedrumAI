@@ -17,6 +17,13 @@ class ARAIHttpManager;
 class ARAIChatManager;
 class ARAIInventoryManager;
 
+enum EUpdateType
+{
+	Unknown,
+	Add,
+	Remove,
+};
+
 UCLASS()
 class REDRUMAI_API ARAIGameMode : public AGameModeBase
 {
@@ -48,7 +55,7 @@ public:
 
 	void SetScoreStruct(const FString& String);
 
-	void AddEvidence(FName EvidenceRowName);
+	void UpdateEvidence(FName EvidenceRowName, EUpdateType InType);
 
 	UPROPERTY()
 	TObjectPtr<ARAIHttpManager> HttpManager;

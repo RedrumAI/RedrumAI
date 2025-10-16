@@ -20,8 +20,9 @@ void ARAIEvidenceActor::OnConstruction(const FTransform& Transform)
 	const FRAIEvidenceData* EvidenceData = EvidenceDataRow.GetRow<FRAIEvidenceData>(DebugContext);
 	if (EvidenceData != nullptr)
 	{
+		InteractType = EvidenceData->InteractType;
+
 		EvidenceClass = EvidenceData->EvidenceClass;
-		EvidenceType = EvidenceData->EvidenceType;
 		DisplayName = EvidenceData->DisplayName;
 		Description = EvidenceData->Description;
 		EvidenceImage = EvidenceData->EvidenceImage;
@@ -34,6 +35,6 @@ void ARAIEvidenceActor::Interacted()
 	ARAIGameMode* RAIGameMode= Cast<ARAIGameMode>(GetWorld()->GetAuthGameMode());
 	if (IsValid(RAIGameMode))
 	{
-		RAIGameMode->AddEvidence(EvidenceDataRow.RowName);
+		RAIGameMode->UpdateEvidence(EvidenceDataRow.RowName, EUpdateType::Add);
 	}	
 }

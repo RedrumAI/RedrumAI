@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RAIBaseWidget.generated.h"
+#include "RAIStackWidget.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedWidget, URAIBaseWidget*, ClickedWidget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnClickedWidget, URAIStackWidget*, ClickedWidget);
 
 UCLASS()
-class REDRUMAI_API URAIBaseWidget : public UUserWidget
+class REDRUMAI_API URAIStackWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"  
-#include "Data/RAIEvidenceType.h"
+#include "Data/RAIInteractType.h"
 #include "RAIEvidenceData.generated.h"
 
 class ARAIEvidenceActor;
@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ARAIEvidenceActor> EvidenceClass;
 	UPROPERTY(EditAnywhere)
-	ERAIEvidenceType EvidenceType;
+	ERAIInteractType InteractType;
 	UPROPERTY(EditAnywhere)
 	FText DisplayName;
 	UPROPERTY(EditAnywhere)

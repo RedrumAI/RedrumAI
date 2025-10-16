@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "RAIStageHUDWidget.generated.h"
 
 class UCanvasPanel;
-class URAIBaseWidget;
+class URAIStackWidget;
 class URAIChatUI;
 class URAIChatLogUI;
 class URAIChatLogUIButton;
@@ -18,9 +18,7 @@ class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
-	virtual void NativeConstruct() override;
-
+protected:
 	UPROPERTY()
 	TObjectPtr<URAIChatUI> ChatUI;
 	UPROPERTY()
@@ -31,19 +29,25 @@ public:
 	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
 
 	TObjectPtr<UCanvasPanel> CanvasPanel;
-	TArray<URAIBaseWidget*> UIStack;
+	TArray<URAIStackWidget*> UIStack;
+	
+public:
+	virtual void NativeConstruct() override;
 
 	UFUNCTION()
 	void BindOwningUI();
 
-	//UI ¿­¸é ¸ÇÀ§¿¡ ³ª¿À°ÔÇÏ´Â ·ÎÁ÷
+	//UI ì—´ë©´ ë§¨ìœ„ì— ë‚˜ì˜¤ê²Œí•˜ëŠ” ë¡œì§
 	UFUNCTION()
-	void OpenUI(URAIBaseWidget* InUI);
+	void OpenUI(URAIStackWidget* InUI);
 	UFUNCTION()
-	void CloseUI(URAIBaseWidget* InUI);
-	//ESC ´©¸£¸é ¸ÇÀ§ UI»èÁ¦ÇÏ´Ù°¡ ESC¸Ş´º Ç¥½Ã
+	void CloseUI(URAIStackWidget* InUI);
+	//ESC ëˆ„ë¥´ë©´ ë§¨ìœ„ UIì‚­ì œí•˜ë‹¤ê°€ ESCë©”ë‰´ í‘œì‹œ
 	UFUNCTION()
 	void CloseLastUI();
+
+	UFUNCTION()
+	void SwitchChatUI(bool bIsTalking);
 	UFUNCTION()
 	void ToggleChatLogUI();
 

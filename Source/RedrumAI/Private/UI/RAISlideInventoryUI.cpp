@@ -99,7 +99,7 @@ void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* 
 		UE_LOG(LogTemp, Warning, TEXT("[%s]:UpdateButtonThumbnail Failed"), *GetName());
 		return;
 	}
-	FButtonStyle NewStyle = InButton->WidgetStyle;
+	FButtonStyle NewStyle = InButton->GetStyle();
 
 	FSlateBrush NormalBrush;
 	NormalBrush.SetResourceObject(InThumbnail);

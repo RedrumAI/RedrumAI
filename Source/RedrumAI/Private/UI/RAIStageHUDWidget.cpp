@@ -50,27 +50,22 @@ void URAIStageHUDWidget::BindOwningUI()
 void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 {
 	//OldSlot 저장
-	FAnchorData SavedLayout;
-	FVector2D SavedAlignment;
-	int32 SavedZOrder;
-	if (UCanvasPanelSlot* OldSlot = Cast<UCanvasPanelSlot>(InUI->Slot))
-	{
-		SavedLayout = OldSlot->GetLayout();
-		SavedAlignment = OldSlot->GetAlignment();
-		SavedZOrder = OldSlot->GetZOrder();
-	}
+	UCanvasPanelSlot* OldSlot = Cast<UCanvasPanelSlot>(InUI->Slot);
+	check(OldSlot);
+	FAnchorData SavedLayout = OldSlot->GetLayout();
+	FVector2D SavedAlignment = OldSlot->GetAlignment();
+	int32 SavedZOrder = OldSlot->GetZOrder();
 
 	//컴포넌트 구조 최하단으로 이동하여 HUD 맨앞에 표시
 	InUI->RemoveFromParent();
 	CanvasPanel->AddChild(InUI);
 
 	//SavedData 적용
-	if (UCanvasPanelSlot* NewSlot = Cast<UCanvasPanelSlot>(InUI->Slot))
-	{
-		NewSlot->SetLayout(SavedLayout);
-		NewSlot->SetAlignment(SavedAlignment);
-		NewSlot->SetZOrder(SavedZOrder);
-	}
+	UCanvasPanelSlot* NewSlot = Cast<UCanvasPanelSlot>(InUI->Slot);
+	check(NewSlot);
+	NewSlot->SetLayout(SavedLayout);
+	NewSlot->SetAlignment(SavedAlignment);
+	NewSlot->SetZOrder(SavedZOrder);
 
 	//UI 표시
 	InUI->OnOpened();

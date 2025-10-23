@@ -18,18 +18,27 @@ ARAIInspectionActor::ARAIInspectionActor()
 	PointLight->SetupAttachment(RootComponent);
 	SceneCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent2D"));
 	SceneCaptureComponent2D->SetupAttachment(RootComponent);
+	//SceneCaptureComponent2D->TextureTarget은 BP에서 할당
 	
-	MeshComponent->SetOnlyOwnerSee(true);
 	MeshComponent->SetLightingChannels(false, true, false);
 	PointLight->SetLightingChannels(false, true, false);
-	SceneCaptureComponent2D->ShowOnlyComponent(MeshComponent);
-	//SceneCaptureComponent2D->TextureTarget은 BP에서 할당
+}
+
+void ARAIInspectionActor::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (GetWorld()->IsGameWorld()) //블루프린트 뷰포트 확인용 if문
+	{
+		MeshComponent->SetVisibleInSceneCaptureOnly(true);
+		SceneCaptureComponent2D->ShowOnlyComponent(MeshComponent);
+	}
 }
 
 void ARAIInspectionActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 void ARAIInspectionActor::Tick(float DeltaTime)

@@ -18,6 +18,7 @@ public:
 	ARAIInspectionActor();
 
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 
 	//컴포넌트 위치는 BP에서 조정

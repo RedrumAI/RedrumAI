@@ -9,6 +9,7 @@
 #include "UI/RAIChatLogUI.h"
 #include "UI/RAIChatLogUIButton.h"
 #include "UI/RAISlideInventoryUI.h"
+#include "UI/RAIInspectionUI.h"
 
 void URAIStageHUDWidget::NativeConstruct()
 {
@@ -17,6 +18,7 @@ void URAIStageHUDWidget::NativeConstruct()
 	ChatLogUI = Cast<URAIChatLogUI>(GetWidgetFromName(TEXT("WBP_RAIChatLogUI")));
 	ChatLogUIButton = Cast<URAIChatLogUIButton>(GetWidgetFromName(TEXT("WBP_RAIChatLogUIButton")));
 	SlideInventoryUI = Cast<URAISlideInventoryUI>(GetWidgetFromName(TEXT("WBP_RAISlideInventoryUI")));
+	InspectionUI = Cast<URAIInspectionUI>(GetWidgetFromName(TEXT("WBP_RAIInspectionUI")));
 
 	//ChatUI, LogUI, Button Valid검사. 불통과시 타이머로 다시돌리기
 	BindOwningUI();
@@ -32,7 +34,8 @@ void URAIStageHUDWidget::BindOwningUI()
 		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
 
 		//UI간 바인드 연결
-		SlideInventoryUI->SendActionTextDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
+		SlideInventoryUI->UseEvidenceDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
+		SlideInventoryUI->InspectEvidenceDelegate.AddDynamic(InspectionUI, &URAIInspectionUI::UpdateInspectionUI);
 	}
 	else
 	{

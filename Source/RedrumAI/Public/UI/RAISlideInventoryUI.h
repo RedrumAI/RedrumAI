@@ -7,7 +7,8 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAISlideInventoryUI.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSendActionTextDelegate, FText, ActionText);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseEvidenceDelegate, FText, ActionText);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInspectEvidenceDelegate, const FRAIEvidenceData&, EvidenceData);
 
 class UButton;
 class UVerticalBox;
@@ -43,7 +44,9 @@ protected:
 
 public:
 	UPROPERTY()
-	FOnSendActionTextDelegate SendActionTextDelegate;
+	FOnUseEvidenceDelegate UseEvidenceDelegate;
+	UPROPERTY()
+	FOnInspectEvidenceDelegate InspectEvidenceDelegate;
 	
 public:
 	virtual void NativeConstruct() override;
@@ -69,4 +72,7 @@ public:
 	UFUNCTION()
 	void UseEvidence();
 	FText MakeActionText(int32 InIndex);
+
+	UFUNCTION()
+	void InspectEvidence();
 };

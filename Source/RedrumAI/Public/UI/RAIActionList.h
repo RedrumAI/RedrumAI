@@ -7,7 +7,8 @@
 #include "Data/RAIEvidenceData.h"
 #include "RAIActionList.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseButtonClickedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClickedUseButtonDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClickedInspectButtonDelegate);
 
 class UVerticalBox;
 class UButton;
@@ -25,17 +26,15 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UButton> Button_Inspect;
 
-	FRAIEvidenceData* EvidenceData;
-
 public:
 	UPROPERTY()
-	FOnUseButtonClickedDelegate UseButtonClickedDelegate;
+	FOnClickedUseButtonDelegate ClickedUseButtonDelegate;
+	UPROPERTY()
+	FOnClickedInspectButtonDelegate ClickedInspectButtonDelegate;
 
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
-
-	void SetEvidenceData(FRAIEvidenceData* InData);
 
 	void SetVisibleState(ESlateVisibility InState);
 	UFUNCTION()

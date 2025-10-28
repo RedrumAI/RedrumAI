@@ -19,9 +19,19 @@ ARAIInspectionActor::ARAIInspectionActor()
 	SceneCaptureComponent2D = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent2D"));
 	SceneCaptureComponent2D->SetupAttachment(RootComponent);
 	//SceneCaptureComponent2D->TextureTarget은 BP에서 할당
-	
+
 	MeshComponent->SetLightingChannels(false, true, false);
 	PointLight->SetLightingChannels(false, true, false);
+
+	InitialYaw = 0.f;
+	InitialPitch = -10.f;
+	InitialDistance = 120.f;
+
+	YawSpeed = 0.2f;
+	PitchSpeed = 0.2f;
+	WheelSpeed = 10.f;
+	MinDistance = 40.f;
+	MaxDistance = 200.f;
 }
 
 void ARAIInspectionActor::PostInitializeComponents()
@@ -33,6 +43,11 @@ void ARAIInspectionActor::PostInitializeComponents()
 		MeshComponent->SetVisibleInSceneCaptureOnly(true);
 		SceneCaptureComponent2D->ShowOnlyComponent(MeshComponent);
 	}
+
+	MeshComponent->SetRelativeRotation(FRotator(InitialPitch, InitialYaw, 0));
+	SceneCaptureComponent2D->SetRelativeRotation(FRotator(0, 180.f, 0));
+	SceneCaptureComponent2D->SetRelativeLocation(FVector(InitialDistance, 0, 0));
+	
 }
 
 void ARAIInspectionActor::BeginPlay()
@@ -45,5 +60,25 @@ void ARAIInspectionActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ARAIInspectionActor::AddYawPitch(float DeltaYaw, float DeltaPitch)
+{
+	MeshComponent->AddRelativeRotation(FRotator(DeltaPitch * PitchSpeed, DeltaYaw * YawSpeed, 0));
+}
+
+void ARAIInspectionActor::AddZoom(float DeltaWheel)
+{
+	float Distance = SceneCaptureComponent2D->GetRelativeLocation().X;
+	Distance -= DeltaWheel * WheelSpeed;
+	Distance = FMath::Clamp(Distance, MinDistance, MaxDistance);
+
+	SceneCaptureComponent2D->SetRelativeLocation(FVector(Distance), 0, 0);
+}
+
+void ARAIInspectionActor::ResetTransform()
+{
+	MeshComponent->SetRelativeRotation(FRotator(InitialPitch, InitialYaw, 0));
+	SceneCaptureComponent2D->SetRelativeLocation(FVector(InitialDistance), 0, 0);
 }
 

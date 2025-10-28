@@ -1,16 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Actors/RAIInspectionActor.h"
 #include "RAIPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveSlideInventoryDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateTalkingStateDelegate, bool, bIsTalking);
 
-class URAIStageHUDWidget;
 class ARAIGameMode;
+class URAIStageHUDWidget;
 class UInputMappingContext;
 class UInputAction;
 
@@ -27,6 +28,11 @@ protected:
 	TObjectPtr<ARAIGameMode> RAIGameMode;
 	UPROPERTY()
 	TObjectPtr<URAIStageHUDWidget> StageHUD;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TSubclassOf<ARAIInspectionActor> BP_InspectionActor;
+	UPROPERTY()
+	TObjectPtr<ARAIInspectionActor> InspectionActor; //위치는 BP_PC에서 조정
+
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputMappingContext> InputMapping;

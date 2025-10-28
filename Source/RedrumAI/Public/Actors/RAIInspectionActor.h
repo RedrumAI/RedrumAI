@@ -29,7 +29,33 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent2D;
 
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float InitialYaw;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float InitialPitch;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float InitialDistance;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float YawSpeed;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float PitchSpeed;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float WheelSpeed;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float MinDistance;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float MaxDistance;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void AddYawPitch(float DeltaYaw, float DeltaPitch);
+	UFUNCTION()
+	void AddZoom(float DeltaWheel);
+
+	//UI켜기/닫기, 초기화버튼 등 이벤트 발생하면 호출
+	void ResetTransform();
 };

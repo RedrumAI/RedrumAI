@@ -5,7 +5,6 @@
 #include "UI/RAIStageHUDWidget.h"
 #include "GameMode/RAIGameMode.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
@@ -24,7 +23,6 @@ void ARAIPlayerController::BeginPlay()
 	UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUDWidget>();
 	StageHUD = CreateWidget<URAIStageHUDWidget>(this, WidgetClass);
 	StageHUD->AddToViewport();
-
 	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
 	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))//현재 Controller에 연결된 Player가 LocalPlayer인지 확인하고
 	{
@@ -36,10 +34,13 @@ void ARAIPlayerController::BeginPlay()
 			}
 		}
 	}
-
 	BindGM();
 	BindHUD();
 	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
+
+	//InspectionActor생성
+	InspectionActor= GetWorld()->SpawnActor<ARAIInspectionActor>(BP_InspectionActor);
+
 }
 
 void ARAIPlayerController::BindGM()

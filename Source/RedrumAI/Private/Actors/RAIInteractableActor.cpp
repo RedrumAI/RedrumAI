@@ -12,7 +12,7 @@ ARAIInteractableActor::ARAIInteractableActor()
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	SetRootComponent(CollisionBox);
-	//추후 Collision Preset 설정해주기
+	//추후 Collision Preset 설정해주기, 일단 TestBP에서 설정
 
 	InteractType = ERAIInteractType::Unknown;
 }

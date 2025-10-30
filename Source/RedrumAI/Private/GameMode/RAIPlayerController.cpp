@@ -173,3 +173,8 @@ void ARAIPlayerController::UseEvidence(FName InRowName)
 {
 	RAIGameMode->UpdateEvidence(InRowName, EUpdateType::Remove);
 }
+
+const ARAIInspectionActor* ARAIPlayerController::GetInspectionActor()
+{
+	return InspectionActor;
+}

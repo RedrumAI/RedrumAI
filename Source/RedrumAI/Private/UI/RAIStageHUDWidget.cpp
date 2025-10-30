@@ -20,13 +20,19 @@ void URAIStageHUDWidget::NativeConstruct()
 	SlideInventoryUI = Cast<URAISlideInventoryUI>(GetWidgetFromName(TEXT("WBP_RAISlideInventoryUI")));
 	InspectionUI = Cast<URAIInspectionUI>(GetWidgetFromName(TEXT("WBP_RAIInspectionUI")));
 
+	ChatUI->SetVisibility(ESlateVisibility::Hidden);
+	ChatLogUI->SetVisibility(ESlateVisibility::Hidden);
+	InspectionUI->SetVisibility(ESlateVisibility::Hidden);
+
 	//ChatUI, LogUI, Button Valid검사. 불통과시 타이머로 다시돌리기
 	BindOwningUI();
 }
 
 void URAIStageHUDWidget::BindOwningUI()
 {
-	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton) && IsValid(SlideInventoryUI))
+	
+
+	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton) && IsValid(SlideInventoryUI) && IsValid(InspectionUI))
 	{
 		//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
 		ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);

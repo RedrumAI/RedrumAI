@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RAIInspectionActor.generated.h"
 
+class UArrowComponent;
 class UPointLightComponent;
 class USceneCaptureComponent2D;
 
@@ -24,6 +25,8 @@ protected:
 	//컴포넌트 위치는 BP에서 조정
 	UPROPERTY(VisibleAnywhere, Category = "RAI")
 	TObjectPtr<UStaticMeshComponent> MeshComponent;
+	UPROPERTY(VisibleAnywhere, Category = "RAI")
+	TObjectPtr<UArrowComponent> Arrow;
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UPointLightComponent> PointLight;
 	UPROPERTY(EditAnywhere, Category = "RAI")
@@ -50,6 +53,9 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void UpdateActorMesh(UStaticMesh* InMesh);
 
 	UFUNCTION()
 	void AddYawPitch(float DeltaYaw, float DeltaPitch);

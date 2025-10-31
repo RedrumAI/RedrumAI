@@ -1,14 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/IHttpRequest.h" // FHttpRequestPtr»ç¿ëÀ» ¸í½ÃÇÏ±â À§ÇØ Çì´õÃß°¡(»ó¼ÓX)
+#include "Interfaces/IHttpRequest.h" // FHttpRequestPtrì‚¬ìš©ì„ ëª…ì‹œí•˜ê¸° ìœ„í•´ í—¤ë”ì¶”ê°€(ìƒì†X)
 #include "Interfaces/IHttpResponse.h"
 #include "RAIHttpManager.generated.h"
 
-//TArray<TSharedPtr<FJsonValue>>´Â TSharedPtrÀÌ Delegate¿¡¼­ »ç¿ëÇÒ ¼ö ¾ø±â¿¡ FStringÀ¸·Ó º¯È¯ÇÏ¿© ÀÎÀÚ »ç¿ë
+//TArray<TSharedPtr<FJsonValue>>ëŠ” TSharedPtrì´ Delegateì—ì„œ ì‚¬ìš©í•  ìˆ˜ ì—†ê¸°ì— FStringìœ¼ë¡­ ë³€í™˜í•˜ì—¬ ì¸ì ì‚¬ìš©
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOpenAIResponseDelegate, FString, Message);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNLPResponseDelegate, FString, InJsonData);
 
@@ -26,7 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SendRequestToOpenAI(const FString& InputString);
 
-	void OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful); //UHT¿¡¼­ FHttp..PtrµéÀ» ÀĞÁö¸øÇÏ±â¿¡ UFUNCTION »ç¿ëºÒ°¡
+	void OnOpenAIResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful); //UHTì—ì„œ FHttp..Ptrë“¤ì„ ì½ì§€ëª»í•˜ê¸°ì— UFUNCTION ì‚¬ìš©ë¶ˆê°€
 
 	UFUNCTION(BlueprintCallable)
 	void SendRequestToNLP();
@@ -35,10 +35,10 @@ public:
 
 public:
 	FString APIKey_OpenAI;
-	FString URL_OpenAI = TEXT("https://api.openai.com/v1/chat/completions"); // chat model°ú Åë½Å
+	FString URL_OpenAI = TEXT("https://api.openai.com/v1/chat/completions"); // chat modelê³¼ í†µì‹ 
 	FString APIKey_NLP;
-	FString URL_NLP = TEXT("https://api-inference.huggingface.co/models/bhadresh-savani/distilbert-base-uncased-emotion");	//TEXT¸ÅÅ©·Î¸¦ »ç¿ëÇÏ¸é Ãß°¡ TCHARº¯È¯ ÇÊ¿äX
-					
+	FString URL_NLP = TEXT("https://router.huggingface.co/hf-inference/models/bhadresh-savani/distilbert-base-uncased-emotion");	//TEXTë§¤í¬ë¡œë¥¼ ì‚¬ìš©í•˜ë©´ ì¶”ê°€ TCHARë³€í™˜ í•„ìš”X
+	
 	UPROPERTY()
 	FOnOpenAIResponseDelegate ResponseDelegate_OpenAI;
 	UPROPERTY()

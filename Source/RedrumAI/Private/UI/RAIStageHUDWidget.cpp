@@ -30,20 +30,25 @@ void URAIStageHUDWidget::NativeConstruct()
 
 void URAIStageHUDWidget::BindOwningUI()
 {
-	
-
-	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton) && IsValid(SlideInventoryUI) && IsValid(InspectionUI))
+	//Canvas 및 하위위젯 유효성 검사
+	bool bNeedRetry = false;
+	if (!IsValid(CanvasPanel))
 	{
-		//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
-		ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
-		ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
-		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
-
-		//UI간 바인드 연결
-		SlideInventoryUI->UseEvidenceDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
-		SlideInventoryUI->InspectEvidenceDelegate.AddDynamic(InspectionUI, &URAIInspectionUI::UpdateInspectionUI);
+		bNeedRetry = true;
 	}
 	else
+	{
+		const TArray<UWidget*> AllWidgets = CanvasPanel->GetAllChildren();
+		for (UWidget* Widget : AllWidgets)
+		{
+			if (!IsValid(Widget))
+			{
+				bNeedRetry = true;
+				break;
+			}
+		}
+	}
+	if (bNeedRetry)
 	{
 		FTimerHandle TimerHandle_BindOwningUI;
 		GetWorld()->GetTimerManager().SetTimer(
@@ -53,7 +58,28 @@ void URAIStageHUDWidget::BindOwningUI()
 			0.1f,
 			false
 		);
+		return;
 	}
+
+	//Bind함수 중복호출 예외처리
+	if (bAlreadyBound == true)
+	{
+		return;
+	}
+	else
+	{
+		bAlreadyBound = true;
+	}	
+
+	//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
+	ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
+	ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
+	ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
+
+	//UI간 바인드 연결
+	SlideInventoryUI->UseEvidenceDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
+	SlideInventoryUI->InspectEvidenceDelegate.AddDynamic(InspectionUI, &URAIInspectionUI::UpdateInspectionUI);
+	
 }
 
 void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)

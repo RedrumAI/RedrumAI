@@ -34,6 +34,8 @@ protected:
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 	TArray<URAIStackWidget*> UIStack;
 	
+	bool bAlreadyBound = false;
+
 public:
 	virtual void NativeConstruct() override;
 

@@ -78,8 +78,7 @@ void URAIStageHUDWidget::BindOwningUI()
 
 	//UI간 바인드 연결
 	SlideInventoryUI->UseEvidenceDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
-	SlideInventoryUI->InspectEvidenceDelegate.AddDynamic(InspectionUI, &URAIInspectionUI::UpdateInspectionUI);
-	
+	SlideInventoryUI->InspectEvidenceDelegate.AddDynamic(InspectionUI, &URAIInspectionUI::OpenInspectionUI);
 }
 
 void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)

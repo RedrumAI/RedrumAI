@@ -15,12 +15,13 @@ void URAIInspectionUI::NativeConstruct()
 	DisplayNameTextBlock->SetAutoWrapText(true);
 	DescriptionTextBlock->SetAutoWrapText(true);
 
+	RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
+	RAIPlayerController->CloseInspectionUIDelegate.AddDynamic(this, &URAIInspectionUI::CloseInspectionUI);
 	BindInspectionActor();	
 }
 
 void URAIInspectionUI::BindInspectionActor()
 {
-	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 	const ARAIInspectionActor* InspectionActor = RAIPlayerController->GetInspectionActor();
 	if (IsValid(InspectionActor))
 	{
@@ -78,14 +79,29 @@ FReply URAIInspectionUI::NativeOnMouseWheel(const FGeometry&, const FPointerEven
 	return FReply::Handled();
 }
 
+void URAIInspectionUI::OpenInspectionUI(const FRAIEvidenceData& InEvidenceData)
+{
+	UpdateInspectionUI(InEvidenceData);
+
+	RAIPlayerController->EnterInspectionModeIMC();
+
+	SetVisibility(ESlateVisibility::Visible);
+}
+
+void URAIInspectionUI::CloseInspectionUI()
+{
+	//RAIPlayerController->RemoveInspectionModeIMC();
+	RAIPlayerController->EnterDefaultModeIMC();
+
+	SetVisibility(ESlateVisibility::Hidden);
+}
+
 void URAIInspectionUI::UpdateInspectionUI(const FRAIEvidenceData& InEvidenceData)
 {
 	UpdateActorMeshDelegate.Broadcast(InEvidenceData.Mesh);
 
 	SetDisplayName(InEvidenceData.DisplayName);
 	SetDescription(InEvidenceData.Description);
-
-	ShowInspectionUI();	
 }
 
 void URAIInspectionUI::SetDisplayName(FText InText)
@@ -96,14 +112,4 @@ void URAIInspectionUI::SetDisplayName(FText InText)
 void URAIInspectionUI::SetDescription(FText InText)
 {
 	DescriptionTextBlock->SetText(InText);
-}
-
-void URAIInspectionUI::ShowInspectionUI()
-{
-	SetVisibility(ESlateVisibility::Visible);
-}
-
-void URAIInspectionUI::HideInspectionUI()
-{
-	SetVisibility(ESlateVisibility::Hidden);
 }

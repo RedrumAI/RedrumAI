@@ -13,6 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnZoomActorDelegate, float, Wheel);
 
 class UTextBlock;
 class UImage;
+class ARAIPlayerController;
 
 UCLASS()
 class REDRUMAI_API URAIInspectionUI : public UUserWidget
@@ -33,6 +34,10 @@ protected:
 	virtual FReply NativeOnMouseMove(const FGeometry&, const FPointerEvent&) override;
 	virtual FReply NativeOnMouseWheel(const FGeometry&, const FPointerEvent&) override;
 
+	
+
+	TWeakObjectPtr<ARAIPlayerController> RAIPlayerController;
+
 	bool bDragging = false;
 
 public:
@@ -47,10 +52,11 @@ public:
 	void BindInspectionActor();
 
 	UFUNCTION()
+	void OpenInspectionUI(const FRAIEvidenceData& InEvidenceData);
+	UFUNCTION()
+	void CloseInspectionUI();
+
 	void UpdateInspectionUI(const FRAIEvidenceData& InEvidenceData);
 	void SetDisplayName(FText InText);
 	void SetDescription(FText InText);
-
-	void ShowInspectionUI();
-	void HideInspectionUI();
 };

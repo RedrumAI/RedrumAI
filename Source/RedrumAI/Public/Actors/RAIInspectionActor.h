@@ -63,5 +63,6 @@ public:
 	void AddZoom(float DeltaWheel);
 
 	//UI켜기/닫기, 초기화버튼 등 이벤트 발생하면 호출
-	void ResetTransform();
+	UFUNCTION()
+	void ResetMeshTransform();
 };

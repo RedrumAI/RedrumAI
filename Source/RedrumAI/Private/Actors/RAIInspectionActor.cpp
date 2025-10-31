@@ -59,7 +59,6 @@ void ARAIInspectionActor::PostInitializeComponents()
 void ARAIInspectionActor::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("yaw = %f  pitch = %f distance = %f"), InitialYaw, InitialPitch, InitialDistance);
 }
 
 void ARAIInspectionActor::Tick(float DeltaTime)
@@ -91,9 +90,11 @@ void ARAIInspectionActor::AddZoom(float DeltaWheel)
 	SceneCaptureComponent2D->SetRelativeLocation(FVector(Distance,0,0));
 }
 
-void ARAIInspectionActor::ResetTransform()
+void ARAIInspectionActor::ResetMeshTransform()
 {
 	MeshComponent->SetRelativeRotation(FRotator(InitialPitch, InitialYaw, 0));
 	SceneCaptureComponent2D->SetRelativeLocation(FVector(InitialDistance), 0, 0);
+
+	UE_LOG(LogTemp, Warning, TEXT("pitch %f, yaw %f, distance%f"), InitialPitch, InitialYaw, InitialDistance);
 }
 

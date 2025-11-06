@@ -115,6 +115,7 @@ void ARAIPlayerController::EnterDefaultModeIMC()
 				}
 
 				InputSystem->AddMappingContext(IMC_DefaultMode, 0);
+				InputSystem->RequestRebuildControlMappings();
 			}
 		}
 	}
@@ -174,6 +175,7 @@ void ARAIPlayerController::EnterInspectionModeIMC()
 					}
 				}
 				InputSystem->AddMappingContext(IMC_InspectionMode, 0);
+				InputSystem->RequestRebuildControlMappings();
 			}
 		}
 	}

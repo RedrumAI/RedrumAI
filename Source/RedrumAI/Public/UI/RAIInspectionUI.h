@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnZoomActorDelegate, float, Wheel);
 class UTextBlock;
 class UImage;
 class ARAIPlayerController;
+class UInputAction;
 
 UCLASS()
 class REDRUMAI_API URAIInspectionUI : public UUserWidget
@@ -28,13 +29,20 @@ protected:
 	TObjectPtr<UTextBlock> DisplayNameTextBlock;
 	UPROPERTY()
 	TObjectPtr<UTextBlock> DescriptionTextBlock;
+	UPROPERTY()
+	TObjectPtr<UTextBlock> ResetManualTextBlock;
+	UPROPERTY()
+	TObjectPtr<UTextBlock> ExitManualTextBlock;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_ResetInspectionMesh;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_CloseInspectionUI;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry&, const FPointerEvent&) override;
 	virtual FReply NativeOnMouseButtonUp(const FGeometry&, const FPointerEvent&) override;
 	virtual FReply NativeOnMouseMove(const FGeometry&, const FPointerEvent&) override;
 	virtual FReply NativeOnMouseWheel(const FGeometry&, const FPointerEvent&) override;
-
-	
 
 	TWeakObjectPtr<ARAIPlayerController> RAIPlayerController;
 
@@ -49,6 +57,7 @@ public:
 	FOnZoomActorDelegate ZoomActorDelegate;
 
 public:
+
 	void BindInspectionActor();
 
 	UFUNCTION()
@@ -59,4 +68,10 @@ public:
 	void UpdateInspectionUI(const FRAIEvidenceData& InEvidenceData);
 	void SetDisplayName(FText InText);
 	void SetDescription(FText InText);
+	void SetManualText(int32 AttemptsLeft = 5);
+	FText GetMappedKeyDisplayName(const UInputAction* IA) const;
+
+	FString ResetManualText;
+	FString ExitManualText;
+
 };

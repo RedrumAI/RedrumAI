@@ -6,19 +6,28 @@
 #include "Actors/RAIInspectionActor.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputAction.h"
+#include "InputCoreTypes.h"
+
 
 void URAIInspectionUI::NativeConstruct()
 {
 	DisplayNameTextBlock = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextBlock_DisplayName")));
 	DescriptionTextBlock = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextBlock_Description")));
+	ResetManualTextBlock = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextBlock_ResetManual")));
+	ExitManualTextBlock = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextBlock_ExitManual")));
 
 	DisplayNameTextBlock->SetAutoWrapText(true);
 	DescriptionTextBlock->SetAutoWrapText(true);
+	ResetManualTextBlock->SetAutoWrapText(true);
+	ExitManualTextBlock->SetAutoWrapText(true);
 
 	RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 	RAIPlayerController->CloseInspectionUIDelegate.AddDynamic(this, &URAIInspectionUI::CloseInspectionUI);
-	BindInspectionActor();	
+	BindInspectionActor();
 }
+
 
 void URAIInspectionUI::BindInspectionActor()
 {
@@ -81,9 +90,9 @@ FReply URAIInspectionUI::NativeOnMouseWheel(const FGeometry&, const FPointerEven
 
 void URAIInspectionUI::OpenInspectionUI(const FRAIEvidenceData& InEvidenceData)
 {
-	UpdateInspectionUI(InEvidenceData);
-
 	RAIPlayerController->EnterInspectionModeIMC();
+
+	UpdateInspectionUI(InEvidenceData);
 
 	SetVisibility(ESlateVisibility::Visible);
 }
@@ -102,7 +111,9 @@ void URAIInspectionUI::UpdateInspectionUI(const FRAIEvidenceData& InEvidenceData
 
 	SetDisplayName(InEvidenceData.DisplayName);
 	SetDescription(InEvidenceData.Description);
+	SetManualText();
 }
+
 
 void URAIInspectionUI::SetDisplayName(FText InText)
 {
@@ -112,4 +123,55 @@ void URAIInspectionUI::SetDisplayName(FText InText)
 void URAIInspectionUI::SetDescription(FText InText)
 {
 	DescriptionTextBlock->SetText(InText);
+}
+
+void URAIInspectionUI::SetManualText(int32 AttemptsLeft)
+{
+	// 1) 현재 활성 매핑에서 키 이름 얻기 시도
+	FText ResetKey = GetMappedKeyDisplayName(IA_ResetInspectionMesh);
+	FText ExitKey = GetMappedKeyDisplayName(IA_CloseInspectionUI);
+
+
+	// 2) Unbound라면 한 틱뒤 재시도
+	bool bResetReady = !ResetKey.ToString().Equals(TEXT("Unbound"));
+	bool bExitReady = !ExitKey.ToString().Equals(TEXT("Unbound"));
+
+	if ((!bResetReady || !bExitReady) && AttemptsLeft > 0)
+	{
+		// 한 틱만 미뤄서 재시도
+		GetWorld()->GetTimerManager().SetTimerForNextTick(
+			FTimerDelegate::CreateUObject(this, &URAIInspectionUI::SetManualText, AttemptsLeft - 1));
+		return;
+	}
+
+	// 3) 최종 텍스트 표시 (Unbound여도 그대로 보여줌)
+	ResetManualText = FString::Printf(TEXT("Press [%s] to Reset Preview"), *ResetKey.ToString());
+	ExitManualText = FString::Printf(TEXT("Press [%s] to Exit"), *ExitKey.ToString());
+
+	ResetManualTextBlock->SetText(FText::FromString(ResetManualText));
+	ExitManualTextBlock->SetText(FText::FromString(ExitManualText));
+}
+
+FText URAIInspectionUI::GetMappedKeyDisplayName(const UInputAction* IA) const
+{
+	if (!IsValid(IA))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s]: GetMappedKeyDisplayName() failed"), *GetName());
+		return FText::FromString(TEXT("-"));
+	}
+
+	if (ULocalPlayer* LocalPlayer = RAIPlayerController->GetLocalPlayer())
+	{
+		if (auto* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			TArray<FKey> MappedKeys = InputSubsystem->QueryKeysMappedToAction(IA);
+			if (MappedKeys.Num() > 0)
+			{
+				return MappedKeys[0].GetDisplayName(false); //true는 디버그용 이름 반환
+			}
+		}
+	}
+
+	//매핑이 없을 경우
+	return FText::FromString(TEXT("Unbound"));
 }

@@ -31,12 +31,6 @@ ARAIInspectionActor::ARAIInspectionActor()
 	MeshComponent->SetVisibleInSceneCaptureOnly(true);
 	SceneCaptureComponent2D->ShowOnlyComponent(MeshComponent);
 
-	FRotator InitialActorRotator = MeshComponent->GetRelativeRotation();
-	FVector InitialCameraVector = SceneCaptureComponent2D->GetRelativeLocation();
-	InitialYaw = InitialActorRotator.Yaw;
-	InitialPitch = InitialActorRotator.Pitch;
-	InitialDistance = InitialCameraVector.X;
-
 	YawSpeed = 0.2f;
 	PitchSpeed = 0.2f;
 	WheelSpeed = 10.f;
@@ -48,17 +42,18 @@ void ARAIInspectionActor::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-
-	/*
-	MeshComponent->SetRelativeRotation(FRotator(InitialPitch, InitialYaw, 0));
-	SceneCaptureComponent2D->SetRelativeRotation(FRotator(0, 180.f, 0));
-	SceneCaptureComponent2D->SetRelativeLocation(FVector(InitialDistance, 0, 0));
-	*/
+	FRotator InitialActorRotator = MeshComponent->GetRelativeRotation();
+	FVector InitialCameraVector = SceneCaptureComponent2D->GetRelativeLocation();
+	InitialYaw = InitialActorRotator.Yaw;
+	InitialPitch = InitialActorRotator.Pitch;
+	InitialDistance = InitialCameraVector.X;
 }
 
 void ARAIInspectionActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("pitch %f, yaw %f, distance%f"), InitialPitch, InitialYaw, InitialDistance);
 }
 
 void ARAIInspectionActor::Tick(float DeltaTime)

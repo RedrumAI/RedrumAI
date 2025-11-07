@@ -88,7 +88,7 @@ void ARAIInspectionActor::AddZoom(float DeltaWheel)
 void ARAIInspectionActor::ResetMeshTransform()
 {
 	MeshComponent->SetRelativeRotation(FRotator(InitialPitch, InitialYaw, 0));
-	SceneCaptureComponent2D->SetRelativeLocation(FVector(InitialDistance), 0, 0);
+	SceneCaptureComponent2D->SetRelativeLocation(FVector(InitialDistance, 0, 0));
 
 	UE_LOG(LogTemp, Warning, TEXT("pitch %f, yaw %f, distance%f"), InitialPitch, InitialYaw, InitialDistance);
 }

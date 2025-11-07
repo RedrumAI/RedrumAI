@@ -9,6 +9,7 @@
 #include "UI/RAIChatLogUI.h"
 #include "UI/RAIChatLogUIButton.h"
 #include "UI/RAISlideInventoryUI.h"
+#include "UI/RAIInspectionUI.h"
 
 void URAIStageHUDWidget::NativeConstruct()
 {
@@ -17,6 +18,11 @@ void URAIStageHUDWidget::NativeConstruct()
 	ChatLogUI = Cast<URAIChatLogUI>(GetWidgetFromName(TEXT("WBP_RAIChatLogUI")));
 	ChatLogUIButton = Cast<URAIChatLogUIButton>(GetWidgetFromName(TEXT("WBP_RAIChatLogUIButton")));
 	SlideInventoryUI = Cast<URAISlideInventoryUI>(GetWidgetFromName(TEXT("WBP_RAISlideInventoryUI")));
+	InspectionUI = Cast<URAIInspectionUI>(GetWidgetFromName(TEXT("WBP_RAIInspectionUI")));
+
+	ChatUI->SetVisibility(ESlateVisibility::Hidden);
+	ChatLogUI->SetVisibility(ESlateVisibility::Hidden);
+	InspectionUI->SetVisibility(ESlateVisibility::Hidden);
 
 	//ChatUI, LogUI, Button Valid검사. 불통과시 타이머로 다시돌리기
 	BindOwningUI();
@@ -24,17 +30,25 @@ void URAIStageHUDWidget::NativeConstruct()
 
 void URAIStageHUDWidget::BindOwningUI()
 {
-	if (IsValid(ChatUI) && IsValid(ChatLogUI) && IsValid(ChatLogUIButton) && IsValid(SlideInventoryUI))
+	//Canvas 및 하위위젯 유효성 검사
+	bool bNeedRetry = false;
+	if (!IsValid(CanvasPanel))
 	{
-		//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
-		ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
-		ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
-		ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
-
-		//UI간 바인드 연결
-		SlideInventoryUI->SendActionTextDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
+		bNeedRetry = true;
 	}
 	else
+	{
+		const TArray<UWidget*> AllWidgets = CanvasPanel->GetAllChildren();
+		for (UWidget* Widget : AllWidgets)
+		{
+			if (!IsValid(Widget))
+			{
+				bNeedRetry = true;
+				break;
+			}
+		}
+	}
+	if (bNeedRetry)
 	{
 		FTimerHandle TimerHandle_BindOwningUI;
 		GetWorld()->GetTimerManager().SetTimer(
@@ -44,33 +58,48 @@ void URAIStageHUDWidget::BindOwningUI()
 			0.1f,
 			false
 		);
+		return;
 	}
+
+	//Bind함수 중복호출 예외처리
+	if (bAlreadyBound == true)
+	{
+		return;
+	}
+	else
+	{
+		bAlreadyBound = true;
+	}	
+
+	//인벤토리Tab의 경우 Open혹은 Close하면 안되기에 제외
+	ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
+	ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
+	ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
+
+	//UI간 바인드 연결
+	SlideInventoryUI->UseEvidenceDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
+	SlideInventoryUI->InspectEvidenceDelegate.AddDynamic(InspectionUI, &URAIInspectionUI::OpenInspectionUI);
 }
 
 void URAIStageHUDWidget::OpenUI(URAIStackWidget* InUI)
 {
 	//OldSlot 저장
-	FAnchorData SavedLayout;
-	FVector2D SavedAlignment;
-	int32 SavedZOrder;
-	if (UCanvasPanelSlot* OldSlot = Cast<UCanvasPanelSlot>(InUI->Slot))
-	{
-		SavedLayout = OldSlot->GetLayout();
-		SavedAlignment = OldSlot->GetAlignment();
-		SavedZOrder = OldSlot->GetZOrder();
-	}
+	UCanvasPanelSlot* OldSlot = Cast<UCanvasPanelSlot>(InUI->Slot);
+	check(OldSlot);
+	FAnchorData SavedLayout = OldSlot->GetLayout();
+	FVector2D SavedAlignment = OldSlot->GetAlignment();
+	int32 SavedZOrder = OldSlot->GetZOrder();
 
 	//컴포넌트 구조 최하단으로 이동하여 HUD 맨앞에 표시
 	InUI->RemoveFromParent();
 	CanvasPanel->AddChild(InUI);
 
 	//SavedData 적용
-	if (UCanvasPanelSlot* NewSlot = Cast<UCanvasPanelSlot>(InUI->Slot))
-	{
-		NewSlot->SetLayout(SavedLayout);
-		NewSlot->SetAlignment(SavedAlignment);
-		NewSlot->SetZOrder(SavedZOrder);
-	}
+	UCanvasPanelSlot* NewSlot = Cast<UCanvasPanelSlot>(InUI->Slot);
+	check(NewSlot);
+	NewSlot->SetLayout(SavedLayout);
+	NewSlot->SetAlignment(SavedAlignment);
+	NewSlot->SetZOrder(SavedZOrder);
 
 	//UI 표시
 	InUI->OnOpened();

@@ -12,6 +12,7 @@ class URAIChatUI;
 class URAIChatLogUI;
 class URAIChatLogUIButton;
 class URAISlideInventoryUI;
+class URAIInspectionUI;
 
 UCLASS()
 class REDRUMAI_API URAIStageHUDWidget : public UUserWidget
@@ -27,10 +28,14 @@ protected:
 	TObjectPtr<URAIChatLogUIButton> ChatLogUIButton;
 	UPROPERTY()
 	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
+	UPROPERTY()
+	TObjectPtr<URAIInspectionUI> InspectionUI;
 
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 	TArray<URAIStackWidget*> UIStack;
 	
+	bool bAlreadyBound = false;
+
 public:
 	virtual void NativeConstruct() override;
 

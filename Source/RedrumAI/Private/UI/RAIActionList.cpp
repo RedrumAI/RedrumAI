@@ -27,11 +27,6 @@ void URAIActionList::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEven
 	SetVisibleState(ESlateVisibility::Collapsed);
 }
 
-void URAIActionList::SetEvidenceData(FRAIEvidenceData* InData)
-{
-	EvidenceData = InData;
-}
-
 void URAIActionList::SetVisibleState(ESlateVisibility InState)
 {
 	SetVisibility(InState);
@@ -46,10 +41,12 @@ void URAIActionList::OnUseButtonClicked()
 {	
 	SetVisibleState(ESlateVisibility::Collapsed);
 
-	UseButtonClickedDelegate.Broadcast();
+	ClickedUseButtonDelegate.Broadcast();
 }
 
 void URAIActionList::OnInspectButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("InspectButton Used"));
+	SetVisibleState(ESlateVisibility::Collapsed);
+
+	ClickedInspectButtonDelegate.Broadcast();
 }

@@ -29,7 +29,9 @@ void URAISlideInventoryUI::InitSettingSlideInventory()
 	{
 		SetupEvidenceData();
 
-		ActionList->UseButtonClickedDelegate.AddDynamic(this, &URAISlideInventoryUI::UseEvidence);
+		ActionList->ClickedUseButtonDelegate.AddDynamic(this, &URAISlideInventoryUI::UseEvidence);
+
+		ActionList->ClickedInspectButtonDelegate.AddDynamic(this, &URAISlideInventoryUI::InspectEvidence);
 	}
 	else
 	{
@@ -99,7 +101,7 @@ void URAISlideInventoryUI::UpdateButtonThumbnail(UButton* InButton, UTexture2D* 
 		UE_LOG(LogTemp, Warning, TEXT("[%s]:UpdateButtonThumbnail Failed"), *GetName());
 		return;
 	}
-	FButtonStyle NewStyle = InButton->WidgetStyle;
+	FButtonStyle NewStyle = InButton->GetStyle();
 
 	FSlateBrush NormalBrush;
 	NormalBrush.SetResourceObject(InThumbnail);
@@ -135,7 +137,6 @@ void URAISlideInventoryUI::OnEvidenceButtonClicked()
 	ClickedIndex = FindClickedButtonIndex();
 	if ( ClickedIndex != -1 && InventoryRowData[ClickedIndex].Key!=NAME_None)
 	{
-		ActionList->SetEvidenceData(InventoryRowData[ClickedIndex].Value);
 		ShowActionList();
 	}
 }
@@ -204,7 +205,7 @@ void URAISlideInventoryUI::OnClosed()
 void URAISlideInventoryUI::UseEvidence()
 {
 	FText ActionText = MakeActionText(ClickedIndex);
-	SendActionTextDelegate.Broadcast(ActionText);
+	UseEvidenceDelegate.Broadcast(ActionText);
 
 	//누구를 보내야하나?
 	//RAIPlayerState->RemoveEvidence(InventoryRowData[ClickedIndex].Key);
@@ -223,5 +224,10 @@ FText URAISlideInventoryUI::MakeActionText(int32 InIndex)
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *ActionString);
 
 	return ActionText;
+}
+
+void URAISlideInventoryUI::InspectEvidence()
+{
+	InspectEvidenceDelegate.Broadcast(*InventoryRowData[ClickedIndex].Value);
 }
 

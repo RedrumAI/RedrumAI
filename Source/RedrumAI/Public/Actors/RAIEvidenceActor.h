@@ -28,8 +28,6 @@ protected:
 	FText Description;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UTexture2D> EvidenceImage;
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> MeshComponent;
 	/*
 	MeshComponent로 사용
 	UPROPERTY(VisibleAnywhere)
@@ -40,8 +38,9 @@ public:
 	TSubclassOf<ARAIEvidenceActor> GetEvidenceClass() const { return EvidenceClass; };
 	FText GetDisplayName() const { return DisplayName; };
 	FText GetDescription() const { return Description; };
-	TSoftObjectPtr<UStaticMesh> GetMesh() const { return MeshComponent->GetStaticMesh(); };
-	TObjectPtr<UTexture2D> GetEvidenceImage() const { return EvidenceImage; };		
+	TObjectPtr<UTexture2D> GetEvidenceImage() const { return EvidenceImage; };
+
+	void UpdateOutlineMesh();
 
 	virtual void Interacted() override;
 };

@@ -142,12 +142,12 @@ void ARAIPlayerCharacter::TraceInteractableActor()
 	{
 		if (IRAIInteractableInterface* OldInteractableActor = Cast<IRAIInteractableInterface>(CurrentlyFocusedActor))
 		{
-			//OldInteractableActor->EndFocused();
+			OldInteractableActor->EndFocused();
 		}
 
 		if (IRAIInteractableInterface* NewInteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
 		{
-			//NewInteractableActor->BeginFocused();
+			NewInteractableActor->BeginFocused();
 		}
 
 		//갱신

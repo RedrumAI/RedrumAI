@@ -75,11 +75,11 @@ void URAISlideInventoryUI::UpdateEvidenceData()
 
 	for (int i = 0;i < EvidenceRows.Num();++i)
 	{
-		InventoryRowData[i].Key = EvidenceRows[i];
-		InventoryRowData[i].Value = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
-
 		if (i < VerticalBox_Button->GetChildrenCount())
 		{
+			InventoryRowData[i].Key = EvidenceRows[i];
+			InventoryRowData[i].Value = nullptr;
+
 			if (InventoryRowData[i].Key == NAME_None)
 			{
 				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
@@ -87,6 +87,8 @@ void URAISlideInventoryUI::UpdateEvidenceData()
 			}
 			else
 			{
+				InventoryRowData[i].Value = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
+
 				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
 				UpdateButtonThumbnail(EvidenceButton, InventoryRowData[i].Value->EvidenceImage);
 			}

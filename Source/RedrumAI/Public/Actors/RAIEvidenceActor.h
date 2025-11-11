@@ -40,7 +40,5 @@ public:
 	FText GetDescription() const { return Description; };
 	TObjectPtr<UTexture2D> GetEvidenceImage() const { return EvidenceImage; };
 
-	void UpdateOutlineMesh();
-
 	virtual void Interacted() override;
 };

@@ -23,7 +23,7 @@ void ARAIPlayerState::PostInitializeComponents()
 
 void ARAIPlayerState::AddEvidence(FName InRowName)
 {
-	FString DebugContext = FString::Printf(TEXT("[%s] : AddEvidence FindRow Called"), *GetName());
+	FString DebugContext = FString::Printf(TEXT("[%s] : AddEvidence Called"), *GetName());
 	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(InRowName, DebugContext);
 	if (FindingData)
 	{
@@ -61,7 +61,7 @@ TArray<FName> ARAIPlayerState::GetEvidenceRows() const
 
 FRAIEvidenceData* ARAIPlayerState::FindEvidenceData(FName RowName) const
 {
-	FString DebugContext = FString::Printf(TEXT("[%s] : AddEvidence FindRow Called"), *GetName());
+	FString DebugContext = FString::Printf(TEXT("[%s] : FindRow Called"), *GetName());
 	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(RowName, DebugContext);
 	return FindingData;
 }

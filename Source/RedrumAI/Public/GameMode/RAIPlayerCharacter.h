@@ -27,6 +27,8 @@ protected:
 	TObjectPtr<UInputAction> IA_TriggerInteractableActor;
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UInputAction> IA_Move;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<UInputAction> IA_Look;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
 	TObjectPtr<USphereComponent> InteractableSphere;
@@ -37,6 +39,15 @@ protected:
 
 	AActor* CurrentlyFocusedActor = nullptr;
 	FTimerHandle LinetraceTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float LookYawScale = 1.f;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float LookPitchScale = 1.f;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float ViewPitchMinValue = -80.f;
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	float ViewPitchMaxValue = 60.f;
 
 public:
 	virtual void BeginPlay() override;
@@ -66,4 +77,5 @@ public:
 	void TriggerInteractableActor();
 
 	void Move(const FInputActionInstance& Instance);	
+	void Look(const FInputActionInstance& Instance);
 };

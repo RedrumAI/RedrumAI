@@ -20,8 +20,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "RAI")
-	TObjectPtr<UMaterial> HighlightMaterial;
+	UPROPERTY(VisibleAnywhere, Category = "RAI")
+	TObjectPtr<UStaticMeshComponent> OriginalMesh;
+	UPROPERTY(VisibleAnywhere, Category = "RAI")
+	TObjectPtr<UStaticMeshComponent> OutlineMesh;
+	UPROPERTY(VisibleAnywhere, Category = "RAI")
+	TObjectPtr<UMaterialInterface> OutlineMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UBoxComponent> CollisionBox;
@@ -31,9 +35,11 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void Interacted() override;
 	virtual void Interacted(AController* InController) override;
+
+	TSoftObjectPtr<UStaticMesh> GetMesh() const { return OriginalMesh->GetStaticMesh(); };
 
 	//캐릭터 Focus시, 관련 함수
 	virtual void BeginFocused() override;

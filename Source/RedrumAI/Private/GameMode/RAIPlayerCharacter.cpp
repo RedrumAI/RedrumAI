@@ -16,10 +16,13 @@ ARAIPlayerCharacter::ARAIPlayerCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	InteractableSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractableSphere"));
 	InteractableSphere->SetupAttachment(RootComponent); //SphereCollision Radius설정은 BP에서 직접 설정하자.
 	InteractableSphere->SetSphereRadius(InteractableDistance);
+
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +46,9 @@ void ARAIPlayerCharacter::PossessedBy(AController* NewController)
 
 	if (APlayerController* NewPlayerController = Cast<APlayerController>(NewController))
 	{
+		// NewPlayerController->PlayerCameraManager->ViewPitchMin = -80.f;
+		// NewPlayerController->PlayerCameraManager->ViewPitchMax = 60.f;
+
 		if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(NewPlayerController->Player))
 		{
 			if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
@@ -82,7 +88,45 @@ void ARAIPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	Input->BindAction(IA_Move, ETriggerEvent::Triggered, this, &ARAIPlayerCharacter::Move);
+	Input->BindAction(IA_Look, ETriggerEvent::Triggered, this, &ARAIPlayerCharacter::Look);
 	Input->BindAction(IA_TriggerInteractableActor, ETriggerEvent::Triggered, this, &ARAIPlayerCharacter::TriggerInteractableActor);
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if(PlayerController->IsLocalController() && PlayerController->PlayerCameraManager)
+		{
+			PlayerController->PlayerCameraManager->ViewPitchMin = ViewPitchMinValue;
+			PlayerController->PlayerCameraManager->ViewPitchMax = ViewPitchMaxValue;
+		}
+	}
+}
+
+void ARAIPlayerCharacter::Move(const FInputActionInstance& Instance)
+{
+	FVector2D InputValue = Instance.GetValue().Get<FVector2D>();
+
+	FRotator ControllerRotation = GetControlRotation();
+	FRotator YawRotator(0, ControllerRotation.Yaw, 0);
+	FVector FowardDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::X); //소스코드는 FVector FowardDirection = YawRotator.Vector();
+	FVector RightDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::Y);
+
+	AddMovementInput(FowardDirection, InputValue.Y);
+	AddMovementInput(RightDirection, InputValue.X);
+}
+
+void ARAIPlayerCharacter::Look(const FInputActionInstance& Instance)
+{
+	const FVector2D LookValue = Instance.GetValue().Get<FVector2D>();
+
+	if (LookValue.X != 0.f && LookYawScale != 0.f)
+	{
+		AddControllerYawInput(LookValue.X * LookYawScale);
+	}
+
+	if (LookValue.Y != 0.f && LookPitchScale != 0.f)
+	{
+		AddControllerPitchInput(LookValue.Y * LookPitchScale);
+	}
 }
 
 void ARAIPlayerCharacter::OnBeginOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -142,12 +186,12 @@ void ARAIPlayerCharacter::TraceInteractableActor()
 	{
 		if (IRAIInteractableInterface* OldInteractableActor = Cast<IRAIInteractableInterface>(CurrentlyFocusedActor))
 		{
-			//OldInteractableActor->EndFocused();
+			OldInteractableActor->EndFocused();
 		}
 
 		if (IRAIInteractableInterface* NewInteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
 		{
-			//NewInteractableActor->BeginFocused();
+			NewInteractableActor->BeginFocused();
 		}
 
 		//갱신
@@ -167,7 +211,7 @@ void ARAIPlayerCharacter::TriggerInteractableActor()
 	Params.AddIgnoredActor(this);
 
 	UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr bHit triggered"));
-	
+
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //트레이스 채널을 바꿔 hit이벤트를 더줄일수 있겠다.
 	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.2f);
 	if (bHit)
@@ -183,19 +227,6 @@ void ARAIPlayerCharacter::TriggerInteractableActor()
 			{
 				InteractableActor->Interacted();
 			}
-		}		
+		}
 	}
-}
-
-void ARAIPlayerCharacter::Move(const FInputActionInstance& Instance)
-{
-	FVector2D InputValue = Instance.GetValue().Get<FVector2D>();
-
-	FRotator ControllerRotation = GetControlRotation();
-	FRotator YawRotator(0, ControllerRotation.Yaw, 0);
-	FVector FowardDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::X); //소스코드는 FVector FowardDirection = YawRotator.Vector();
-	FVector RightDirection = FRotationMatrix(YawRotator).GetScaledAxis(EAxis::Y);
-
-	AddMovementInput(FowardDirection, InputValue.Y);
-	AddMovementInput(RightDirection, InputValue.X);
 }

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "Actors/RAIInspectionActor.h"
 #include "RAIPlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMoveSlideInventoryDelegate);
@@ -12,10 +11,20 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateTalkingStateDelegate, bool,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCloseInspectionUIDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResetInspectionMeshDelegate);
 
+UENUM()
+enum class ERAIConversationApproachState : uint8
+{
+	None,
+	ToSideAnchor,
+	ToFrontAnchor
+};
+
 class ARAIGameMode;
 class URAIStageHUDWidget;
 class UInputMappingContext;
 class UInputAction;
+class ARAIInspectionActor;
+class IRAIConversationInterface;
 
 UCLASS()
 class REDRUMAI_API ARAIPlayerController : public APlayerController
@@ -56,6 +65,13 @@ protected:
 
 	bool bIsTalking = false;
 
+	ERAIConversationApproachState ApproachState = ERAIConversationApproachState::None;
+	IRAIConversationInterface* CurrentSuspect = nullptr;
+	FVector ApproachStartLocation;
+	FVector ApproachTargetLocation;
+	float   ApproachElapsedTime = 0.f;
+	float   ApproachDuration = 0.4f; // 0.4초 정도
+
 public:
 	UPROPERTY()
 	FOnMoveSlideInventoryDelegate MoveSlideInventoryDelegate;
@@ -65,9 +81,11 @@ public:
 	FOnCloseInspectionUIDelegate CloseInspectionUIDelegate;
 	UPROPERTY()
 	FOnResetInspectionMeshDelegate ResetInspectionMeshDelegate;
-	
+
 public:
 	virtual void BeginPlay() override;
+	virtual void PlayerTick(float DeltaTime) override;
+
 	void BindGM();
 	void BindHUD();
 	virtual void SetupInputComponent() override;
@@ -86,6 +104,10 @@ public:
 	UFUNCTION()
 	void AddChatLogUI(FString InRole, FString InMessage);
 
+	void TryStartConversation(IRAIConversationInterface* Suspect);
+	void StartApproachToFront(IRAIConversationInterface* Suspect);
+	void StartApproachToSide(IRAIConversationInterface* Suspect, bool bUseRight);
+	void TickConversationApproach(float DeltaSeconds);
 	bool GetTalkingState() const;
 	void SetTalkingState(bool InBool);
 	UFUNCTION()

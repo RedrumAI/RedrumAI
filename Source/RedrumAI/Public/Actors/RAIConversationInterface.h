@@ -25,7 +25,7 @@ class REDRUMAI_API IRAIConversationInterface
 	GENERATED_BODY()
 
 public:
-    float VisionHalfAngle = 40.f;
+    float VisionHalfAngle = 50.f;
 
     // 플레이어 컨트롤러를 기준으로, 이 타겟 기준 방향을 계산
     virtual ERAIConversationSide GetConversationSide(AController* InController) const = 0;

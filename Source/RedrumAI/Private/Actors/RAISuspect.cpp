@@ -8,10 +8,13 @@ ARAISuspect::ARAISuspect()
 {
 	FrontAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("FrontAnchor"));
 	FrontAnchor->SetupAttachment(OriginalMesh);
+	FrontAnchor->bVisualizeComponent = true;
 	LeftAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("LeftAnchor"));
 	LeftAnchor->SetupAttachment(OriginalMesh);
+	LeftAnchor->bVisualizeComponent = true;
 	RightAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("RightAnchor"));
 	RightAnchor->SetupAttachment(OriginalMesh);
+	RightAnchor->bVisualizeComponent = true;
 
 	InteractType = ERAIInteractType::Suspect;
 }
@@ -19,7 +22,7 @@ ARAISuspect::ARAISuspect()
 void ARAISuspect::Interacted(AController* InController)
 {
 	ARAIPlayerController* InPC = Cast<ARAIPlayerController>(InController);
-	InPC->SetTalkingState(true);
+	InPC->TryStartConversation(this);
 }
 
 ERAIConversationSide ARAISuspect::GetConversationSide(AController* InController) const
@@ -64,20 +67,24 @@ ERAIConversationSide ARAISuspect::GetConversationSide(AController* InController)
 
 FVector ARAISuspect::GetFrontAnchorLocation() const
 {
-	return FVector();
+	return FrontAnchor ? FrontAnchor->GetComponentLocation() : GetActorLocation();
 }
 
 FVector ARAISuspect::GetLeftAnchorLocation() const
 {
-	return FVector();
+	return LeftAnchor ? LeftAnchor->GetComponentLocation() : GetActorLocation();
 }
 
 FVector ARAISuspect::GetRightAnchorLocation() const
 {
-	return FVector();
+	return RightAnchor ? RightAnchor->GetComponentLocation() : GetActorLocation();
 }
 
 FVector ARAISuspect::GetHeadWorldLocation() const
 {
-	return FVector();
+	if (USkeletalMeshComponent* Mesh = Cast<USkeletalMeshComponent>(OriginalMesh))
+	{
+		return Mesh->GetSocketLocation(TEXT("Head"));
+	}
+	return GetActorLocation(); // 예비값
 }

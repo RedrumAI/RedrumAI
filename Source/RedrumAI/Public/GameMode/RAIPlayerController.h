@@ -26,6 +26,8 @@ class UInputAction;
 class ARAIInspectionActor;
 class IRAIConversationInterface;
 
+class URAILobbyUI;
+
 UCLASS()
 class REDRUMAI_API ARAIPlayerController : public APlayerController
 {
@@ -35,10 +37,25 @@ public:
 	ARAIPlayerController();
 
 protected:
+
 	UPROPERTY()
 	TObjectPtr<ARAIGameMode> RAIGameMode;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TSubclassOf<URAILobbyUI> LobbyUIClass;
+	UPROPERTY()
+	TObjectPtr<URAILobbyUI> LobbyUI;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TSubclassOf< URAIStageHUDWidget> StageHUDClass;
 	UPROPERTY()
 	TObjectPtr<URAIStageHUDWidget> StageHUD;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<ULevelSequence> IntroSequenceAsset;
+	UPROPERTY()
+	TObjectPtr<ATargetPoint> StageTargetPoint;
+
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TSubclassOf<ARAIInspectionActor> BP_InspectionActor;
 	UPROPERTY()
@@ -84,6 +101,14 @@ public:
 
 public:
 	virtual void BeginPlay() override;
+
+	void FindStageTargetPoint();
+	UFUNCTION()
+	void GameStartFromLobby();
+	void PlayIntroSequence();
+	UFUNCTION()
+	void SetupStageAfterIntro();
+
 	virtual void PlayerTick(float DeltaTime) override;
 
 	void BindGM();
@@ -118,4 +143,5 @@ public:
 	void UseEvidence(FName InRowName);
 
 	const ARAIInspectionActor* GetInspectionActor();
+
 };

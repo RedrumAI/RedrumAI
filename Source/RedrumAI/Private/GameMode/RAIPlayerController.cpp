@@ -12,6 +12,12 @@
 #include "Actors/RAIInspectionActor.h"
 #include "Actors/RAIConversationInterface.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "EngineUtils.h"
+#include "Engine/TargetPoint.h"
+#include "UI/RAILobbyUI.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+#include "LevelSequenceActor.h"
 
 ARAIPlayerController::ARAIPlayerController()
 {
@@ -21,6 +27,7 @@ void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 소유IMC 확인
 	for (TFieldIterator<FObjectProperty> PropertyIterator(GetClass()); PropertyIterator; ++PropertyIterator)
 	{
 		FObjectProperty* ObjectProperty = *PropertyIterator;
@@ -35,25 +42,112 @@ void ARAIPlayerController::BeginPlay()
 		}
 	}
 
-	//BP로 만들어진 StageHUD의 경로 하드코딩
-	FSoftClassPath StageHUDClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/YJ/Widget/WBP_StageHUDWidget.WBP_StageHUDWidget_C'"));
-	UClass* WidgetClass = StageHUDClassPath.TryLoadClass<URAIStageHUDWidget>();
-	StageHUD = CreateWidget<URAIStageHUDWidget>(this, WidgetClass);
-	StageHUD->AddToViewport();
-
-	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
-	EnterDefaultModeIMC();
-
-	BindGM();
-	BindHUD();
-	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
-
 	//InspectionActor생성 및 리셋함수 바인드
 	InspectionActor = GetWorld()->SpawnActor<ARAIInspectionActor>(BP_InspectionActor);
 	if (InspectionActor)
 	{
 		ResetInspectionMeshDelegate.AddDynamic(InspectionActor, &ARAIInspectionActor::ResetMeshTransform);
 	}
+
+	//GM바인드
+	BindGM();
+	
+	//TalkingState 관리 함수 bind
+	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
+
+	//Intro관련 설정
+	FindStageTargetPoint();
+
+	if (LobbyUIClass)
+	{
+		LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
+		if (LobbyUI)
+		{
+			LobbyUI->AddToViewport();
+		}
+	}
+
+	FInputModeUIOnly InputMode;
+	SetInputMode(InputMode);
+	SetShowMouseCursor(true);
+	if (APawn* MyPawn = GetPawn())
+	{
+		MyPawn->DisableInput(this);
+	}
+}
+
+void ARAIPlayerController::FindStageTargetPoint()
+{
+	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
+	{
+		ATargetPoint* TargetPoint = *TargetPointIterator;
+		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
+		{
+			StageTargetPoint = TargetPoint;
+			break;
+		}
+	}
+}
+
+void ARAIPlayerController::GameStartFromLobby()
+{
+	//LobbyUI 제거
+	if (LobbyUI)
+	{
+		LobbyUI->RemoveFromParent();
+		LobbyUI = nullptr;
+	}
+
+	//시퀀스 재생하는 동안 입력 차단
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
+	SetShowMouseCursor(false);
+
+	PlayIntroSequence();
+}
+
+void ARAIPlayerController::PlayIntroSequence()
+{
+	if (!IntroSequenceAsset)
+	{
+		SetupStageAfterIntro();
+		return;
+	}
+
+	FMovieSceneSequencePlaybackSettings Settings;
+	ALevelSequenceActor* SequenceActor = nullptr;
+	ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+		GetWorld(),
+		IntroSequenceAsset,
+		Settings,
+		SequenceActor
+	);
+
+	if (SequencePlayer)
+	{
+		SequencePlayer->OnFinished.AddDynamic(this, &ARAIPlayerController::SetupStageAfterIntro);
+		SequencePlayer->Play();
+	}
+}
+
+void ARAIPlayerController::SetupStageAfterIntro()
+{
+	GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
+	GetPawn()->EnableInput(this);
+
+	if (StageHUDClass)
+	{
+		StageHUD = CreateWidget<URAIStageHUDWidget>(this, StageHUDClass);
+		if (StageHUD)
+		{
+			StageHUD->AddToViewport();
+		}
+	}
+
+	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
+	EnterDefaultModeIMC();
+
+	BindHUD();
 }
 
 void ARAIPlayerController::PlayerTick(float DeltaTime)

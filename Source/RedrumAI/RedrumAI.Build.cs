@@ -8,7 +8,7 @@ public class RedrumAI : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HTTP", "Json","JsonUtilities", "UMG" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HTTP", "Json","JsonUtilities", "UMG", "LevelSequence", "MovieScene" });
 
         //PrivateDependencyModuleNames.AddRange(new string[] { });
 

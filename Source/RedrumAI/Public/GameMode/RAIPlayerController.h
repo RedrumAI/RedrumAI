@@ -25,8 +25,9 @@ class UInputMappingContext;
 class UInputAction;
 class ARAIInspectionActor;
 class IRAIConversationInterface;
-
 class URAILobbyUI;
+class ULevelSequence;
+class ATargetPoint;
 
 UCLASS()
 class REDRUMAI_API ARAIPlayerController : public APlayerController

@@ -17,8 +17,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FName Name;
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UTexture2D> SuspectImage;
-	
-
 };

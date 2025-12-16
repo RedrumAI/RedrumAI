@@ -17,6 +17,8 @@ class REDRUMAI_API ARAIPlayerState : public APlayerState
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "RAI")
 	TObjectPtr<UDataTable> EvidenceDataTable;
+	UPROPERTY(EditDefaultsOnly, Category = "RAI")
+	TObjectPtr<UDataTable> LevelDataTable;
 
 	TArray<FName> EvidenceRows;
 

@@ -26,6 +26,8 @@ protected:
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
 	UPROPERTY()
 	TObjectPtr<URAIChatLogUIButton> ChatLogUIButton;
+	//UPROPERTY()
+	//TObjectPtr<URAIFinalVerdictUIButton> FinalVerdictUIButton;
 	UPROPERTY()
 	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
 	UPROPERTY()

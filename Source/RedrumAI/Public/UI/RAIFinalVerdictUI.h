@@ -9,6 +9,7 @@
 
 class UTileView;
 class UButton;
+class UDataTable;
 
 UCLASS()
 class REDRUMAI_API URAIFinalVerdictUI : public URAIStackWidget
@@ -21,6 +22,17 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UButton> Button_Submit;
 
+	UPROPERTY()
+	TObjectPtr<UDataTable> VerdictDataTable;
+
+	UPROPERTY()
+	TObjectPtr<UObject> LastClickedItem;
+
 public:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnSubmitButtonClicked();
+	void BuildVerdictEntries();
+	void OnSuspectTileViewItemClicked(UObject* ClickedItem);
 };

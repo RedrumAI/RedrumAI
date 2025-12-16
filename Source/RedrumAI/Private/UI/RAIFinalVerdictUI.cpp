@@ -6,6 +6,9 @@
 #include "Components/Button.h"
 #include "Components/SizeBoxSlot.h"
 
+#include "Data/RAIFinalVerdictDataStruct.h"
+#include "UI/RAIFinalVerdictDataObject.h"
+
 void URAIFinalVerdictUI::NativeConstruct()
 {
 	TileView_Suspect = Cast<UTileView>(GetWidgetFromName(TEXT("TileView_Suspect")));
@@ -18,6 +21,54 @@ void URAIFinalVerdictUI::NativeConstruct()
 		TileViewSlot->SetVerticalAlignment(VAlign_Center); //수직은 사이즈박스의 중앙에 위치하고 최대 사이즈박스 수직만큼 제한
 	}
 
-	//TileView_Suspect의 Entry 디자인 설정은 BP에서 적용 (EntrySpacing, Entry Width/Height, TileAlighnment, EntryWidgetClass)
+	//TileView_Suspect의 Entry 디자인 설정은 BP에서 적용. (EntrySpacing, Entry Width/Height, TileAlighnment, EntryWidgetClass)
 
+	TileView_Suspect->OnItemClicked().AddUObject(this, &URAIFinalVerdictUI::OnSuspectTileViewItemClicked);
+	Button_Submit->OnClicked.AddDynamic(this, &URAIFinalVerdictUI::OnSubmitButtonClicked);
+}
+
+void URAIFinalVerdictUI::BuildVerdictEntries()
+{
+	TileView_Suspect->ClearListItems();
+
+	TArray<FName> RowNames = VerdictDataTable->GetRowNames();
+
+	for (const FName& RowName : RowNames)
+	{
+		FString DebugContext = FString::Printf(TEXT("[%s] : FindRow Called"), *GetName());
+		FRAIFinalVerdictDataStruct* Row = VerdictDataTable->FindRow<FRAIFinalVerdictDataStruct>(RowName, DebugContext);
+		
+		if(!Row)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("VerdictDataTable [%s] Rows Empty!!!"), *RowName.ToString());
+			continue;
+		}
+
+		URAIFinalVerdictDataObject* DataObject = NewObject<URAIFinalVerdictDataObject>(this);
+		DataObject->SetData(*Row);
+
+		TileView_Suspect->AddItem(DataObject);
+	}
+}
+
+void URAIFinalVerdictUI::OnSuspectTileViewItemClicked(UObject* ClickedItem)
+{
+	// 같은 아이템을 다시 클릭 -> 토글 해제
+	if (LastClickedItem == ClickedItem && TileView_Suspect->GetSelectedItem() == ClickedItem)
+	{
+		TileView_Suspect->ClearSelection();
+		LastClickedItem = nullptr;
+		return;
+	}
+
+	// 다른 아이템 클릭 -> 선택
+	TileView_Suspect->SetSelectedItem(ClickedItem);
+	LastClickedItem = ClickedItem;
+}
+
+void URAIFinalVerdictUI::OnSubmitButtonClicked()
+{
+	// UObejct* SelectedSuspect = TileView_Suspect->GetSelectedItem();
+	// SelectedItem이 존재한다면 suspect name 을 컨트롤러로 전달
+	// gamemode 정답 판정 및 엔딩 시퀀스
 }

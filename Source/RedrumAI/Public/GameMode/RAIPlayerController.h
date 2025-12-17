@@ -106,9 +106,11 @@ public:
 	void FindStageTargetPoint();
 	UFUNCTION()
 	void GameStartFromLobby();
+	void SetupLevelData();
 	void PlayIntroSequence();
 	UFUNCTION()
 	void SetupStageAfterIntro();
+
 
 	virtual void PlayerTick(float DeltaTime) override;
 

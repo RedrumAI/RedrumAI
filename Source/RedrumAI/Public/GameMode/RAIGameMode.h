@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "Data/RAIMessageRole.h"
 #include "Data/RAIEmotionScore.h"
+#include "Data/RAILevelDataStruct.h"
 #include "RAIGameMode.generated.h"
 
 //AI응답의 문장 혹은 NLP점수가 필요할 경우, 해당 클래스에서 ARAIGameMode::FResponseDelegate, FScoreDelegate에 바인드할것
@@ -29,11 +30,28 @@ class REDRUMAI_API ARAIGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY()
+	TObjectPtr<ARAIHttpManager> HttpManager;
+	UPROPERTY()
+	TObjectPtr<ARAIChatManager> ChatManager;
+	UPROPERTY()
+	TObjectPtr<ARAIInventoryManager> InventoryManager;
+
+	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
+	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
+
+	UPROPERTY()
+	FResponseDelegate SendResponseDelegate;
+	UPROPERTY()
+	FScoreDelegate SendScoreDelegate;
+	UPROPERTY()
+	FUpdateChatLogUIDelegate UpdateChatLogUIDelegate;
+
 public:
 	ARAIGameMode();
 	
 	virtual void BeginPlay() override;
-
 	UFUNCTION()
 	void BindHM();
 	UFUNCTION()
@@ -57,20 +75,5 @@ public:
 
 	void UpdateEvidence(FName EvidenceRowName, EUpdateType InType);
 
-	UPROPERTY()
-	TObjectPtr<ARAIHttpManager> HttpManager;
-	UPROPERTY()
-	TObjectPtr<ARAIChatManager> ChatManager;
-	UPROPERTY()
-	TObjectPtr<ARAIInventoryManager> InventoryManager;
-
-	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
-	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
-
-	UPROPERTY()
-	FResponseDelegate SendResponseDelegate;
-	UPROPERTY()
-	FScoreDelegate SendScoreDelegate;
-	UPROPERTY()
-	FUpdateChatLogUIDelegate UpdateChatLogUIDelegate;
+	void GetLevelData();
 };

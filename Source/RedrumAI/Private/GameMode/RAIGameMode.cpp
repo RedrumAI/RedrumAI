@@ -36,7 +36,6 @@ void ARAIGameMode::BeginPlay()
 	BindCM();
 	InitSettingOpenAI();
 
-
 	/*
 	FTimerHandle TimerHandle1_tmp;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -297,4 +296,14 @@ void ARAIGameMode::OnEventDelegate_OpenAI(FString Message)
 void ARAIGameMode::OnEventDelegate_SendMessageArray(FString MessageString)
 {	//CM의 델리게이트(질문)를 받아 HM을 통해 OpenAI와 통신
 	HttpManager->SendRequestToOpenAI(MessageString);
+}
+
+void ARAIGameMode::GetLevelData()
+{
+	
+	/*
+	//PS를 GS처럼 사용하기에 다음처럼 데이터를 불러와야함.
+	ARAIPlayerState* RAIPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<ARAIPlayerState>();
+	pc->Getplayerstate
+	*/
 }

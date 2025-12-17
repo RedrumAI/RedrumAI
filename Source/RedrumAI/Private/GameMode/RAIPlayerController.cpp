@@ -26,54 +26,77 @@ ARAIPlayerController::ARAIPlayerController()
 void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// 소유IMC 확인
-	for (TFieldIterator<FObjectProperty> PropertyIterator(GetClass()); PropertyIterator; ++PropertyIterator)
+	// 1. PlayerController설정
 	{
-		FObjectProperty* ObjectProperty = *PropertyIterator;
-		if (ObjectProperty->PropertyClass == UInputMappingContext::StaticClass())
-		{
-			UInputMappingContext* IMCProperty = Cast<UInputMappingContext>(ObjectProperty->GetObjectPropertyValue_InContainer(this));
+		
+		RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 
-			if (IMCProperty)
+		// 소유IMC 확인
+		for (TFieldIterator<FObjectProperty> PropertyIterator(GetClass()); PropertyIterator; ++PropertyIterator)
+		{
+			FObjectProperty* ObjectProperty = *PropertyIterator;
+			if (ObjectProperty->PropertyClass == UInputMappingContext::StaticClass())
 			{
-				IMCArray.AddUnique(IMCProperty);
+				UInputMappingContext* IMCProperty = Cast<UInputMappingContext>(ObjectProperty->GetObjectPropertyValue_InContainer(this));
+
+				if (IMCProperty)
+				{
+					IMCArray.AddUnique(IMCProperty);
+				}
 			}
 		}
-	}
 
-	//InspectionActor생성 및 리셋함수 바인드
-	InspectionActor = GetWorld()->SpawnActor<ARAIInspectionActor>(BP_InspectionActor);
-	if (InspectionActor)
-	{
-		ResetInspectionMeshDelegate.AddDynamic(InspectionActor, &ARAIInspectionActor::ResetMeshTransform);
-	}
-
-	//GM바인드
-	BindGM();
-	
-	//TalkingState 관리 함수 bind
-	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
-
-	//Intro관련 설정
-	FindStageTargetPoint();
-
-	if (LobbyUIClass)
-	{
-		LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
-		if (LobbyUI)
+		//StageHUD생성
+		if (StageHUDClass)
 		{
-			LobbyUI->AddToViewport();
+			StageHUD = CreateWidget<URAIStageHUDWidget>(this, StageHUDClass);
+			if (StageHUD)
+			{
+				StageHUD->AddToViewport();
+			}
+		}
+		StageHUD->SetVisibility(ESlateVisibility::Hidden);
+
+		//GM바인드
+		BindGM();
+
+		//TalkingState 관리 함수 bind
+		UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
+
+		//InspectionActor생성 및 리셋함수 바인드
+		InspectionActor = GetWorld()->SpawnActor<ARAIInspectionActor>(BP_InspectionActor);
+		if (InspectionActor)
+		{
+			ResetInspectionMeshDelegate.AddDynamic(InspectionActor, &ARAIInspectionActor::ResetMeshTransform);
 		}
 	}
 
-	FInputModeUIOnly InputMode;
-	SetInputMode(InputMode);
-	SetShowMouseCursor(true);
-	if (APawn* MyPawn = GetPawn())
+	// 2. Lobby 설정
 	{
-		MyPawn->DisableInput(this);
+		if (LobbyUIClass)
+		{
+			LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
+			if (LobbyUI)
+			{
+				LobbyUI->AddToViewport();
+			}
+		}
+
+		//Lobby 시, 입력 차단
+		FInputModeUIOnly InputMode;
+		SetInputMode(InputMode);
+		SetShowMouseCursor(true);
+		if (APawn* MyPawn = GetPawn())
+		{
+			MyPawn->DisableInput(this);
+		}
 	}
+
+	// 3. Stage 설정
+	{
+		FindStageTargetPoint();
+	}
+
 }
 
 void ARAIPlayerController::FindStageTargetPoint()
@@ -89,6 +112,7 @@ void ARAIPlayerController::FindStageTargetPoint()
 	}
 }
 
+// LobbyUI BroadCast Call
 void ARAIPlayerController::GameStartFromLobby()
 {
 	//LobbyUI 제거
@@ -103,7 +127,21 @@ void ARAIPlayerController::GameStartFromLobby()
 	SetInputMode(InputMode);
 	SetShowMouseCursor(false);
 
-	PlayIntroSequence();
+	//GM에서 데이터 받아오기 위한 첫신호 발사
+	SetupLevelData();
+
+	PlayIntroSequence();	
+}
+
+void ARAIPlayerController::SetupLevelData()
+{
+	ensure(RAIGameMode);
+
+	// GM에서 LevelData를 받아와서
+	// UI에 반영 뿐인가?
+	//RAIGameMode->GetLevelData();
+	//StageHUD->UseLevelData();
+
 }
 
 void ARAIPlayerController::PlayIntroSequence()
@@ -135,14 +173,7 @@ void ARAIPlayerController::SetupStageAfterIntro()
 	GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
 	GetPawn()->EnableInput(this);
 
-	if (StageHUDClass)
-	{
-		StageHUD = CreateWidget<URAIStageHUDWidget>(this, StageHUDClass);
-		if (StageHUD)
-		{
-			StageHUD->AddToViewport();
-		}
-	}
+	StageHUD->SetVisibility(ESlateVisibility::Visible);
 
 	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
 	EnterDefaultModeIMC();
@@ -162,7 +193,6 @@ void ARAIPlayerController::PlayerTick(float DeltaTime)
 
 void ARAIPlayerController::BindGM()
 {
-	RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 	ensure(RAIGameMode);
 
 	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::SetAIChat);

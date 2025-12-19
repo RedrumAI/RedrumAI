@@ -6,13 +6,24 @@
 #include "Engine/GameInstance.h"
 #include "RAIGameInstance.generated.h"
 
-/**
- * 
- */
+struct FRAIEvidenceData;
+
 UCLASS()
 class REDRUMAI_API URAIGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "RAI")
+	TObjectPtr<UDataTable> EvidenceDataTable;
+	UPROPERTY(EditDefaultsOnly, Category = "RAI")
+	TObjectPtr<UDataTable> LevelDataTable;
+
 public:
+	UDataTable* GetEvidenceDataTable() { return EvidenceDataTable; }
+	UDataTable* GetLevelDataTable() { return LevelDataTable; }
+
+
+	int32 GetEvidenceDataTableRowNum();
+	const FRAIEvidenceData* FindEvidenceData(FName RowName) const;
 };

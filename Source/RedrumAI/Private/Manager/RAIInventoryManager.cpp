@@ -2,7 +2,7 @@
 
 
 #include "Manager/RAIInventoryManager.h"
-#include "GameMode/RAIPlayerState.h"
+#include "GameMode/RAIGameState.h"
 
 // Sets default values
 ARAIInventoryManager::ARAIInventoryManager()
@@ -12,45 +12,14 @@ ARAIInventoryManager::ARAIInventoryManager()
 
 }
 
-// Called when the game starts or when spawned
-void ARAIInventoryManager::BeginPlay()
-{
-	Super::BeginPlay();
-
-	InitInventoryManager();
-
-}
-
-void ARAIInventoryManager::InitInventoryManager()
-{
-	// RAIPlayerState 조회 후 할당
-	RAIPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<ARAIPlayerState>();
-	if (!IsValid(RAIPlayerState))
-	{
-		FTimerHandle TimerHandle_InitInventoryManager;
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_InitInventoryManager,
-			this,
-			&ARAIInventoryManager::InitInventoryManager,
-			0.1f,
-			false
-		);
-	}
-}
-
-// Called every frame
-void ARAIInventoryManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 void ARAIInventoryManager::AddEvidence(FName EvidenceRowName)
 {
-	RAIPlayerState->AddEvidence(EvidenceRowName);
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	RAIGameState->AddEvidence(EvidenceRowName);
 }
 
 void ARAIInventoryManager::RemoveEvidence(FName EvidenceRowName)
 {
-	RAIPlayerState->RemoveEvidence(EvidenceRowName);
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	RAIGameState->RemoveEvidence(EvidenceRowName);
 }

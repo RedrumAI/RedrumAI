@@ -41,6 +41,7 @@ protected:
 	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
 	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
 
+public:
 	UPROPERTY()
 	FResponseDelegate SendResponseDelegate;
 	UPROPERTY()

@@ -7,6 +7,7 @@
 #include "RAIGameInstance.generated.h"
 
 struct FRAIEvidenceData;
+struct FRAILevelDataStruct;
 
 UCLASS()
 class REDRUMAI_API URAIGameInstance : public UGameInstance
@@ -23,7 +24,8 @@ public:
 	UDataTable* GetEvidenceDataTable() { return EvidenceDataTable; }
 	UDataTable* GetLevelDataTable() { return LevelDataTable; }
 
-
 	int32 GetEvidenceDataTableRowNum();
-	const FRAIEvidenceData* FindEvidenceData(FName RowName) const;
+	const FRAIEvidenceData* FindEvidenceData(FName InRowName) const;
+
+	const FRAILevelDataStruct* FindLevelData(FName InRowName) const;
 };

@@ -76,5 +76,5 @@ public:
 
 	void UpdateEvidence(FName EvidenceRowName, EUpdateType InType);
 
-	void GetLevelData();
+	void SetupLevelByRowName(FName InRowName);
 };

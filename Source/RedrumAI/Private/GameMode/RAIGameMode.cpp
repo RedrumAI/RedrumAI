@@ -6,6 +6,7 @@
 #include "Manager/RAIChatManager.h"
 #include "Manager/RAIInventoryManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameMode/RAIGameState.h"
 
 
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
@@ -153,22 +154,22 @@ void ARAIGameMode::UpdateEvidence(FName EvidenceRowName, EUpdateType InType)
 {
 	switch (InType)
 	{
-	case EUpdateType::Add :
+	case EUpdateType::Add:
+	{
+		if (IsValid(InventoryManager))
 		{
-			if (IsValid(InventoryManager))
-			{
-				InventoryManager->AddEvidence(EvidenceRowName);
-			}
+			InventoryManager->AddEvidence(EvidenceRowName);
 		}
-		break;
+	}
+	break;
 	case EUpdateType::Remove:
+	{
+		if (IsValid(InventoryManager))
 		{
-			if (IsValid(InventoryManager))
-			{
-				InventoryManager->RemoveEvidence(EvidenceRowName);
-			}
+			InventoryManager->RemoveEvidence(EvidenceRowName);
 		}
-		break;
+	}
+	break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("[GM]: UpdateEvidence Failed. Use correct UpdateType"));
 		break;
@@ -298,12 +299,7 @@ void ARAIGameMode::OnEventDelegate_SendMessageArray(FString MessageString)
 	HttpManager->SendRequestToOpenAI(MessageString);
 }
 
-void ARAIGameMode::GetLevelData()
+void ARAIGameMode::SetupLevelByRowName(FName InRowName)
 {
-	
-	/*
-	//PS를 GS처럼 사용하기에 다음처럼 데이터를 불러와야함.
-	ARAIPlayerState* RAIPlayerState = GetWorld()->GetFirstPlayerController()->GetPlayerState<ARAIPlayerState>();
-	pc->Getplayerstate
-	*/
+	GetGameState<ARAIGameState>()->SetLevelData(InRowName);
 }

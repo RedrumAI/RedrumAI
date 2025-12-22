@@ -4,6 +4,7 @@
 #include "GameMode/RAIPlayerController.h"
 #include "UI/RAIStageHUDWidget.h"
 #include "GameMode/RAIGameMode.h"
+#include "GameMode/RAIGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -59,6 +60,7 @@ void ARAIPlayerController::BeginPlay()
 
 		//GM바인드
 		BindGM();
+		BindGS();
 
 		//TalkingState 관리 함수 bind
 		UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
@@ -99,6 +101,13 @@ void ARAIPlayerController::BeginPlay()
 
 }
 
+void ARAIPlayerController::SetupLevelByRowName(FName InRowName)
+{
+	RAIGameMode->SetupLevelByRowName(InRowName);
+	// Set 완료 델리게이트 필요.
+
+}
+
 void ARAIPlayerController::FindStageTargetPoint()
 {
 	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
@@ -112,8 +121,7 @@ void ARAIPlayerController::FindStageTargetPoint()
 	}
 }
 
-// LobbyUI BroadCast Call
-void ARAIPlayerController::GameStartFromLobby()
+void ARAIPlayerController::StartLevel()
 {
 	//LobbyUI 제거
 	if (LobbyUI)
@@ -127,25 +135,15 @@ void ARAIPlayerController::GameStartFromLobby()
 	SetInputMode(InputMode);
 	SetShowMouseCursor(false);
 
-	//GM에서 데이터 받아오기 위한 첫신호 발사
-	SetupLevelData();
-
-	PlayIntroSequence();	
-}
-
-void ARAIPlayerController::SetupLevelData()
-{
-	ensure(RAIGameMode);
-
-	// GM에서 LevelData를 받아와서
-	// UI에 반영 뿐인가?
-	//RAIGameMode->GetLevelData();
-	//StageHUD->UseLevelData();
-
+	//시퀀스 재생
+	PlayIntroSequence();
 }
 
 void ARAIPlayerController::PlayIntroSequence()
 {
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	ULevelSequence* IntroSequenceAsset = RAIGameState->GetIntroSequenceAsset();
+
 	if (!IntroSequenceAsset)
 	{
 		SetupStageAfterIntro();
@@ -197,6 +195,15 @@ void ARAIPlayerController::BindGM()
 
 	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::SetAIChat);
 	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
+}
+
+void ARAIPlayerController::BindGS()
+{
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	if (RAIGameState)
+	{
+		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIPlayerController::StartLevel);
+	}
 }
 
 void ARAIPlayerController::BindHUD()

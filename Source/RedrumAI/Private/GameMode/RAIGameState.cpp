@@ -4,6 +4,8 @@
 #include "GameMode/RAIGameState.h"
 #include "GameMode/RAIGameInstance.h"
 #include "Data/RAIEvidenceData.h"
+#include "Data/RAILevelDataStruct.h"
+#include "LevelSequence.h"
 
 void ARAIGameState::PostInitializeComponents()
 {
@@ -17,6 +19,22 @@ void ARAIGameState::PostInitializeComponents()
 	{
 		EvidenceRows[i] = NAME_None;
 	}
+}
+
+const FRAILevelDataStruct* ARAIGameState::GetLevelData()
+{
+	return &LevelData;
+}
+
+ULevelSequence* ARAIGameState::GetIntroSequenceAsset()
+{
+	return LevelData.IntroSequenceAsset;
+}
+
+void ARAIGameState::SetLevelData(FName InRowName)
+{
+	URAIGameInstance* RAIGameInstance = GetWorld()->GetGameInstance<URAIGameInstance>();
+	LevelData = *(RAIGameInstance->FindLevelData(InRowName));
 }
 
 void ARAIGameState::AddEvidence(FName InRowName)
@@ -60,3 +78,4 @@ const FRAIEvidenceData* ARAIGameState::FindEvidenceData(FName RowName) const
 	URAIGameInstance* RAIGameInstance = GetWorld()->GetGameInstance<URAIGameInstance>();
 	return RAIGameInstance->FindEvidenceData(RowName);
 }
+

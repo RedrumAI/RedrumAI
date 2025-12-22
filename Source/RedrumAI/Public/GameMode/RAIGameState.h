@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "Data/RAILevelDataStruct.h"
 #include "RAIGameState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetLevelDataDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateEvidenceRowsDelegate);
 
 struct FRAIEvidenceData;
+class ULevelSequence;
 
 UCLASS()
 class REDRUMAI_API ARAIGameState : public AGameStateBase
@@ -20,23 +23,34 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "RAI")
 	TObjectPtr<UDataTable> EvidenceDataTable;
 	*/
+	/*
 	//GameMode에서 게임시작하면 레벨데이터를 GS에 넘기고 UI가 이걸보고 반영
 	UPROPERTY(EditDefaultsOnly, Category = "RAI") //지금 레벨에 필요한 데이터(용의자, 정답)를 들고있어야한다.
 	TObjectPtr<UDataTable> LevelDataTable;
+	*/
+
+	//UPROPERTY(EditDefaultsOnly, Category = "RAI")
+	FRAILevelDataStruct LevelData;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TArray<FName> EvidenceRows;
 
 
 public:
+	UPROPERTY()
+	FOnFinishSetLevelDataDelegate FinishSetLevelDataDelegate;
+	UPROPERTY()
+	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;
+
+public:
 	virtual void PostInitializeComponents() override;
+	const FRAILevelDataStruct* GetLevelData();
+	ULevelSequence* GetIntroSequenceAsset();
+	void SetLevelData(FName InRowName);
 
 	void AddEvidence(FName InRowName);
 	void RemoveEvidence(FName InRowName);
 
 	TArray<FName> GetEvidenceRows() const;
 	const FRAIEvidenceData* FindEvidenceData(FName RowName) const;
-
-	UPROPERTY()
-	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;
 };

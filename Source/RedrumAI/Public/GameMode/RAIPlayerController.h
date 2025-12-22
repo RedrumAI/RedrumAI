@@ -26,7 +26,6 @@ class UInputAction;
 class ARAIInspectionActor;
 class IRAIConversationInterface;
 class URAILobbyUI;
-class ULevelSequence;
 class ATargetPoint;
 
 UCLASS()
@@ -52,8 +51,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URAIStageHUDWidget> StageHUD;
 
-	UPROPERTY(EditAnywhere, Category = "RAI")
-	TObjectPtr<ULevelSequence> IntroSequenceAsset;
 	UPROPERTY()
 	TObjectPtr<ATargetPoint> StageTargetPoint;
 
@@ -103,10 +100,10 @@ public:
 public:
 	virtual void BeginPlay() override;
 
+	void SetupLevelByRowName(FName InRowName);
+
 	void FindStageTargetPoint();
-	UFUNCTION()
-	void GameStartFromLobby();
-	void SetupLevelData();
+	void StartLevel();
 	void PlayIntroSequence();
 	UFUNCTION()
 	void SetupStageAfterIntro();
@@ -115,6 +112,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 	void BindGM();
+	void BindGS();
 	void BindHUD();
 	virtual void SetupInputComponent() override;
 

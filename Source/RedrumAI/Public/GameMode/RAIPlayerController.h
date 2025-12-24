@@ -103,11 +103,11 @@ public:
 	void SetupLevelByRowName(FName InRowName);
 
 	void FindStageTargetPoint();
+	UFUNCTION()
 	void StartLevel();
 	void PlayIntroSequence();
 	UFUNCTION()
 	void SetupStageAfterIntro();
-
 
 	virtual void PlayerTick(float DeltaTime) override;
 

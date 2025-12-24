@@ -33,6 +33,7 @@ public:
 
 	UFUNCTION()
 	void OnSubmitButtonClicked();
+	UFUNCTION()
 	void BuildVerdictEntries();
 	void OnSuspectTileViewItemClicked(UObject* ClickedItem);
 };

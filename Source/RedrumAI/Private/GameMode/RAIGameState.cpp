@@ -6,6 +6,7 @@
 #include "Data/RAIEvidenceData.h"
 #include "Data/RAILevelDataStruct.h"
 #include "LevelSequence.h"
+#include "Data/RAIFinalVerdictDataStruct.h"
 
 void ARAIGameState::PostInitializeComponents()
 {
@@ -34,7 +35,65 @@ ULevelSequence* ARAIGameState::GetIntroSequenceAsset()
 void ARAIGameState::SetLevelData(FName InRowName)
 {
 	URAIGameInstance* RAIGameInstance = GetWorld()->GetGameInstance<URAIGameInstance>();
-	LevelData = *(RAIGameInstance->FindLevelData(InRowName));
+
+	const FRAILevelDataStruct* FoundData = RAIGameInstance->FindLevelData(InRowName);
+
+	if(!FoundData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LevelData not Found"));
+		return;
+	}
+
+	LevelData = *FoundData;
+
+	FinishSetLevelDataDelegate.Broadcast();
+}
+
+TArray<FName> ARAIGameState::GetSuspectNames()
+{
+	TArray<FName> SuspectNames;
+
+	for (auto Suspect : LevelData.Suspects)
+	{
+		FRAIFinalVerdictDataStruct* SuspectData = Suspect.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
+			Suspect.RowName,
+			TEXT("Suspect"),//디버그표시용 이름: 찾으려는 핸들
+			true
+		);
+
+		SuspectNames.Add(SuspectData->Name);
+	}
+
+	return SuspectNames;
+}
+
+TArray<UTexture2D*> ARAIGameState::GetSuspectImages()
+{
+	TArray<UTexture2D*> SuspectImages;
+
+	for (auto Suspect : LevelData.Suspects)
+	{
+		FRAIFinalVerdictDataStruct* SuspectData = Suspect.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
+			Suspect.RowName,
+			TEXT("Suspect"),//디버그표시용 이름: 찾으려는 핸들
+			true
+		);
+
+		SuspectImages.Add(SuspectData->SuspectImage);
+	}
+
+	return SuspectImages;
+}
+
+FName ARAIGameState::GetAnswerName()
+{
+	FRAIFinalVerdictDataStruct* AnswerData = LevelData.Answer.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
+		LevelData.Answer.RowName,
+		TEXT("Answer"), //디버그표시용 이름: 찾으려는 핸들
+		true
+	);
+
+	return AnswerData->Name;
 }
 
 void ARAIGameState::AddEvidence(FName InRowName)

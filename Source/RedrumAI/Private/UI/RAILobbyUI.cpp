@@ -20,11 +20,13 @@ void URAILobbyUI::NativeConstruct()
 	Button_Level2 = Cast<UButton>(GetWidgetFromName(TEXT("Button_Level2")));
 	Button_Level3 = Cast<UButton>(GetWidgetFromName(TEXT("Button_Level3")));
 
+	VerticalBox_Level->SetVisibility(ESlateVisibility::Hidden);
+
 	Button_Start->OnClicked.AddDynamic(this, &URAILobbyUI::ToggleLevelVerticalBox);
 
 	Button_Level1->OnClicked.AddDynamic(this, &URAILobbyUI::OnClick_Level1);
-	Button_Level1->OnClicked.AddDynamic(this, &URAILobbyUI::OnClick_Level2);
-	Button_Level1->OnClicked.AddDynamic(this, &URAILobbyUI::OnClick_Level3);
+	Button_Level2->OnClicked.AddDynamic(this, &URAILobbyUI::OnClick_Level2);
+	Button_Level3->OnClicked.AddDynamic(this, &URAILobbyUI::OnClick_Level3);
 }
 
 void URAILobbyUI::ToggleLevelVerticalBox()

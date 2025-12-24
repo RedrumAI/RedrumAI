@@ -104,8 +104,6 @@ void ARAIPlayerController::BeginPlay()
 void ARAIPlayerController::SetupLevelByRowName(FName InRowName)
 {
 	RAIGameMode->SetupLevelByRowName(InRowName);
-	// Set 완료 델리게이트 필요.
-
 }
 
 void ARAIPlayerController::FindStageTargetPoint()

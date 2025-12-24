@@ -8,6 +8,7 @@
 
 #include "Data/RAIFinalVerdictDataStruct.h"
 #include "UI/RAIFinalVerdictDataObject.h"
+#include "GameMode/RAIGameState.h"
 
 void URAIFinalVerdictUI::NativeConstruct()
 {
@@ -16,7 +17,7 @@ void URAIFinalVerdictUI::NativeConstruct()
 	//Button_Submit->OnClicked.AddDynamic(this, &)
 
 	if (USizeBoxSlot* TileViewSlot = Cast<USizeBoxSlot>(TileView_Suspect->Slot))
-	{	
+	{
 		TileViewSlot->SetHorizontalAlignment(HAlign_Fill); //수평은 사이즈박스 크기만큼 제한
 		TileViewSlot->SetVerticalAlignment(VAlign_Center); //수직은 사이즈박스의 중앙에 위치하고 최대 사이즈박스 수직만큼 제한
 	}
@@ -25,19 +26,40 @@ void URAIFinalVerdictUI::NativeConstruct()
 
 	TileView_Suspect->OnItemClicked().AddUObject(this, &URAIFinalVerdictUI::OnSuspectTileViewItemClicked);
 	Button_Submit->OnClicked.AddDynamic(this, &URAIFinalVerdictUI::OnSubmitButtonClicked);
+
+	if (ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>())
+	{
+		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &URAIFinalVerdictUI::BuildVerdictEntries);
+	}
 }
 
 void URAIFinalVerdictUI::BuildVerdictEntries()
 {
 	TileView_Suspect->ClearListItems();
 
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	TArray<FName> SuspectNames = RAIGameState->GetSuspectNames();
+	TArray<UTexture2D*> SuspectImages = RAIGameState->GetSuspectImages();
+	FName AnswerName = RAIGameState->GetAnswerName();
+
+	for (int i = 0; i < SuspectNames.Num();++i)
+	{
+		URAIFinalVerdictDataObject* DataObject = NewObject<URAIFinalVerdictDataObject>(this);
+		DataObject->SetName(SuspectNames[i]);
+		DataObject->SetSuspectImage(SuspectImages[i]);
+		DataObject->SetIsAnswer(AnswerName == SuspectNames[i] ? true : false);
+
+		TileView_Suspect->AddItem(DataObject);
+	}
+
+	/*
 	TArray<FName> RowNames = VerdictDataTable->GetRowNames();
 
 	for (const FName& RowName : RowNames)
 	{
 		FString DebugContext = FString::Printf(TEXT("[%s] : FindRow Called"), *GetName());
 		FRAIFinalVerdictDataStruct* Row = VerdictDataTable->FindRow<FRAIFinalVerdictDataStruct>(RowName, DebugContext);
-		
+
 		if(!Row)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("VerdictDataTable [%s] Rows Empty!!!"), *RowName.ToString());
@@ -45,10 +67,11 @@ void URAIFinalVerdictUI::BuildVerdictEntries()
 		}
 
 		URAIFinalVerdictDataObject* DataObject = NewObject<URAIFinalVerdictDataObject>(this);
-		DataObject->SetData(*Row);
+		//DataObject->SetData(*Row);
 
 		TileView_Suspect->AddItem(DataObject);
 	}
+	*/
 }
 
 void URAIFinalVerdictUI::OnSuspectTileViewItemClicked(UObject* ClickedItem)

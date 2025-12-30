@@ -7,6 +7,10 @@
 
 int32 URAIGameInstance::GetEvidenceDataTableRowNum()
 {
+	if (EvidenceDataTable == nullptr)
+	{
+		return 0;
+	}
 	return EvidenceDataTable->GetRowMap().Num();
 }
 
@@ -14,7 +18,7 @@ const FRAIEvidenceData* URAIGameInstance::FindEvidenceData(FName InRowName) cons
 {
 	FString DebugContext = FString::Printf(TEXT("[%s] : FindEvidenceData Called"), *GetName());
 	FRAIEvidenceData* FindingData = EvidenceDataTable->FindRow<FRAIEvidenceData>(InRowName, DebugContext);
-	
+
 	return FindingData;
 }
 

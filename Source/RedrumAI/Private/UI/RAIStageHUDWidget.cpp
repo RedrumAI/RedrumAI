@@ -7,7 +7,7 @@
 #include "UI/RAIStackWidget.h"
 #include "UI/RAIChatUI.h"
 #include "UI/RAIChatLogUI.h"
-#include "UI/RAIChatLogUIButton.h"
+#include "UI/RAIUIButton.h"
 #include "UI/RAISlideInventoryUI.h"
 #include "UI/RAIInspectionUI.h"
 
@@ -16,7 +16,7 @@ void URAIStageHUDWidget::NativeConstruct()
 	CanvasPanel = Cast<UCanvasPanel>(GetWidgetFromName(TEXT("CanvasPanel")));
 	ChatUI = Cast<URAIChatUI>(GetWidgetFromName(TEXT("WBP_RAIChatUI")));
 	ChatLogUI = Cast<URAIChatLogUI>(GetWidgetFromName(TEXT("WBP_RAIChatLogUI")));
-	ChatLogUIButton = Cast<URAIChatLogUIButton>(GetWidgetFromName(TEXT("WBP_RAIChatLogUIButton")));
+	ChatLogUIButton = Cast<URAIUIButton>(GetWidgetFromName(TEXT("WBP_RAIUIButton_ChatLog")));
 	SlideInventoryUI = Cast<URAISlideInventoryUI>(GetWidgetFromName(TEXT("WBP_RAISlideInventoryUI")));
 	InspectionUI = Cast<URAIInspectionUI>(GetWidgetFromName(TEXT("WBP_RAIInspectionUI")));
 

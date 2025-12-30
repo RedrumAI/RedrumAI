@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "RAIChatLogUIButton.generated.h"
+#include "RAIUIButton.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRAIButtonClicked);
 
 class UButton;
 
 UCLASS()
-class REDRUMAI_API URAIChatLogUIButton : public UUserWidget
+class REDRUMAI_API URAIUIButton : public UUserWidget
 {
 	GENERATED_BODY()
 	

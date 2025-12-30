@@ -37,6 +37,7 @@ void URAIFinalVerdictUI::BuildVerdictEntries()
 {
 	TileView_Suspect->ClearListItems();
 
+	//Get TileView Object Data from GameState
 	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
 	TArray<FName> SuspectNames = RAIGameState->GetSuspectNames();
 	TArray<UTexture2D*> SuspectImages = RAIGameState->GetSuspectImages();
@@ -51,27 +52,6 @@ void URAIFinalVerdictUI::BuildVerdictEntries()
 
 		TileView_Suspect->AddItem(DataObject);
 	}
-
-	/*
-	TArray<FName> RowNames = VerdictDataTable->GetRowNames();
-
-	for (const FName& RowName : RowNames)
-	{
-		FString DebugContext = FString::Printf(TEXT("[%s] : FindRow Called"), *GetName());
-		FRAIFinalVerdictDataStruct* Row = VerdictDataTable->FindRow<FRAIFinalVerdictDataStruct>(RowName, DebugContext);
-
-		if(!Row)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("VerdictDataTable [%s] Rows Empty!!!"), *RowName.ToString());
-			continue;
-		}
-
-		URAIFinalVerdictDataObject* DataObject = NewObject<URAIFinalVerdictDataObject>(this);
-		//DataObject->SetData(*Row);
-
-		TileView_Suspect->AddItem(DataObject);
-	}
-	*/
 }
 
 void URAIFinalVerdictUI::OnSuspectTileViewItemClicked(UObject* ClickedItem)

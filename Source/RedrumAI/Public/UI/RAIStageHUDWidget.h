@@ -10,7 +10,7 @@ class UCanvasPanel;
 class URAIStackWidget;
 class URAIChatUI;
 class URAIChatLogUI;
-class URAIChatLogUIButton;
+class URAIUIButton;
 class URAISlideInventoryUI;
 class URAIInspectionUI;
 
@@ -25,7 +25,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
 	UPROPERTY()
-	TObjectPtr<URAIChatLogUIButton> ChatLogUIButton;
+	TObjectPtr<URAIUIButton> ChatLogUIButton;
 	//UPROPERTY()
 	//TObjectPtr<URAIFinalVerdictUIButton> FinalVerdictUIButton;
 	UPROPERTY()

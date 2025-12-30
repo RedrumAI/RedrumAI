@@ -1,19 +1,19 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/RAIChatLogUIButton.h"
+#include "UI/RAIUIButton.h"
 #include "Components/Button.h"
 
-void URAIChatLogUIButton::NativeConstruct()
+void URAIUIButton::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	Button = Cast<UButton>(GetWidgetFromName(TEXT("Button")));
 	
-	Button->OnClicked.AddDynamic(this, &URAIChatLogUIButton::OnRAIButtonClicked);
+	Button->OnClicked.AddDynamic(this, &URAIUIButton::OnRAIButtonClicked);
 }
 
-void URAIChatLogUIButton::OnRAIButtonClicked()
+void URAIUIButton::OnRAIButtonClicked()
 {
 	RAIButtonClickedDelegate.Broadcast();
 }

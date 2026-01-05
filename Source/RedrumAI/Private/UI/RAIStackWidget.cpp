@@ -30,5 +30,6 @@ void URAIStackWidget::OnClosed()
     {
 
     }
-    SetVisibility(ESlateVisibility::Hidden);
+    //SetVisibility(ESlateVisibility::Hidden);
+    SetVisibility(ESlateVisibility::Collapsed);
 }

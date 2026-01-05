@@ -11,6 +11,7 @@ class URAIStackWidget;
 class URAIChatUI;
 class URAIChatLogUI;
 class URAIUIButton;
+class URAIFinalVerdictUI;
 class URAISlideInventoryUI;
 class URAIInspectionUI;
 
@@ -26,8 +27,10 @@ protected:
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
 	UPROPERTY()
 	TObjectPtr<URAIUIButton> ChatLogUIButton;
-	//UPROPERTY()
-	//TObjectPtr<URAIFinalVerdictUIButton> FinalVerdictUIButton;
+	UPROPERTY()
+	TObjectPtr<URAIFinalVerdictUI> FinalVerdictUI;
+	UPROPERTY()
+	TObjectPtr<URAIUIButton> FinalVerdictUIButton;
 	UPROPERTY()
 	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
 	UPROPERTY()
@@ -57,6 +60,8 @@ public:
 	void SwitchChatUI(bool bIsTalking);
 	UFUNCTION()
 	void ToggleChatLogUI();
+	UFUNCTION()
+	void ToggleFinalVerdictUI();
 
 	UFUNCTION()
 	void SetAIChat(FString String);

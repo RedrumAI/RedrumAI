@@ -5,12 +5,11 @@
 #include "Components/TileView.h"
 #include "Components/Button.h"
 #include "Components/SizeBoxSlot.h"
-
 #include "Data/RAIFinalVerdictDataStruct.h"
 #include "UI/RAIFinalVerdictDataObject.h"
 #include "GameMode/RAIGameState.h"
 
-void URAIFinalVerdictUI::NativeConstruct()
+void URAIFinalVerdictUI::NativeOnInitialized()
 {
 	TileView_Suspect = Cast<UTileView>(GetWidgetFromName(TEXT("TileView_Suspect")));
 	Button_Submit = Cast<UButton>(GetWidgetFromName(TEXT("Button_Submit")));

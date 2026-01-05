@@ -29,7 +29,7 @@ protected:
 	TObjectPtr<UObject> LastClickedItem;
 
 public:
-	virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
 
 	UFUNCTION()
 	void OnSubmitButtonClicked();

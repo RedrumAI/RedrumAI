@@ -47,7 +47,6 @@ void URAIFinalVerdictUI::BuildVerdictEntries()
 		URAIFinalVerdictDataObject* DataObject = NewObject<URAIFinalVerdictDataObject>(this);
 		DataObject->SetName(SuspectNames[i]);
 		DataObject->SetSuspectImage(SuspectImages[i]);
-		DataObject->SetIsAnswer(AnswerName == SuspectNames[i] ? true : false);
 
 		TileView_Suspect->AddItem(DataObject);
 	}

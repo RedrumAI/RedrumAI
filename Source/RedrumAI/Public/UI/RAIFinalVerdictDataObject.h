@@ -18,13 +18,10 @@ class REDRUMAI_API URAIFinalVerdictDataObject : public UObject
 protected:
 	FName Name;
 	TObjectPtr<UTexture2D> SuspectImage;
-	uint8 bIsAnswer : 1 = 0;
 
 public:
 	FName GetName() { return Name; }
 	void SetName(FName InName) { Name = InName; }
 	UTexture2D* GetSuspectImage() { return SuspectImage; }
 	void SetSuspectImage(UTexture2D* InSuspectImage) { SuspectImage = InSuspectImage; }
-	bool GetIsAnswer() { return bIsAnswer; }
-	void SetIsAnswer(bool InIsAnswer) { bIsAnswer = InIsAnswer; }
 };

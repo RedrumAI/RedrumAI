@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"  
+#include "Engine/DataTable.h" 
+#include "Data/RAILevelSuspectData.h"
 #include "RAILevelDataStruct.generated.h"
 
 class ULevelSequence;
@@ -18,7 +19,7 @@ public:
 	~FRAILevelDataStruct();
 
 	//UPROPERTY()
-	//레벨데이터 //지금은 단일 레벨이라 pass
+	//ULevel* LevelToTravel //지금은 단일 레벨이라 pass
 
 	//레벨스토리 UI입력용
 	//UPROPERTY()
@@ -28,10 +29,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<ULevelSequence> IntroSequenceAsset;
 
-	// 레벨에 등장하는 용의자들
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI", meta = (RowType = "/Script/RedrumAI.RAIFinalVerdictDataStruct")) //메타데이터를 통해 DT와 내부 핸들을 드롭다운으로 노출
-	TArray<FDataTableRowHandle> Suspects;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI")
+	TArray<FRAILevelSuspectData> LevelSuspects;
 	// 범인
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI", meta = (RowType = "/Script/RedrumAI.RAIFinalVerdictDataStruct"))
 	FDataTableRowHandle Answer;

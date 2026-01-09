@@ -8,12 +8,12 @@
 #include "Data/RAIFinalVerdictDataStruct.h"
 #include "UI/RAIFinalVerdictDataObject.h"
 #include "GameMode/RAIGameState.h"
+#include "GameMode/RAIPlayerController.h"
 
 void URAIFinalVerdictUI::NativeOnInitialized()
 {
 	TileView_Suspect = Cast<UTileView>(GetWidgetFromName(TEXT("TileView_Suspect")));
 	Button_Submit = Cast<UButton>(GetWidgetFromName(TEXT("Button_Submit")));
-	//Button_Submit->OnClicked.AddDynamic(this, &)
 
 	if (USizeBoxSlot* TileViewSlot = Cast<USizeBoxSlot>(TileView_Suspect->Slot))
 	{
@@ -72,4 +72,11 @@ void URAIFinalVerdictUI::OnSubmitButtonClicked()
 	// UObejct* SelectedSuspect = TileView_Suspect->GetSelectedItem();
 	// SelectedItem이 존재한다면 suspect name 을 컨트롤러로 전달
 	// gamemode 정답 판정 및 엔딩 시퀀스
+
+	URAIFinalVerdictDataObject* SelectedItem = TileView_Suspect->GetSelectedItem<URAIFinalVerdictDataObject>();
+	const FName SelectedSuspectName = SelectedItem->GetName();
+
+	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
+	RAIPlayerController->StartEnding(SelectedSuspectName);
+
 }

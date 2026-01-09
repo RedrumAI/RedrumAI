@@ -6,7 +6,6 @@
 #include "UI/RAIStackWidget.h"
 #include "RAIFinalVerdictUI.generated.h"
 
-
 class UTileView;
 class UButton;
 class UDataTable;
@@ -32,8 +31,9 @@ public:
 	virtual void NativeOnInitialized() override;
 
 	UFUNCTION()
-	void OnSubmitButtonClicked();
-	UFUNCTION()
 	void BuildVerdictEntries();
+	UFUNCTION()
 	void OnSuspectTileViewItemClicked(UObject* ClickedItem);
+	UFUNCTION()
+	void OnSubmitButtonClicked();
 };

@@ -7,9 +7,9 @@
 #include "Components/TextBlock.h"
 #include "Components/Border.h"
 
-void URAIFinalVerdictEntry::NativeConstruct()
+void URAIFinalVerdictEntry::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	Image_SuspectImage = Cast<UImage>(GetWidgetFromName(TEXT("Image_SuspectImage")));
 	TextBlock_Name = Cast<UTextBlock>(GetWidgetFromName(TEXT("TextBlock_Name")));;

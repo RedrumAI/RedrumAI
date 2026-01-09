@@ -38,6 +38,7 @@ public:
 	
 	TArray<FName> GetSuspectNames();
 	TArray<UTexture2D*> GetSuspectImages();
+	ULevelSequence* GetEndingSequence(FName InSuspectName);
 	FName GetAnswerName();
 
 	void AddEvidence(FName InRowName);

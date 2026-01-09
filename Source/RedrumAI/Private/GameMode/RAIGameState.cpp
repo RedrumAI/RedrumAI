@@ -55,10 +55,12 @@ TArray<FName> ARAIGameState::GetSuspectNames()
 {
 	TArray<FName> SuspectNames;
 
-	for (auto Suspect : LevelData.Suspects)
+	for (auto LevelSuspect : LevelData.LevelSuspects)
 	{
-		FRAIFinalVerdictDataStruct* SuspectData = Suspect.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
-			Suspect.RowName,
+		FDataTableRowHandle SuspectRow = LevelSuspect.Suspect;
+
+		FRAIFinalVerdictDataStruct* SuspectData = SuspectRow.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
+			SuspectRow.RowName,
 			TEXT("Suspect"),//디버그표시용 이름: 찾으려는 핸들
 			true
 		);
@@ -73,10 +75,12 @@ TArray<UTexture2D*> ARAIGameState::GetSuspectImages()
 {
 	TArray<UTexture2D*> SuspectImages;
 
-	for (auto Suspect : LevelData.Suspects)
+	for (auto LevelSuspect : LevelData.LevelSuspects)
 	{
-		FRAIFinalVerdictDataStruct* SuspectData = Suspect.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
-			Suspect.RowName,
+		FDataTableRowHandle SuspectRow = LevelSuspect.Suspect;
+
+		FRAIFinalVerdictDataStruct* SuspectData = SuspectRow.DataTable->FindRow<FRAIFinalVerdictDataStruct>(
+			SuspectRow.RowName,
 			TEXT("Suspect"),//디버그표시용 이름: 찾으려는 핸들
 			true
 		);
@@ -85,6 +89,21 @@ TArray<UTexture2D*> ARAIGameState::GetSuspectImages()
 	}
 
 	return SuspectImages;
+}
+
+ULevelSequence* ARAIGameState::GetEndingSequence(FName InSuspectName)
+{
+	for (auto LevelSuspect : LevelData.LevelSuspects)
+	{
+		if (LevelSuspect.Suspect.RowName == InSuspectName)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *LevelSuspect.Suspect.RowName.ToString());
+
+			return LevelSuspect.EndingSequence;
+		}
+	}
+
+	return nullptr;
 }
 
 FName ARAIGameState::GetAnswerName()

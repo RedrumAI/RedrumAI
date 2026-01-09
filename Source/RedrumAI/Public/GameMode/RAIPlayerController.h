@@ -111,6 +111,9 @@ public:
 
 	virtual void PlayerTick(float DeltaTime) override;
 
+	//Called by RAIFinalVerdictUI
+	void StartEnding(FName InSuspectName);
+
 	void BindGM();
 	void BindGS();
 	void BindHUD();

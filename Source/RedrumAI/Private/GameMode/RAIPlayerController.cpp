@@ -187,6 +187,17 @@ void ARAIPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
+void ARAIPlayerController::StartEnding(FName InSuspectName)
+{
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	ULevelSequence* EndingSequence = RAIGameState->GetEndingSequence(InSuspectName);
+
+	//Play(EndingSequence)
+	//TODO:
+	//1. HUD 끄기
+	//2. 시퀀스 실행 / Play(EndingSequence)
+}
+
 void ARAIPlayerController::BindGM()
 {
 	ensure(RAIGameMode);

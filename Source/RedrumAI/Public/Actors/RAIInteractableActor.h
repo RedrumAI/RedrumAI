@@ -20,7 +20,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, Category = "RAI")
+	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UStaticMeshComponent> OriginalMesh;
 	UPROPERTY(VisibleAnywhere, Category = "RAI")
 	TObjectPtr<UStaticMeshComponent> OutlineMesh;

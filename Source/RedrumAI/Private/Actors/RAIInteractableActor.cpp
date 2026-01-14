@@ -11,6 +11,7 @@ ARAIInteractableActor::ARAIInteractableActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//정확한 InteractType은 하위 클래스 OnConstruct에서 지정한다.
 	InteractType = ERAIInteractType::Unknown;
 
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));

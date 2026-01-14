@@ -219,6 +219,7 @@ void ARAIPlayerCharacter::TriggerInteractableActor()
 		UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr Success!"));
 		if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("[%s] Hited"), *HitResult.GetActor()->GetName());
 			if (InteractableActor->GetInteractType() == ERAIInteractType::Suspect)
 			{
 				InteractableActor->Interacted(Controller);

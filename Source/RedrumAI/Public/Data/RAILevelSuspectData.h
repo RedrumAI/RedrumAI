@@ -5,6 +5,7 @@
 #include "RAILevelSuspectData.generated.h"
 
 class ULevelSequence;
+class URAICutsceneDialogueDataAsset;
 
 USTRUCT(BlueprintType)
 struct FRAILevelSuspectData : public FTableRowBase
@@ -21,4 +22,7 @@ struct FRAILevelSuspectData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<ULevelSequence> EndingSequence;
+
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TObjectPtr<URAICutsceneDialogueDataAsset> CutsceneDialogue;
 };

@@ -2,27 +2,80 @@
 
 
 #include "Actors/RAISuspect.h"
+#include "Components/CapsuleComponent.h"
 #include "GameMode/RAIPlayerController.h"
 
 ARAISuspect::ARAISuspect()
 {
+	OutlineMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("OutlineMesh"));
+	OutlineMesh->SetupAttachment(GetMesh());	
+
+	//추후 Collision Preset 설정
+	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	OutlineMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	OutlineMesh->SetCastShadow(false);
+	OutlineMesh->SetVisibility(false);
+
 	FrontAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("FrontAnchor"));
-	FrontAnchor->SetupAttachment(OriginalMesh);
+	FrontAnchor->SetupAttachment(GetMesh());
 	FrontAnchor->bVisualizeComponent = true;
 	LeftAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("LeftAnchor"));
-	LeftAnchor->SetupAttachment(OriginalMesh);
+	LeftAnchor->SetupAttachment(GetMesh());
 	LeftAnchor->bVisualizeComponent = true;
 	RightAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("RightAnchor"));
-	RightAnchor->SetupAttachment(OriginalMesh);
+	RightAnchor->SetupAttachment(GetMesh());
 	RightAnchor->bVisualizeComponent = true;
 
 	InteractType = ERAIInteractType::Suspect;
+}
+
+void ARAISuspect::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	const FSoftObjectPath OutlineMaterialPath(TEXT("/Script/Engine.Material'/Game/YJ/Actors/EvidenceActor/M_HighlightOutline.M_HighlightOutline'"));
+	OutlineMaterial = Cast<UMaterialInterface>(OutlineMaterialPath.TryLoad());
+
+	OutlineMesh->SetSkeletalMesh(GetMesh()->GetSkeletalMeshAsset());
+	if (IsValid(OutlineMaterial))
+	{
+		OutlineMesh->SetMaterial(0, OutlineMaterial);
+	}
 }
 
 void ARAISuspect::Interacted(AController* InController)
 {
 	ARAIPlayerController* InPC = Cast<ARAIPlayerController>(InController);
 	InPC->TryStartConversation(this);
+	UE_LOG(LogTemp, Warning, TEXT("[%s] Interacted"), *this->GetName());
+}
+
+void ARAISuspect::BeginFocused()
+{
+	UE_LOG(LogTemp, Log, TEXT("[%s] Begin Focused"), *this->GetName());
+}
+
+void ARAISuspect::EndFocused()
+{
+	UE_LOG(LogTemp, Log, TEXT("[%s] End Focused"), *this->GetName());
+}
+
+void ARAISuspect::EnableHighlight()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("EnableHighlight On"));
+	//OutlineMesh->SetVisibility(false);
+}
+
+void ARAISuspect::DisableHighlight()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("DisableHighlight"));
+	//OutlineMesh->SetVisibility(false);
+}
+
+ERAIInteractType ARAISuspect::GetInteractType()
+{
+	return InteractType;
 }
 
 ERAIConversationSide ARAISuspect::GetConversationSide(AController* InController) const
@@ -82,9 +135,9 @@ FVector ARAISuspect::GetRightAnchorLocation() const
 
 FVector ARAISuspect::GetHeadWorldLocation() const
 {
-	if (USkeletalMeshComponent* Mesh = Cast<USkeletalMeshComponent>(OriginalMesh))
+	if (GetMesh()->DoesSocketExist(TEXT("Head")))
 	{
-		return Mesh->GetSocketLocation(TEXT("Head"));
+		return GetMesh()->GetSocketLocation(TEXT("Head"));
 	}
 	return GetActorLocation(); // 예비값
 }

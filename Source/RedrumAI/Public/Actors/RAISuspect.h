@@ -1,17 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/RAIInteractableActor.h"
+#include "GameFramework/Character.h"
+#include "RAIInteractableInterface.h"
 #include "RAIConversationInterface.h"
 #include "RAISuspect.generated.h"
 
-/**
- * 
- */
+
+
+
 UCLASS()
-class REDRUMAI_API ARAISuspect : public ARAIInteractableActor, public IRAIConversationInterface
+class REDRUMAI_API ARAISuspect : public ACharacter, public IRAIInteractableInterface, public IRAIConversationInterface
 {
 	GENERATED_BODY()
 	
@@ -19,6 +20,17 @@ public:
 	ARAISuspect();
 
 protected:
+    //ACharacter->GetMesh()로 대체
+    //UPROPERTY(EditAnywhere, Category = "RAI")
+    //TObjectPtr<USkeletalMeshComponent> OriginalMesh;
+    UPROPERTY(VisibleAnywhere, Category = "RAI")
+    TObjectPtr<USkeletalMeshComponent> OutlineMesh;
+    UPROPERTY(VisibleAnywhere, Category = "RAI")
+    TObjectPtr<UMaterialInterface> OutlineMaterial;
+
+    UPROPERTY(EditAnywhere)
+    ERAIInteractType InteractType;
+
     UPROPERTY(VisibleAnywhere, Category = "RAI")
     TObjectPtr<USceneComponent> FrontAnchor;
     UPROPERTY(VisibleAnywhere, Category = "RAI")
@@ -27,7 +39,16 @@ protected:
     TObjectPtr<USceneComponent> RightAnchor;
 
 public:
+    virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void Interacted(AController* InController) override;
+
+    //캐릭터 Focus시, 관련 함수
+    virtual void BeginFocused() override;
+    virtual void EndFocused() override;
+    virtual void EnableHighlight() override;
+    virtual void DisableHighlight() override;
+
+    virtual ERAIInteractType GetInteractType() override;
 
     virtual ERAIConversationSide GetConversationSide(AController* InController) const override;
 

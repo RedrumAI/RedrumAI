@@ -7,7 +7,7 @@
 #include "Manager/RAIInventoryManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameMode/RAIGameState.h"
-
+#include "GameMode/RAIPlayerController.h"
 
 //Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
@@ -35,6 +35,7 @@ void ARAIGameMode::BeginPlay()
 
 	BindHM();
 	BindCM();
+	BindGS();
 	InitSettingOpenAI();
 
 	/*
@@ -231,6 +232,39 @@ void ARAIGameMode::BindCM()
 			0.1f,
 			false
 		);
+	}
+}
+
+void ARAIGameMode::BindGS()
+{
+	ARAIGameState* RAIGameState = GetGameState<ARAIGameState>();
+	if(IsValid(RAIGameState))
+	{
+		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIGameMode::StartLevel);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(
+			this,
+			&ARAIGameMode::BindGS
+		);
+	}
+}
+
+void ARAIGameMode::StartLevel()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
+	{
+		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
+		{
+			EachController->StartLevel();
+		}
 	}
 }
 

@@ -210,8 +210,9 @@ void ARAIPlayerController::BindGS()
 {
 	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
 	if (RAIGameState)
-	{
-		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIPlayerController::StartLevel);
+	{	
+		// 실행 흐름 변경 : GM이 각 PC 호출로 변경
+		//RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIPlayerController::StartLevel);
 	}
 }
 

@@ -45,7 +45,7 @@ void ARAIGameState::SetLevelData(FName InRowName)
 		UE_LOG(LogTemp, Warning, TEXT("LevelData not Found"));
 		return;
 	}
-
+	
 	LevelData = *FoundData;
 
 	FinishSetLevelDataDelegate.Broadcast();
@@ -157,5 +157,10 @@ const FRAIEvidenceData* ARAIGameState::FindEvidenceData(FName RowName) const
 {
 	URAIGameInstance* RAIGameInstance = GetWorld()->GetGameInstance<URAIGameInstance>();
 	return RAIGameInstance->FindEvidenceData(RowName);
+}
+
+void ARAIGameState::TriggerDialogue(int idx)
+{
+	TriggeredDialogueDelegate.Broadcast(idx);
 }
 

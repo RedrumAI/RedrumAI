@@ -15,7 +15,8 @@ void URAISequenceDirector::Initialize()
 	GameState = World->GetGameState<ARAIGameState>();
 }
 
-void URAISequenceDirector::SayHi()
+void URAISequenceDirector::TriggerDialogue(int idx)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hi"));
+	GameState->TriggerDialogue(idx);
 }
+

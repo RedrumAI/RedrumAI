@@ -57,6 +57,11 @@ public:
 	void BindHM();
 	UFUNCTION()
 	void BindCM();
+	UFUNCTION()
+	void BindGS();
+
+	UFUNCTION()
+	void StartLevel();
 
 	UFUNCTION()
 	void OnEventDelegate_NLP(FString InJsonData);

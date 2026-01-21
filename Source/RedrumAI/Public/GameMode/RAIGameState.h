@@ -9,6 +9,9 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetLevelDataDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateEvidenceRowsDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTriggeredDialogueDelegate, int, Idx);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSetFinalSuspect, FName, SelectedSuspectName);
+
 
 struct FRAIEvidenceData;
 class ULevelSequence;
@@ -29,6 +32,8 @@ public:
 	FOnFinishSetLevelDataDelegate FinishSetLevelDataDelegate;
 	UPROPERTY()
 	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;
+	UPROPERTY()
+	FOnTriggeredDialogueDelegate TriggeredDialogueDelegate;
 
 public:
 	virtual void PostInitializeComponents() override;
@@ -43,7 +48,10 @@ public:
 
 	void AddEvidence(FName InRowName);
 	void RemoveEvidence(FName InRowName);
-
+	
 	TArray<FName> GetEvidenceRows() const;
 	const FRAIEvidenceData* FindEvidenceData(FName RowName) const;
+
+	void TriggerDialogue(int idx);
+	//void SetFinalSuspect(FName SelectedSuspectName);
 };

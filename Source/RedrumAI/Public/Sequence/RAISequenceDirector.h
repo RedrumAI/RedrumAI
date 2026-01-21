@@ -22,6 +22,6 @@ public:
 	void Initialize();
 
 	UFUNCTION(BlueprintCallable, Category = "RAI")
-	void SayHi();
+	void TriggerDialogue(int idx);
 
 };

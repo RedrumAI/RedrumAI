@@ -76,9 +76,7 @@ void URAIFinalVerdictUI::OnSubmitButtonClicked()
 	URAIFinalVerdictDataObject* SelectedItem = TileView_Suspect->GetSelectedItem<URAIFinalVerdictDataObject>();
 	const FName SelectedSuspectName = SelectedItem->GetName();
 	
-	//GameState->Set파이널용의자(); //replicate property를 통해서 값이 변경되면 PC와 EndingHUD가 그값 보기, or 안봐도 자기 함수에서 그값을 통해 로직실행시키기.
-
 	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
-	RAIPlayerController->StartEnding(SelectedSuspectName);
+	RAIPlayerController->SetupFinalSuspectName(SelectedSuspectName);
 
 }

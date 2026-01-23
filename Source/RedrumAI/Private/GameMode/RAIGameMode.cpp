@@ -241,6 +241,7 @@ void ARAIGameMode::BindGS()
 	if(IsValid(RAIGameState))
 	{
 		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIGameMode::StartLevel);
+		RAIGameState->FinishSetFinalSuspectNameDelegate.AddDynamic(this, &ARAIGameMode::StartEnding);
 	}
 	else
 	{
@@ -249,6 +250,11 @@ void ARAIGameMode::BindGS()
 			&ARAIGameMode::BindGS
 		);
 	}
+}
+
+void ARAIGameMode::SetupLevelByRowName(FName InRowName)
+{
+	GetGameState<ARAIGameState>()->SetLevelData(InRowName);
 }
 
 void ARAIGameMode::StartLevel()
@@ -264,6 +270,31 @@ void ARAIGameMode::StartLevel()
 		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
 		{
 			EachController->StartLevel();
+		}
+	}
+}
+
+void ARAIGameMode::SetupFinalSuspectName(FName InSuspectName)
+{
+	//이거 뒤에 SetLevelData바꿔서 사용하자
+	GetGameState<ARAIGameState>()->SetFinalSuspectName(InSuspectName);
+}
+
+void ARAIGameMode::StartEnding()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
+	{
+		UE_LOG(LogTemp,Warning, TEXT("GM:StartEnding Run"));
+		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Controller Cast success"));
+			EachController->StartEnding();
 		}
 	}
 }
@@ -331,9 +362,4 @@ void ARAIGameMode::OnEventDelegate_OpenAI(FString Message)
 void ARAIGameMode::OnEventDelegate_SendMessageArray(FString MessageString)
 {	//CM의 델리게이트(질문)를 받아 HM을 통해 OpenAI와 통신
 	HttpManager->SendRequestToOpenAI(MessageString);
-}
-
-void ARAIGameMode::SetupLevelByRowName(FName InRowName)
-{
-	GetGameState<ARAIGameState>()->SetLevelData(InRowName);
 }

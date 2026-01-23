@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/RAIEndingHUD.h"
@@ -23,6 +23,7 @@ void URAIEndingHUD::SetLineText(int idx)
 {
 	if (RAIGameState)
 	{
-		
+		FText CurrentLine = RAIGameState->GetDialogueLineByIndex(idx);
+		TextBlock_Line->SetText(CurrentLine);
 	}
 }

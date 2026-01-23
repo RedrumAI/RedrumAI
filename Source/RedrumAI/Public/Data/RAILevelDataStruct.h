@@ -34,5 +34,5 @@ public:
 	// 범인
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RAI", meta = (RowType = "/Script/RedrumAI.RAIFinalVerdictDataStruct"))
 	FDataTableRowHandle Answer;
-
+	
 };

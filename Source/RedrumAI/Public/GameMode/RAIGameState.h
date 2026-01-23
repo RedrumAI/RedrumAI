@@ -10,7 +10,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetLevelDataDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateEvidenceRowsDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTriggeredDialogueDelegate, int, Idx);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSetFinalSuspect, FName, SelectedSuspectName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetFinalSuspectNameDelegate);
 
 
 struct FRAIEvidenceData;
@@ -27,6 +27,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TArray<FName> EvidenceRows;
 
+	FName FinalSuspectName;
+
 public:
 	UPROPERTY()
 	FOnFinishSetLevelDataDelegate FinishSetLevelDataDelegate;
@@ -34,24 +36,32 @@ public:
 	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;
 	UPROPERTY()
 	FOnTriggeredDialogueDelegate TriggeredDialogueDelegate;
-
+	UPROPERTY()
+	FOnFinishSetFinalSuspectNameDelegate FinishSetFinalSuspectNameDelegate;
+	
 public:
 	virtual void PostInitializeComponents() override;
+
 	const FRAILevelDataStruct* GetLevelData();
-	ULevelSequence* GetIntroSequenceAsset();
 	void SetLevelData(FName InRowName);
+
+	ULevelSequence* GetIntroSequenceAsset();
 	
+	const TArray<FName> GetEvidenceRows();
+	const FRAIEvidenceData* FindEvidenceData(FName RowName) const;
+
+	const FName GetFinalSuspectName();
+	void SetFinalSuspectName(FName InSuspectName);
+
+public:
 	TArray<FName> GetSuspectNames();
 	TArray<UTexture2D*> GetSuspectImages();
-	ULevelSequence* GetEndingSequence(FName InSuspectName);
+	const ULevelSequence* GetEndingSequence();
 	FName GetAnswerName();
 
 	void AddEvidence(FName InRowName);
 	void RemoveEvidence(FName InRowName);
 	
-	TArray<FName> GetEvidenceRows() const;
-	const FRAIEvidenceData* FindEvidenceData(FName RowName) const;
-
 	void TriggerDialogue(int idx);
-	//void SetFinalSuspect(FName SelectedSuspectName);
+	FText GetDialogueLineByIndex(int idx);
 };

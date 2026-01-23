@@ -93,30 +93,11 @@ void ARAIPlayerController::BeginPlay()
 			MyPawn->DisableInput(this);
 		}
 	}
-
-	// 3. Stage 설정
-	{
-		FindStageTargetPoint();
-	}
-
 }
 
 void ARAIPlayerController::SetupLevelByRowName(FName InRowName)
 {
 	RAIGameMode->SetupLevelByRowName(InRowName);
-}
-
-void ARAIPlayerController::FindStageTargetPoint()
-{
-	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
-	{
-		ATargetPoint* TargetPoint = *TargetPointIterator;
-		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
-		{
-			StageTargetPoint = TargetPoint;
-			break;
-		}
-	}
 }
 
 void ARAIPlayerController::StartLevel()
@@ -128,9 +109,7 @@ void ARAIPlayerController::StartLevel()
 		LobbyUI = nullptr;
 	}
 
-	//시퀀스 재생하는 동안 입력 차단
-	FInputModeGameOnly InputMode;
-	SetInputMode(InputMode);
+	// 마우스 커서 제거
 	SetShowMouseCursor(false);
 
 	//시퀀스 재생
@@ -166,15 +145,31 @@ void ARAIPlayerController::PlayIntroSequence()
 
 void ARAIPlayerController::SetupStageAfterIntro()
 {
+	//플레이어 위치 이동 및 입력 활성화
+	FindStageTargetPoint();
 	GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
+
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
 	GetPawn()->EnableInput(this);
-
-	StageHUD->SetVisibility(ESlateVisibility::Visible);
-
 	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
 	EnterDefaultModeIMC();
 
+	StageHUD->SetVisibility(ESlateVisibility::Visible);
 	BindHUD();
+}
+
+void ARAIPlayerController::FindStageTargetPoint()
+{
+	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
+	{
+		ATargetPoint* TargetPoint = *TargetPointIterator;
+		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
+		{
+			StageTargetPoint = TargetPoint;
+			break;
+		}
+	}
 }
 
 void ARAIPlayerController::PlayerTick(float DeltaTime)
@@ -187,15 +182,49 @@ void ARAIPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
-void ARAIPlayerController::StartEnding(FName InSuspectName)
+void ARAIPlayerController::SetupFinalSuspectName(FName InSuspectName)
+{
+	RAIGameMode->SetupFinalSuspectName(InSuspectName);
+}
+
+void ARAIPlayerController::StartEnding()
+{
+	PlayEndingSequence();
+	//1. StageHUD 끄기
+	//2. 움직임 입력 차단
+	//3. Ending 전용 입력 활성화
+}
+
+void ARAIPlayerController::PlayEndingSequence()
 {
 	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
-	ULevelSequence* EndingSequence = RAIGameState->GetEndingSequence(InSuspectName);
+	const ULevelSequence* EndingSequence= RAIGameState->GetEndingSequence();
+	ULevelSequence* EndingSequenceAsset = const_cast<ULevelSequence*>(EndingSequence);
 
-	//Play(EndingSequence)
-	//TODO:
-	//1. HUD 끄기
-	//2. 시퀀스 실행 / Play(EndingSequence)
+	if (!EndingSequenceAsset)
+	{
+		CompleteEnding();
+		return;
+	}
+
+	FMovieSceneSequencePlaybackSettings Settings;
+	ALevelSequenceActor* SequenceActor = nullptr;
+	ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+		GetWorld(),
+		EndingSequenceAsset,
+		Settings,
+		SequenceActor
+	);
+	if (SequencePlayer)
+	{
+		SequencePlayer->OnFinished.AddDynamic(this, &ARAIPlayerController::CompleteEnding);
+		SequencePlayer->Play();
+	}
+}
+
+void ARAIPlayerController::CompleteEnding()
+{
+	UE_LOG(LogTemp, Warning, TEXT("CompleteEnding!!!"));
 }
 
 void ARAIPlayerController::BindGM()

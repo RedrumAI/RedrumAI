@@ -102,17 +102,23 @@ public:
 
 	void SetupLevelByRowName(FName InRowName);
 
-	void FindStageTargetPoint();
-	UFUNCTION()
 	void StartLevel();
 	void PlayIntroSequence();
 	UFUNCTION()
 	void SetupStageAfterIntro();
+	void FindStageTargetPoint();
 
 	virtual void PlayerTick(float DeltaTime) override;
 
+	void SetupFinalSuspectName(FName InSuspectName);
+
 	//Called by RAIFinalVerdictUI
-	void StartEnding(FName InSuspectName);
+	void StartEnding();
+	void PlayEndingSequence();
+	UFUNCTION()
+	void CompleteEnding();
+
+
 
 	void BindGM();
 	void BindGS();

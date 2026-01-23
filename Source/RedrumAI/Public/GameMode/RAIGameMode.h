@@ -60,8 +60,13 @@ public:
 	UFUNCTION()
 	void BindGS();
 
+	void SetupLevelByRowName(FName InRowName);
 	UFUNCTION()
 	void StartLevel();
+
+	void SetupFinalSuspectName(FName InSuspectName);
+	UFUNCTION()
+	void StartEnding();
 
 	UFUNCTION()
 	void OnEventDelegate_NLP(FString InJsonData);
@@ -81,5 +86,4 @@ public:
 
 	void UpdateEvidence(FName EvidenceRowName, EUpdateType InType);
 
-	void SetupLevelByRowName(FName InRowName);
 };

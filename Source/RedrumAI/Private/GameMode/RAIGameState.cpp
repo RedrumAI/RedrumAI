@@ -7,6 +7,7 @@
 #include "Data/RAILevelDataStruct.h"
 #include "LevelSequence.h"
 #include "Data/RAIFinalVerdictDataStruct.h"
+#include "Data/RAICutsceneDialogueDataAsset.h"
 
 void ARAIGameState::PostInitializeComponents()
 {
@@ -40,15 +41,26 @@ void ARAIGameState::SetLevelData(FName InRowName)
 
 	const FRAILevelDataStruct* FoundData = RAIGameInstance->FindLevelData(InRowName);
 
-	if(!FoundData)
+	if (!FoundData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LevelData not Found"));
 		return;
 	}
-	
+
 	LevelData = *FoundData;
 
 	FinishSetLevelDataDelegate.Broadcast();
+}
+
+const FName ARAIGameState::GetFinalSuspectName()
+{
+	return FinalSuspectName;
+}
+
+void ARAIGameState::SetFinalSuspectName(FName InSuspectName)
+{
+	FinalSuspectName = InSuspectName;
+	FinishSetFinalSuspectNameDelegate.Broadcast();
 }
 
 TArray<FName> ARAIGameState::GetSuspectNames()
@@ -91,11 +103,11 @@ TArray<UTexture2D*> ARAIGameState::GetSuspectImages()
 	return SuspectImages;
 }
 
-ULevelSequence* ARAIGameState::GetEndingSequence(FName InSuspectName)
+const ULevelSequence* ARAIGameState::GetEndingSequence()
 {
 	for (auto LevelSuspect : LevelData.LevelSuspects)
 	{
-		if (LevelSuspect.Suspect.RowName == InSuspectName)
+		if (LevelSuspect.Suspect.RowName == FinalSuspectName)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *LevelSuspect.Suspect.RowName.ToString());
 
@@ -148,7 +160,7 @@ void ARAIGameState::RemoveEvidence(FName InRowName)
 	UpdateEvidenceRowsDelegate.Broadcast();
 }
 
-TArray<FName> ARAIGameState::GetEvidenceRows() const
+const TArray<FName> ARAIGameState::GetEvidenceRows()
 {
 	return EvidenceRows;
 }
@@ -164,3 +176,19 @@ void ARAIGameState::TriggerDialogue(int idx)
 	TriggeredDialogueDelegate.Broadcast(idx);
 }
 
+FText ARAIGameState::GetDialogueLineByIndex(int idx)
+{
+	for (auto LevelSuspect : LevelData.LevelSuspects)
+	{
+		if (LevelSuspect.Suspect.RowName == FinalSuspectName)
+		{
+			if (LevelSuspect.CutsceneDialogue->Lines.IsValidIndex(idx))
+			{
+				return LevelSuspect.CutsceneDialogue->Lines[idx];
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("LineByIndex[%d] is not valid"), idx);
+	return FText();
+}

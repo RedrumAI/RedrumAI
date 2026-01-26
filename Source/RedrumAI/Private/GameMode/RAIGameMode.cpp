@@ -9,7 +9,6 @@
 #include "GameMode/RAIGameState.h"
 #include "GameMode/RAIPlayerController.h"
 
-//Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
 {
 	ScoreStruct.Reset();
@@ -36,22 +35,14 @@ void ARAIGameMode::BeginPlay()
 	BindHM();
 	BindCM();
 	BindGS();
-	InitSettingOpenAI();
 
-	/*
-	FTimerHandle TimerHandle1_tmp;
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle1_tmp,
-		this,
-		&ARAIGameMode::tmpTimerFunction1,
-		8.0f,
-		false
-	);
-	*/
 }
 
 void ARAIGameMode::InitSettingOpenAI()
 {
+	ScoreStruct.Reset();
+	ResponseString.Reset();
+
 	FString SettingString;
 	/* 테스트 위해 잠시 삭제
 	SettingString = FString::Printf(
@@ -65,11 +56,14 @@ void ARAIGameMode::InitSettingOpenAI()
 		TEXT("그리고 나의 첫 번째 시스템 메시지에 대해서는 응답으로 단지 \"!\"만 보내.")
 	);
 	*/
+
 	SettingString = FString::Printf(
 		TEXT("temp 안녕")
 	);
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
+
+		ChatManager->ClearChatSession();
 		ChatManager->AddMessageArray(SettingString, developer);
 	}
 	else
@@ -82,19 +76,6 @@ void ARAIGameMode::InitSettingOpenAI()
 			1.0f,
 			false
 		);
-	}
-}
-
-//C++ 테스트를 위한 임시함수. 추후 함수삭제예정
-void ARAIGameMode::tmpTimerFunction1()
-{
-	FString str;
-	str = FString::Printf(
-		TEXT("오늘 아침에 너는 무슨일을 하고있었지?")
-	);
-	if (IsValid(ChatManager) && HttpManager)
-	{
-		ChatManager->AddMessageArray(str, user);
 	}
 }
 
@@ -240,7 +221,7 @@ void ARAIGameMode::BindGS()
 	ARAIGameState* RAIGameState = GetGameState<ARAIGameState>();
 	if(IsValid(RAIGameState))
 	{
-		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIGameMode::StartLevel);
+		RAIGameState->FinishSetupStageStateDelegate.AddDynamic(this, &ARAIGameMode::StartLevel);
 		RAIGameState->FinishSetFinalSuspectNameDelegate.AddDynamic(this, &ARAIGameMode::StartEnding);
 	}
 	else
@@ -254,7 +235,7 @@ void ARAIGameMode::BindGS()
 
 void ARAIGameMode::SetupLevelByRowName(FName InRowName)
 {
-	GetGameState<ARAIGameState>()->SetLevelData(InRowName);
+	GetGameState<ARAIGameState>()->SetupStageState(InRowName);
 }
 
 void ARAIGameMode::StartLevel()
@@ -265,6 +246,10 @@ void ARAIGameMode::StartLevel()
 		return;
 	}
 
+	//서버 스테이지 설정
+	InitSettingOpenAI();
+
+	//각 클라이언트 스테이지 시작
 	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
 	{
 		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))

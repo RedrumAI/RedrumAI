@@ -28,7 +28,7 @@ void URAIFinalVerdictUI::NativeOnInitialized()
 
 	if (ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>())
 	{
-		RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &URAIFinalVerdictUI::BuildVerdictEntries);
+		RAIGameState->FinishSetupStageStateDelegate.AddDynamic(this, &URAIFinalVerdictUI::BuildVerdictEntries);
 	}
 }
 
@@ -69,14 +69,15 @@ void URAIFinalVerdictUI::OnSuspectTileViewItemClicked(UObject* ClickedItem)
 
 void URAIFinalVerdictUI::OnSubmitButtonClicked()
 {
-	// UObejct* SelectedSuspect = TileView_Suspect->GetSelectedItem();
-	// SelectedItem이 존재한다면 suspect name 을 컨트롤러로 전달
-	// gamemode 정답 판정 및 엔딩 시퀀스
-
 	URAIFinalVerdictDataObject* SelectedItem = TileView_Suspect->GetSelectedItem<URAIFinalVerdictDataObject>();
+
+	if(!SelectedItem)
+	{
+		return;
+	}
+
 	const FName SelectedSuspectName = SelectedItem->GetName();
 	
 	ARAIPlayerController* RAIPlayerController = Cast<ARAIPlayerController>(GetOwningPlayer());
 	RAIPlayerController->SetupFinalSuspectName(SelectedSuspectName);
-
 }

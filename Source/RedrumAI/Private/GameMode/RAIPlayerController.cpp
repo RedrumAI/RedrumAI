@@ -2,7 +2,6 @@
 
 
 #include "GameMode/RAIPlayerController.h"
-#include "UI/RAIStageHUDWidget.h"
 #include "GameMode/RAIGameMode.h"
 #include "GameMode/RAIGameState.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,6 +15,8 @@
 #include "EngineUtils.h"
 #include "Engine/TargetPoint.h"
 #include "UI/RAILobbyUI.h"
+#include "UI/RAIStageHUDWidget.h"
+#include "UI/RAIEndingHUD.h"
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
@@ -27,9 +28,9 @@ ARAIPlayerController::ARAIPlayerController()
 void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
 	// 1. PlayerController설정
 	{
-		
 		RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 
 		// 소유IMC 확인
@@ -146,7 +147,7 @@ void ARAIPlayerController::PlayIntroSequence()
 void ARAIPlayerController::SetupStageAfterIntro()
 {
 	//플레이어 위치 이동 및 입력 활성화
-	FindStageTargetPoint();
+	ATargetPoint* StageTargetPoint = FindStageTargetPoint();
 	GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
 
 	FInputModeGameOnly InputMode;
@@ -159,17 +160,17 @@ void ARAIPlayerController::SetupStageAfterIntro()
 	BindHUD();
 }
 
-void ARAIPlayerController::FindStageTargetPoint()
+ATargetPoint* ARAIPlayerController::FindStageTargetPoint()
 {
 	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
 	{
 		ATargetPoint* TargetPoint = *TargetPointIterator;
 		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
 		{
-			StageTargetPoint = TargetPoint;
-			break;
+			return TargetPoint;
 		}
 	}
+	return nullptr;
 }
 
 void ARAIPlayerController::PlayerTick(float DeltaTime)
@@ -189,10 +190,34 @@ void ARAIPlayerController::SetupFinalSuspectName(FName InSuspectName)
 
 void ARAIPlayerController::StartEnding()
 {
-	PlayEndingSequence();
-	//1. StageHUD 끄기
+	//1. StageHUD 끄고 EnidngHUD 생성
+	
+	//StageHUD 제거
+	if (StageHUD)
+	{
+		StageHUD->RemoveFromParent(); 
+		StageHUD = nullptr;
+	}
+
+	EndingHUD = CreateWidget<URAIEndingHUD>(this, EndingHUDClass);
+	if (EndingHUD)
+	{
+		EndingHUD->AddToViewport();
+	}
+
 	//2. 움직임 입력 차단
+	FInputModeUIOnly InputMode;
+	SetInputMode(InputMode);
+	SetShowMouseCursor(true); //엔딩크레딧 시, 커서를 보이게 할것인가?
+	if (APawn* MyPawn = GetPawn())
+	{
+		MyPawn->DisableInput(this);
+	}
+	
 	//3. Ending 전용 입력 활성화
+
+
+	PlayEndingSequence();
 }
 
 void ARAIPlayerController::PlayEndingSequence()
@@ -224,6 +249,7 @@ void ARAIPlayerController::PlayEndingSequence()
 
 void ARAIPlayerController::CompleteEnding()
 {
+
 	UE_LOG(LogTemp, Warning, TEXT("CompleteEnding!!!"));
 }
 

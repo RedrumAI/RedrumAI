@@ -20,12 +20,13 @@ enum class ERAIConversationApproachState : uint8
 };
 
 class ARAIGameMode;
-class URAIStageHUDWidget;
 class UInputMappingContext;
 class UInputAction;
 class ARAIInspectionActor;
 class IRAIConversationInterface;
 class URAILobbyUI;
+class URAIStageHUDWidget;
+class URAIEndingHUD;
 class ATargetPoint;
 
 UCLASS()
@@ -47,12 +48,14 @@ protected:
 	TObjectPtr<URAILobbyUI> LobbyUI;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
-	TSubclassOf< URAIStageHUDWidget> StageHUDClass;
+	TSubclassOf<URAIStageHUDWidget> StageHUDClass;
 	UPROPERTY()
 	TObjectPtr<URAIStageHUDWidget> StageHUD;
 
+	UPROPERTY(EditAnywhere, Category = "RAI")
+	TSubclassOf<URAIEndingHUD> EndingHUDClass;
 	UPROPERTY()
-	TObjectPtr<ATargetPoint> StageTargetPoint;
+	TObjectPtr<URAIEndingHUD> EndingHUD;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TSubclassOf<ARAIInspectionActor> BP_InspectionActor;
@@ -106,7 +109,7 @@ public:
 	void PlayIntroSequence();
 	UFUNCTION()
 	void SetupStageAfterIntro();
-	void FindStageTargetPoint();
+	ATargetPoint* FindStageTargetPoint();
 
 	virtual void PlayerTick(float DeltaTime) override;
 
@@ -117,8 +120,6 @@ public:
 	void PlayEndingSequence();
 	UFUNCTION()
 	void CompleteEnding();
-
-
 
 	void BindGM();
 	void BindGS();

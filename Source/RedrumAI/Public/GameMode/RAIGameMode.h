@@ -78,7 +78,6 @@ public:
 	void UpdateChatLogUI();
 
 	void InitSettingOpenAI();
-	void tmpTimerFunction1();
 
 	void AskSuspect(const FText Text);
 

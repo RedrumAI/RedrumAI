@@ -7,7 +7,7 @@
 #include "Data/RAILevelDataStruct.h"
 #include "RAIGameState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetLevelDataDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetupStageStateDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateEvidenceRowsDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTriggeredDialogueDelegate, int, Idx);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishSetFinalSuspectNameDelegate);
@@ -31,7 +31,7 @@ protected:
 
 public:
 	UPROPERTY()
-	FOnFinishSetLevelDataDelegate FinishSetLevelDataDelegate;
+	FOnFinishSetupStageStateDelegate FinishSetupStageStateDelegate;
 	UPROPERTY()
 	FOnUpdateEvidenceRowsDelegate UpdateEvidenceRowsDelegate;
 	UPROPERTY()
@@ -41,6 +41,10 @@ public:
 	
 public:
 	virtual void PostInitializeComponents() override;
+
+	void SetupStageState(FName InLevelRowName);
+
+	void ClearEvidenceRow();
 
 	const FRAILevelDataStruct* GetLevelData();
 	void SetLevelData(FName InRowName);

@@ -31,11 +31,16 @@ public:
 	//추후 AI가 여러개가 된다면 TMap를 사용해 AI이름과 내역을 짝지어 관리하는게 좋겠다.
 	TArray<TSharedPtr<FJsonValue>> MessageArray;
 
+	void ClearChatSession();
+
 	FRAIEmotionScore EmotionScore;
 
+	FOnSendMessageDelegate SendMessageDelegate;
+	FOnAddMessageArrayDelegate AddMessageArrayDelegate;
+
+public:
 	void SetEmotionScore(const FRAIEmotionScore& InEmotionStruct);
 	void CalculateEmotion(float& EmotionScore, float Score);
-
 
 	virtual void AddMessageArray(const FRAIEmotionScore& EmotionStruct, FString Message, ERAIMessageRole MessageRole);
 	virtual void AddMessageArray(FString Message, ERAIMessageRole MessageRole);
@@ -45,7 +50,4 @@ public:
 	void ShowMessageArray();
 
 	const TArray<TPair<FString, FString>> GetChatLog();
-
-	FOnSendMessageDelegate SendMessageDelegate;
-	FOnAddMessageArrayDelegate AddMessageArrayDelegate;
 };

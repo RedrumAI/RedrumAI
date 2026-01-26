@@ -18,7 +18,7 @@ void ARAIGameState::PostInitializeComponents()
 		EvidenceRows.SetNum(RAIGameInstance->GetEvidenceDataTableRowNum());
 	}
 
-	//초기화하지 않아도 0이지만, 명시용
+	//초기화
 	for (int i = 0; i < EvidenceRows.Num(); ++i)
 	{
 		EvidenceRows[i] = NAME_None;
@@ -35,6 +35,25 @@ ULevelSequence* ARAIGameState::GetIntroSequenceAsset()
 	return LevelData.IntroSequenceAsset;
 }
 
+void ARAIGameState::SetupStageState(FName InLevelRowName)
+{
+	ClearEvidenceRow();
+
+	FinalSuspectName = NAME_None;
+
+	SetLevelData(InLevelRowName);
+
+	FinishSetupStageStateDelegate.Broadcast();
+}
+
+void ARAIGameState::ClearEvidenceRow()
+{
+	for (int i = 0; i < EvidenceRows.Num(); ++i)
+	{
+		EvidenceRows[i] = NAME_None;
+	}
+}
+
 void ARAIGameState::SetLevelData(FName InRowName)
 {
 	URAIGameInstance* RAIGameInstance = GetWorld()->GetGameInstance<URAIGameInstance>();
@@ -46,10 +65,8 @@ void ARAIGameState::SetLevelData(FName InRowName)
 		UE_LOG(LogTemp, Warning, TEXT("LevelData not Found"));
 		return;
 	}
-
+	
 	LevelData = *FoundData;
-
-	FinishSetLevelDataDelegate.Broadcast();
 }
 
 const FName ARAIGameState::GetFinalSuspectName()

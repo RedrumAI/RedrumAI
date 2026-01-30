@@ -121,6 +121,8 @@ public:
 	UFUNCTION()
 	void CompleteEnding();
 
+	URAIEndingHUD* GetEndingHUD();
+
 	void BindGM();
 	void BindGS();
 	void BindHUD();

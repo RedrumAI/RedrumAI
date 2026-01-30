@@ -6,8 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "RAIEndingHUD.generated.h"
 
-class ARAIGameState;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFinishEndingCreditAnimationDelegate);
+
 class UTextBlock;
+class ARAIGameState;
+class UWidgetAnimation;
 
 UCLASS()
 class REDRUMAI_API URAIEndingHUD : public UUserWidget
@@ -22,10 +25,23 @@ protected:
 	TObjectPtr<UTextBlock> TextBlock_Skip;
 
 	TObjectPtr<ARAIGameState> RAIGameState;
+	
+	// BP에서 만든 애니메이션과 "이름이 같아야" 자동 바인딩됨
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<UWidgetAnimation> EndingCreditAnimation;
+	
+public:
+	UPROPERTY()
+	FOnFinishEndingCreditAnimationDelegate FinishEndingCreditAnimationDelegate;
+
+	bool bCreditAnimationEnd = false;
 
 public:
 	virtual void NativeConstruct() override;
 	
 	UFUNCTION()
 	void SetLineText(int idx);
+
+	UFUNCTION()
+	void WhenAnimationFinished();
 };

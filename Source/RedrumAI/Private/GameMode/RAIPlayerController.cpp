@@ -136,7 +136,7 @@ void ARAIPlayerController::PlayIntroSequence()
 		Settings,
 		SequenceActor
 	);
-
+	
 	if (SequencePlayer)
 	{
 		SequencePlayer->OnFinished.AddDynamic(this, &ARAIPlayerController::SetupStageAfterIntro);
@@ -251,6 +251,11 @@ void ARAIPlayerController::CompleteEnding()
 {
 
 	UE_LOG(LogTemp, Warning, TEXT("CompleteEnding!!!"));
+}
+
+URAIEndingHUD* ARAIPlayerController::GetEndingHUD()
+{
+	return EndingHUD;
 }
 
 void ARAIPlayerController::BindGM()

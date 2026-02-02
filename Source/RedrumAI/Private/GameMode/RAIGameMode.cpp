@@ -247,7 +247,7 @@ void ARAIGameMode::StartLevel()
 	}
 
 	//서버 스테이지 설정
-	InitSettingOpenAI();
+	//InitSettingOpenAI();
 
 	//각 클라이언트 스테이지 시작
 	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)

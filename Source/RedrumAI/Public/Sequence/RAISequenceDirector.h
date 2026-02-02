@@ -18,11 +18,15 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ARAIGameState> GameState;
 
-	//TObjectPtr<URAIEndingHUD> EndingHUD;
+	UPROPERTY()
+	TObjectPtr<URAIEndingHUD> EndingHUD;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "RAI")
 	void Initialize();
+
+	UFUNCTION(BlueprintCallable, Category = "RAI")
+	void BeginEndingCredit();
 
 	UFUNCTION(BlueprintCallable, Category = "RAI")
 	void TriggerDialogue(int idx);

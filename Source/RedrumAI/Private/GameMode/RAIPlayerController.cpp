@@ -249,7 +249,10 @@ void ARAIPlayerController::PlayEndingSequence()
 
 void ARAIPlayerController::CompleteEnding()
 {
-
+	// [ToDo]
+	// EndingHUD 제거 및 LobbyHud 생성
+	// 플레이어 위치 로비로 이동
+	// 입력 활성화 (클릭)
 	UE_LOG(LogTemp, Warning, TEXT("CompleteEnding!!!"));
 }
 

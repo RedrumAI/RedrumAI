@@ -14,8 +14,21 @@ void URAISequenceDirector::Initialize()
 	{
 		return;
 	}
-
 	GameState = World->GetGameState<ARAIGameState>();
+
+	ARAIPlayerController* MyPC = GetWorld()->GetFirstPlayerController<ARAIPlayerController>();
+	EndingHUD = MyPC->GetEndingHUD();
+}
+
+void URAISequenceDirector::BeginEndingCredit()
+{
+	if (!GetWorld() || !IsValid(EndingHUD))
+	{
+		return;
+	}
+
+	EndingHUD->ShowHUD(true);
+	EndingHUD->PlayEndingCreditAnimation();
 }
 
 void URAISequenceDirector::TriggerDialogue(int idx)
@@ -25,14 +38,7 @@ void URAISequenceDirector::TriggerDialogue(int idx)
 
 void URAISequenceDirector::CheckEndingHold()
 {
-	if(!GetWorld())
-	{
-		return;
-	}
-	
-	ARAIPlayerController* MyPC = GetWorld()->GetFirstPlayerController<ARAIPlayerController>();
-	URAIEndingHUD* EndingHUD = MyPC->GetEndingHUD();
-	if (!IsValid(EndingHUD))
+	if(!GetWorld() || !IsValid(EndingHUD))
 	{
 		return;
 	}

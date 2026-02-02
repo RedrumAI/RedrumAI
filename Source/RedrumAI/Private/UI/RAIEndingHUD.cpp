@@ -19,23 +19,38 @@ void URAIEndingHUD::NativeConstruct()
 		RAIGameState->TriggeredDialogueDelegate.AddDynamic(this, &URAIEndingHUD::SetLineText);
 	}
 
+	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void URAIEndingHUD::ShowHUD(bool InVisibility)
+{
+	if (InVisibility)
+	{
+		SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void URAIEndingHUD::PlayEndingCreditAnimation()
+{
 	if (EndingCreditAnimation)
 	{
 		// 해당 이벤트 발생 시 내장 함수
 		FWidgetAnimationDynamicEvent EndEvent;
-		EndEvent.BindDynamic(this, &URAIEndingHUD::WhenAnimationFinished);
+		EndEvent.BindDynamic(this, &URAIEndingHUD::NoticeEndingCreditAniamtionFinished);
 
 		// 끝난 시점 이벤트
 		BindToAnimationFinished(EndingCreditAnimation, EndEvent);
 
 		PlayAnimation(EndingCreditAnimation);
-
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EndingCreditAnimation is null. Check BindWidgetAnim name match."));
 	}
-
 }
 
 void URAIEndingHUD::SetLineText(int idx)
@@ -47,7 +62,7 @@ void URAIEndingHUD::SetLineText(int idx)
 	}
 }
 
-void URAIEndingHUD::WhenAnimationFinished()
+void URAIEndingHUD::NoticeEndingCreditAniamtionFinished()
 {
 	bCreditAnimationEnd = true;
 	FinishEndingCreditAnimationDelegate.Broadcast();

@@ -39,9 +39,13 @@ public:
 public:
 	virtual void NativeConstruct() override;
 	
+	//허드 가시성 토글 ShowHUD(bool InVisibility)
+	void ShowHUD(bool InVisibility);
+	void PlayEndingCreditAnimation();
+
 	UFUNCTION()
 	void SetLineText(int idx);
 
 	UFUNCTION()
-	void WhenAnimationFinished();
-};
+	void NoticeEndingCreditAniamtionFinished();
+}; 

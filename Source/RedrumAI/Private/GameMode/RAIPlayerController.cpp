@@ -48,17 +48,6 @@ void ARAIPlayerController::BeginPlay()
 			}
 		}
 
-		//StageHUD생성
-		if (StageHUDClass)
-		{
-			StageHUD = CreateWidget<URAIStageHUDWidget>(this, StageHUDClass);
-			if (StageHUD)
-			{
-				StageHUD->AddToViewport();
-			}
-		}
-		StageHUD->SetVisibility(ESlateVisibility::Hidden);
-
 		//GM바인드
 		BindGM();
 		BindGS();
@@ -147,14 +136,25 @@ void ARAIPlayerController::PlayIntroSequence()
 void ARAIPlayerController::SetupStageAfterIntro()
 {
 	//플레이어 위치 이동 및 입력 활성화
-	ATargetPoint* StageTargetPoint = FindStageTargetPoint();
-	GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
+	//ATargetPoint* StageTargetPoint = FindStageTargetPoint();
+	//GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
 
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 	GetPawn()->EnableInput(this);
 	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
 	EnterDefaultModeIMC();
+
+	//StageHUD생성
+	if (StageHUDClass)
+	{
+		StageHUD = CreateWidget<URAIStageHUDWidget>(this, StageHUDClass);
+		if (StageHUD)
+		{
+			StageHUD->AddToViewport();
+		}
+	}
+	StageHUD->SetVisibility(ESlateVisibility::Hidden);
 
 	StageHUD->SetVisibility(ESlateVisibility::Visible);
 	BindHUD();
@@ -216,7 +216,6 @@ void ARAIPlayerController::StartEnding()
 	
 	//3. Ending 전용 입력 활성화
 
-
 	PlayEndingSequence();
 }
 
@@ -253,6 +252,23 @@ void ARAIPlayerController::CompleteEnding()
 	// EndingHUD 제거 및 LobbyHud 생성
 	// 플레이어 위치 로비로 이동
 	// 입력 활성화 (클릭)
+
+	//EndingHUD 제거
+	if (EndingHUD)
+	{
+		EndingHUD->RemoveFromParent();
+		EndingHUD = nullptr;
+	}
+
+	if (LobbyUIClass)
+	{
+		LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
+		if (LobbyUI)
+		{
+			LobbyUI->AddToViewport();
+		}
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("CompleteEnding!!!"));
 }
 

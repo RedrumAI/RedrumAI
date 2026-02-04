@@ -9,6 +9,9 @@
 #include "GameMode/RAIGameState.h"
 #include "GameMode/RAIPlayerController.h"
 
+#include "EngineUtils.h"
+#include "Engine/TargetPoint.h"
+
 ARAIGameMode::ARAIGameMode()
 {
 	ScoreStruct.Reset();
@@ -249,14 +252,29 @@ void ARAIGameMode::StartLevel()
 	//서버 스테이지 설정
 	//InitSettingOpenAI();
 
+	ATargetPoint* StageTargetPoint = FindStageTargetPoint();
 	//각 클라이언트 스테이지 시작
 	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
 	{
 		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
 		{
 			EachController->StartLevel();
+			EachController->GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation()); //전부 한자리에 생성되는 상황
 		}
 	}
+}
+
+ATargetPoint* ARAIGameMode::FindStageTargetPoint()
+{
+	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
+	{
+		ATargetPoint* TargetPoint = *TargetPointIterator;
+		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
+		{
+			return TargetPoint;
+		}
+	}
+	return nullptr;
 }
 
 void ARAIGameMode::SetupFinalSuspectName(FName InSuspectName)

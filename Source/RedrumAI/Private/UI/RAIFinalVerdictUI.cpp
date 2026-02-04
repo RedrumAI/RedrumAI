@@ -26,18 +26,23 @@ void URAIFinalVerdictUI::NativeOnInitialized()
 	TileView_Suspect->OnItemClicked().AddUObject(this, &URAIFinalVerdictUI::OnSuspectTileViewItemClicked);
 	Button_Submit->OnClicked.AddDynamic(this, &URAIFinalVerdictUI::OnSubmitButtonClicked);
 
-	if (ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>())
-	{
-		RAIGameState->FinishSetupStageStateDelegate.AddDynamic(this, &URAIFinalVerdictUI::BuildVerdictEntries);
-	}
+	BuildVerdictEntries();
 }
 
 void URAIFinalVerdictUI::BuildVerdictEntries()
 {
 	TileView_Suspect->ClearListItems();
 
-	//Get TileView Object Data from GameState
 	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	if (!IsValid(RAIGameState))
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(
+			this,
+			&URAIFinalVerdictUI::BuildVerdictEntries
+		);
+	}
+
+	//Get TileView Object Data from GameState	
 	TArray<FName> SuspectNames = RAIGameState->GetSuspectNames();
 	TArray<UTexture2D*> SuspectImages = RAIGameState->GetSuspectImages();
 	FName AnswerName = RAIGameState->GetAnswerName();

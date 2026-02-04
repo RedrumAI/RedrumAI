@@ -17,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, 
 class ARAIHttpManager;
 class ARAIChatManager;
 class ARAIInventoryManager;
+class ATargetPoint;
 
 enum EUpdateType
 {
@@ -64,6 +65,8 @@ public:
 	UFUNCTION()
 	void StartLevel();
 
+    ATargetPoint* FindStageTargetPoint();
+
 	void SetupFinalSuspectName(FName InSuspectName);
 	UFUNCTION()
 	void StartEnding();
@@ -84,5 +87,7 @@ public:
 	void SetScoreStruct(const FString& String);
 
 	void UpdateEvidence(FName EvidenceRowName, EUpdateType InType);
+
+	ATargetPoint* FindStageTargetPoint();
 
 };

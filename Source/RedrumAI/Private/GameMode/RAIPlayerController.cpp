@@ -239,6 +239,7 @@ void ARAIPlayerController::PlayEndingSequence()
 		Settings,
 		SequenceActor
 	);
+
 	if (SequencePlayer)
 	{
 		SequencePlayer->OnFinished.AddDynamic(this, &ARAIPlayerController::CompleteEnding);
@@ -252,6 +253,8 @@ void ARAIPlayerController::CompleteEnding()
 	// EndingHUD 제거 및 LobbyHud 생성
 	// 플레이어 위치 로비로 이동
 	// 입력 활성화 (클릭)
+
+	RAIGameMode->MovePlayerToStartPoint(this);
 
 	//EndingHUD 제거
 	if (EndingHUD)

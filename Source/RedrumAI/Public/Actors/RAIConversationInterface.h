@@ -14,6 +14,15 @@ enum class ERAIConversationSide : uint8
 	Right  UMETA(DisplayName = "Right")
 };
 
+UENUM(BlueprintType)
+enum class ERAIConversationState : uint8
+{
+	Idle  UMETA(DisplayName = "Idle"),
+	Normal  UMETA(DisplayName = "Normal"),
+	Agree  UMETA(DisplayName = "Agree"),
+	Disagree   UMETA(DisplayName = "Left")
+};
+
 UINTERFACE(MinimalAPI)
 class URAIConversationInterface : public UInterface
 {

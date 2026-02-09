@@ -167,14 +167,14 @@ void ARAIPlayerCharacter::OnEndOverlapped(UPrimitiveComponent* OverlappedCompone
 void ARAIPlayerCharacter::TraceInteractableActor()
 {
 	// Linetrace 시작, 끝 지점 상세설정 필요 (시작: 카메라위치, 끝:카메라ForwardVector*N)
-	FVector Start = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector() * InteractableDistance;
-	FVector End = Start + ForwardVector;
+	APlayerController* MyPC = GetController<APlayerController>();
+	FVector Start = MyPC->PlayerCameraManager->GetCameraLocation();
+	FVector ForwardVector = MyPC->PlayerCameraManager->GetCameraRotation().Vector();
+	FVector End = Start + ForwardVector * InteractableDistance;
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //트레이스 채널을 바꿔 hit이벤트를 더줄일수 있겠다.
 	if (bHit)
 	{
@@ -201,22 +201,25 @@ void ARAIPlayerCharacter::TraceInteractableActor()
 
 void ARAIPlayerCharacter::TriggerInteractableActor()
 {
+	UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr bHit triggered"));
+
 	// Linetrace 시작, 끝 지점 상세설정 필요 (시작: 카메라위치, 끝:카메라ForwardVector*N)
-	FVector Start = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector() * InteractableDistance;
-	FVector End = Start + ForwardVector;
+	APlayerController* MyPC = GetController<APlayerController>();
+	FVector Start = MyPC->PlayerCameraManager->GetCameraLocation();
+	FVector ForwardVector = MyPC->PlayerCameraManager->GetCameraRotation().Vector();
+	FVector End = Start + ForwardVector * InteractableDistance;
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-
-	UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr bHit triggered"));
-
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params); //트레이스 채널을 바꿔 hit이벤트를 더줄일수 있겠다.
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.2f);
 	if (bHit)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr Success!"));
+		UE_LOG(LogTemp, Warning, TEXT("TriggerInteractableAcotr Hit!"));
+
+		//Draw Linetrace DebugImage
+		DrawDebugLine(GetWorld(), Start, HitResult.Location, FColor::Red, false, 0.2f);
+		DrawDebugSphere(GetWorld(), HitResult.Location, 6.f, 12, FColor::Green, false, 0.2f);
 		if (IRAIInteractableInterface* InteractableActor = Cast<IRAIInteractableInterface>(HitResult.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("[%s] Hited"), *HitResult.GetActor()->GetName());
@@ -229,5 +232,11 @@ void ARAIPlayerCharacter::TriggerInteractableActor()
 				InteractableActor->Interacted();
 			}
 		}
+	}
+	else
+	{
+		//Draw Linetrace DebugImage
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.2f);
+		DrawDebugSphere(GetWorld(), End, 6.f, 12, FColor::Green, false, 0.2f);
 	}
 }

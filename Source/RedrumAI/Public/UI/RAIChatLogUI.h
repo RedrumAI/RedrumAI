@@ -32,4 +32,7 @@ public:
 
 	void CreateChatLogEntry(FString InRole, FString InMessage);
 	void SetChatLogEntrySetting(TObjectPtr<URAIChatLogEntry> InChatLogEntry, FString InRole, FString InMessage);
+
+	virtual void OnOpened() override;
+	void CalculateUILayout();
 };

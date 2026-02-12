@@ -2,8 +2,8 @@
 
 
 #include "GameMode/RAIPlayerController.h"
-#include "UI/RAIStageHUDWidget.h"
 #include "GameMode/RAIGameMode.h"
+#include "GameMode/RAIGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
@@ -15,6 +15,8 @@
 #include "EngineUtils.h"
 #include "Engine/TargetPoint.h"
 #include "UI/RAILobbyUI.h"
+#include "UI/RAIStageHUDWidget.h"
+#include "UI/RAIEndingHUD.h"
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
@@ -27,69 +29,68 @@ void ARAIPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 소유IMC 확인
-	for (TFieldIterator<FObjectProperty> PropertyIterator(GetClass()); PropertyIterator; ++PropertyIterator)
+	// 1. PlayerController설정
 	{
-		FObjectProperty* ObjectProperty = *PropertyIterator;
-		if (ObjectProperty->PropertyClass == UInputMappingContext::StaticClass())
-		{
-			UInputMappingContext* IMCProperty = Cast<UInputMappingContext>(ObjectProperty->GetObjectPropertyValue_InContainer(this));
+		RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 
-			if (IMCProperty)
+		// 소유IMC 확인
+		for (TFieldIterator<FObjectProperty> PropertyIterator(GetClass()); PropertyIterator; ++PropertyIterator)
+		{
+			FObjectProperty* ObjectProperty = *PropertyIterator;
+			if (ObjectProperty->PropertyClass == UInputMappingContext::StaticClass())
 			{
-				IMCArray.AddUnique(IMCProperty);
+				UInputMappingContext* IMCProperty = Cast<UInputMappingContext>(ObjectProperty->GetObjectPropertyValue_InContainer(this));
+
+				if (IMCProperty)
+				{
+					IMCArray.AddUnique(IMCProperty);
+				}
 			}
 		}
-	}
 
-	//InspectionActor생성 및 리셋함수 바인드
-	InspectionActor = GetWorld()->SpawnActor<ARAIInspectionActor>(BP_InspectionActor);
-	if (InspectionActor)
-	{
-		ResetInspectionMeshDelegate.AddDynamic(InspectionActor, &ARAIInspectionActor::ResetMeshTransform);
-	}
+		//GM바인드
+		BindGM();
+		BindGS();
 
-	//GM바인드
-	BindGM();
-	
-	//TalkingState 관리 함수 bind
-	UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
+		//TalkingState 관리 함수 bind
+		UpdateTalkingStateDelegate.AddDynamic(this, &ARAIPlayerController::SwitchTalkingMode);
 
-	//Intro관련 설정
-	FindStageTargetPoint();
-
-	if (LobbyUIClass)
-	{
-		LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
-		if (LobbyUI)
+		//InspectionActor생성 및 리셋함수 바인드
+		InspectionActor = GetWorld()->SpawnActor<ARAIInspectionActor>(BP_InspectionActor);
+		if (InspectionActor)
 		{
-			LobbyUI->AddToViewport();
+			ResetInspectionMeshDelegate.AddDynamic(InspectionActor, &ARAIInspectionActor::ResetMeshTransform);
 		}
 	}
 
-	FInputModeUIOnly InputMode;
-	SetInputMode(InputMode);
-	SetShowMouseCursor(true);
-	if (APawn* MyPawn = GetPawn())
+	// 2. Lobby 설정
 	{
-		MyPawn->DisableInput(this);
+		if (LobbyUIClass)
+		{
+			LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
+			if (LobbyUI)
+			{
+				LobbyUI->AddToViewport();
+			}
+		}
+
+		//Lobby 시, 입력 차단
+		FInputModeUIOnly InputMode;
+		SetInputMode(InputMode);
+		SetShowMouseCursor(true);
+		if (APawn* MyPawn = GetPawn())
+		{
+			MyPawn->DisableInput(this);
+		}
 	}
 }
 
-void ARAIPlayerController::FindStageTargetPoint()
+void ARAIPlayerController::SetupLevelByRowName(FName InRowName)
 {
-	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
-	{
-		ATargetPoint* TargetPoint = *TargetPointIterator;
-		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
-		{
-			StageTargetPoint = TargetPoint;
-			break;
-		}
-	}
+	RAIGameMode->SetupLevelByRowName(InRowName);
 }
 
-void ARAIPlayerController::GameStartFromLobby()
+void ARAIPlayerController::StartLevel()
 {
 	//LobbyUI 제거
 	if (LobbyUI)
@@ -98,16 +99,18 @@ void ARAIPlayerController::GameStartFromLobby()
 		LobbyUI = nullptr;
 	}
 
-	//시퀀스 재생하는 동안 입력 차단
-	FInputModeGameOnly InputMode;
-	SetInputMode(InputMode);
+	// 마우스 커서 제거
 	SetShowMouseCursor(false);
 
+	//시퀀스 재생
 	PlayIntroSequence();
 }
 
 void ARAIPlayerController::PlayIntroSequence()
 {
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	ULevelSequence* IntroSequenceAsset = RAIGameState->GetIntroSequenceAsset();
+
 	if (!IntroSequenceAsset)
 	{
 		SetupStageAfterIntro();
@@ -122,7 +125,7 @@ void ARAIPlayerController::PlayIntroSequence()
 		Settings,
 		SequenceActor
 	);
-
+	
 	if (SequencePlayer)
 	{
 		SequencePlayer->OnFinished.AddDynamic(this, &ARAIPlayerController::SetupStageAfterIntro);
@@ -132,9 +135,17 @@ void ARAIPlayerController::PlayIntroSequence()
 
 void ARAIPlayerController::SetupStageAfterIntro()
 {
-	GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
-	GetPawn()->EnableInput(this);
+	//플레이어 위치 이동 및 입력 활성화
+	//ATargetPoint* StageTargetPoint = FindStageTargetPoint();
+	//GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation());
 
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
+	GetPawn()->EnableInput(this);
+	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
+	EnterDefaultModeIMC();
+
+	//StageHUD생성
 	if (StageHUDClass)
 	{
 		StageHUD = CreateWidget<URAIStageHUDWidget>(this, StageHUDClass);
@@ -143,11 +154,23 @@ void ARAIPlayerController::SetupStageAfterIntro()
 			StageHUD->AddToViewport();
 		}
 	}
+	StageHUD->SetVisibility(ESlateVisibility::Hidden);
 
-	//EnhancedInputLocalPlayerSubsystem과 InputMapping 연결
-	EnterDefaultModeIMC();
-
+	StageHUD->SetVisibility(ESlateVisibility::Visible);
 	BindHUD();
+}
+
+ATargetPoint* ARAIPlayerController::FindStageTargetPoint()
+{
+	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
+	{
+		ATargetPoint* TargetPoint = *TargetPointIterator;
+		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
+		{
+			return TargetPoint;
+		}
+	}
+	return nullptr;
 }
 
 void ARAIPlayerController::PlayerTick(float DeltaTime)
@@ -160,13 +183,119 @@ void ARAIPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
+void ARAIPlayerController::SetupFinalSuspectName(FName InSuspectName)
+{
+	RAIGameMode->SetupFinalSuspectName(InSuspectName);
+}
+
+void ARAIPlayerController::StartEnding()
+{
+	//1. StageHUD 끄고 EnidngHUD 생성
+	
+	//StageHUD 제거
+	if (StageHUD)
+	{
+		StageHUD->RemoveFromParent(); 
+		StageHUD = nullptr;
+	}
+
+	EndingHUD = CreateWidget<URAIEndingHUD>(this, EndingHUDClass);
+	if (EndingHUD)
+	{
+		EndingHUD->AddToViewport();
+	}
+
+	//2. 움직임 입력 차단
+	FInputModeUIOnly InputMode;
+	SetInputMode(InputMode);
+	SetShowMouseCursor(true); //엔딩크레딧 시, 커서를 보이게 할것인가?
+	if (APawn* MyPawn = GetPawn())
+	{
+		MyPawn->DisableInput(this);
+	}
+	
+	//3. Ending 전용 입력 활성화
+
+	PlayEndingSequence();
+}
+
+void ARAIPlayerController::PlayEndingSequence()
+{
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	const ULevelSequence* EndingSequence= RAIGameState->GetEndingSequence();
+	ULevelSequence* EndingSequenceAsset = const_cast<ULevelSequence*>(EndingSequence);
+
+	if (!EndingSequenceAsset)
+	{
+		CompleteEnding();
+		return;
+	}
+
+	FMovieSceneSequencePlaybackSettings Settings;
+	ALevelSequenceActor* SequenceActor = nullptr;
+	ULevelSequencePlayer* SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
+		GetWorld(),
+		EndingSequenceAsset,
+		Settings,
+		SequenceActor
+	);
+
+	if (SequencePlayer)
+	{
+		SequencePlayer->OnFinished.AddDynamic(this, &ARAIPlayerController::CompleteEnding);
+		SequencePlayer->Play();
+	}
+}
+
+void ARAIPlayerController::CompleteEnding()
+{
+	// [ToDo]
+	// EndingHUD 제거 및 LobbyHud 생성
+	// 플레이어 위치 로비로 이동
+	// 입력 활성화 (클릭)
+
+	RAIGameMode->MovePlayerToStartPoint(this);
+
+	//EndingHUD 제거
+	if (EndingHUD)
+	{
+		EndingHUD->RemoveFromParent();
+		EndingHUD = nullptr;
+	}
+
+	if (LobbyUIClass)
+	{
+		LobbyUI = CreateWidget<URAILobbyUI>(this, LobbyUIClass);
+		if (LobbyUI)
+		{
+			LobbyUI->AddToViewport();
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("CompleteEnding!!!"));
+}
+
+URAIEndingHUD* ARAIPlayerController::GetEndingHUD()
+{
+	return EndingHUD;
+}
+
 void ARAIPlayerController::BindGM()
 {
-	RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
 	ensure(RAIGameMode);
 
 	RAIGameMode->SendResponseDelegate.AddDynamic(this, &ARAIPlayerController::SetAIChat);
 	RAIGameMode->UpdateChatLogUIDelegate.AddDynamic(this, &ARAIPlayerController::AddChatLogUI);
+}
+
+void ARAIPlayerController::BindGS()
+{
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	if (RAIGameState)
+	{	
+		// 실행 흐름 변경 : GM이 각 PC 호출로 변경
+		//RAIGameState->FinishSetLevelDataDelegate.AddDynamic(this, &ARAIPlayerController::StartLevel);
+	}
 }
 
 void ARAIPlayerController::BindHUD()

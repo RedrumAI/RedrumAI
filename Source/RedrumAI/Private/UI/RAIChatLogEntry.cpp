@@ -5,14 +5,11 @@
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 
-void URAIChatLogEntry::NativeConstruct()
+void URAIChatLogEntry::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
-	SizeBox = Cast<USizeBox>(GetWidgetFromName(TEXT("SizeBox")));
 	Chat = Cast<UTextBlock>(GetWidgetFromName(TEXT("Chat")));
-
-	SizeBox->SetWidthOverride(SizeBoxWidth);
 }
 
 void URAIChatLogEntry::SetChat(FString InChat)

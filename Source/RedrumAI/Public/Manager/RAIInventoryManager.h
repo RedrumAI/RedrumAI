@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RAIInventoryManager.generated.h"
 
-class ARAIPlayerState;
+class ARAIGameState;
 
 UCLASS()
 class REDRUMAI_API ARAIInventoryManager : public AActor
@@ -14,23 +14,8 @@ class REDRUMAI_API ARAIInventoryManager : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ARAIInventoryManager();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	void InitInventoryManager();
-
-	TObjectPtr<ARAIPlayerState> RAIPlayerState;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-
-public:
 	void AddEvidence(FName EvidenceRowName);
 	void RemoveEvidence(FName EvidenceRowName);
 };

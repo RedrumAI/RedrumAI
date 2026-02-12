@@ -20,13 +20,14 @@ enum class ERAIConversationApproachState : uint8
 };
 
 class ARAIGameMode;
-class URAIStageHUDWidget;
 class UInputMappingContext;
 class UInputAction;
 class ARAIInspectionActor;
 class IRAIConversationInterface;
-
 class URAILobbyUI;
+class URAIStageHUDWidget;
+class URAIEndingHUD;
+class ATargetPoint;
 
 UCLASS()
 class REDRUMAI_API ARAIPlayerController : public APlayerController
@@ -47,14 +48,14 @@ protected:
 	TObjectPtr<URAILobbyUI> LobbyUI;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
-	TSubclassOf< URAIStageHUDWidget> StageHUDClass;
+	TSubclassOf<URAIStageHUDWidget> StageHUDClass;
 	UPROPERTY()
 	TObjectPtr<URAIStageHUDWidget> StageHUD;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
-	TObjectPtr<ULevelSequence> IntroSequenceAsset;
+	TSubclassOf<URAIEndingHUD> EndingHUDClass;
 	UPROPERTY()
-	TObjectPtr<ATargetPoint> StageTargetPoint;
+	TObjectPtr<URAIEndingHUD> EndingHUD;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TSubclassOf<ARAIInspectionActor> BP_InspectionActor;
@@ -102,16 +103,28 @@ public:
 public:
 	virtual void BeginPlay() override;
 
-	void FindStageTargetPoint();
-	UFUNCTION()
-	void GameStartFromLobby();
+	void SetupLevelByRowName(FName InRowName);
+
+	void StartLevel();
 	void PlayIntroSequence();
 	UFUNCTION()
 	void SetupStageAfterIntro();
+	ATargetPoint* FindStageTargetPoint();
 
 	virtual void PlayerTick(float DeltaTime) override;
 
+	void SetupFinalSuspectName(FName InSuspectName);
+
+	//Called by RAIFinalVerdictUI
+	void StartEnding();
+	void PlayEndingSequence();
+	UFUNCTION()
+	void CompleteEnding();
+
+	URAIEndingHUD* GetEndingHUD();
+
 	void BindGM();
+	void BindGS();
 	void BindHUD();
 	virtual void SetupInputComponent() override;
 

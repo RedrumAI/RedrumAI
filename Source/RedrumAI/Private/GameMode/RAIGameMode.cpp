@@ -1,14 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GameMode/RAIGameMode.h"
 #include "Manager/RAIHttpManager.h"
 #include "Manager/RAIChatManager.h"
 #include "Manager/RAIInventoryManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameMode/RAIGameState.h"
+#include "GameMode/RAIPlayerController.h"
+#include "GameFramework/PlayerStart.h"
+#include "EngineUtils.h"
+#include "Engine/TargetPoint.h"
 
-
-//Secretes.ini로부터 API_KEY 불러오는 예시코드
 ARAIGameMode::ARAIGameMode()
 {
 	ScoreStruct.Reset();
@@ -34,23 +36,14 @@ void ARAIGameMode::BeginPlay()
 
 	BindHM();
 	BindCM();
-	InitSettingOpenAI();
-
-
-	/*
-	FTimerHandle TimerHandle1_tmp;
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle1_tmp,
-		this,
-		&ARAIGameMode::tmpTimerFunction1,
-		8.0f,
-		false
-	);
-	*/
+	BindGS();
 }
 
 void ARAIGameMode::InitSettingOpenAI()
 {
+	ScoreStruct.Reset();
+	ResponseString.Reset();
+
 	FString SettingString;
 	/* 테스트 위해 잠시 삭제
 	SettingString = FString::Printf(
@@ -64,11 +57,14 @@ void ARAIGameMode::InitSettingOpenAI()
 		TEXT("그리고 나의 첫 번째 시스템 메시지에 대해서는 응답으로 단지 \"!\"만 보내.")
 	);
 	*/
+
 	SettingString = FString::Printf(
 		TEXT("temp 안녕")
 	);
 	if (IsValid(ChatManager) && IsValid(HttpManager))
 	{
+
+		ChatManager->ClearChatSession();
 		ChatManager->AddMessageArray(SettingString, developer);
 	}
 	else
@@ -81,19 +77,6 @@ void ARAIGameMode::InitSettingOpenAI()
 			1.0f,
 			false
 		);
-	}
-}
-
-//C++ 테스트를 위한 임시함수. 추후 함수삭제예정
-void ARAIGameMode::tmpTimerFunction1()
-{
-	FString str;
-	str = FString::Printf(
-		TEXT("오늘 아침에 너는 무슨일을 하고있었지?")
-	);
-	if (IsValid(ChatManager) && HttpManager)
-	{
-		ChatManager->AddMessageArray(str, user);
 	}
 }
 
@@ -154,22 +137,22 @@ void ARAIGameMode::UpdateEvidence(FName EvidenceRowName, EUpdateType InType)
 {
 	switch (InType)
 	{
-	case EUpdateType::Add :
+	case EUpdateType::Add:
+	{
+		if (IsValid(InventoryManager))
 		{
-			if (IsValid(InventoryManager))
-			{
-				InventoryManager->AddEvidence(EvidenceRowName);
-			}
+			InventoryManager->AddEvidence(EvidenceRowName);
 		}
-		break;
+	}
+	break;
 	case EUpdateType::Remove:
+	{
+		if (IsValid(InventoryManager))
 		{
-			if (IsValid(InventoryManager))
-			{
-				InventoryManager->RemoveEvidence(EvidenceRowName);
-			}
+			InventoryManager->RemoveEvidence(EvidenceRowName);
 		}
-		break;
+	}
+	break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("[GM]: UpdateEvidence Failed. Use correct UpdateType"));
 		break;
@@ -186,7 +169,6 @@ void ARAIGameMode::UpdateChatLogUI()
 
 	UpdateChatLogUIDelegate.Broadcast(LastRole, LastMessage);
 }
-
 
 void ARAIGameMode::BindHM()
 {
@@ -234,64 +216,180 @@ void ARAIGameMode::BindCM()
 	}
 }
 
+void ARAIGameMode::BindGS()
+{
+	ARAIGameState* RAIGameState = GetGameState<ARAIGameState>();
+	if (IsValid(RAIGameState))
+	{
+		RAIGameState->FinishSetupStageStateDelegate.AddDynamic(this, &ARAIGameMode::StartLevel);
+		RAIGameState->FinishSetFinalSuspectNameDelegate.AddDynamic(this, &ARAIGameMode::StartEnding);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(
+			this,
+			&ARAIGameMode::BindGS
+		);
+	}
+}
+
+void ARAIGameMode::SetupLevelByRowName(FName InRowName)
+{
+	GetGameState<ARAIGameState>()->SetupStageState(InRowName);
+}
+
+void ARAIGameMode::StartLevel()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	//서버 스테이지 설정
+	//InitSettingOpenAI();
+
+	//ATargetPoint* StageTargetPoint = FindStageTargetPoint();
+	////각 클라이언트 스테이지 시작
+	//for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
+	//{
+	//	if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
+	//	{
+	//		EachController->StartLevel();
+	//		EachController->GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation()); //전부 한자리에 생성되는 상황
+	//	}
+	//}
+
+	//플레이어 시작 위치 검색 및 이동
+	TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); //멀티코드 대비용 다수 TargetPoint 검색 이터레이터
+	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
+	{
+		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
+		{
+			EachController->StartLevel();
+
+			if (TargetPointIterator)
+			{
+				ATargetPoint* NowTargetPoint = *TargetPointIterator;
+				EachController->GetPawn()->SetActorLocation(NowTargetPoint->GetActorLocation());
+				++TargetPointIterator;
+			}
+		}
+	}
+}
+
+//ATargetPoint* ARAIGameMode::FindStageTargetPoint()
+//{
+//	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
+//	{
+//		ATargetPoint* TargetPoint = *TargetPointIterator;
+//		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
+//		{
+//			return TargetPoint;
+//		}
+//	}
+//	return nullptr;
+//}
+
+void ARAIGameMode::MovePlayerToStartPoint(APlayerController* InPC)
+{
+	for (TActorIterator<APlayerStart> StartPointIterator(GetWorld()); StartPointIterator; ++StartPointIterator)
+	{
+		if (InPC && StartPointIterator)
+		{
+			APlayerStart* PlayerStart = *StartPointIterator;
+
+			InPC->GetPawn()->SetActorLocationAndRotation(
+				PlayerStart->GetActorLocation(),
+				FQuat(PlayerStart->GetActorRotation())
+			);
+			InPC->SetControlRotation(PlayerStart->GetActorRotation());
+		}
+	}
+}
+
+void ARAIGameMode::SetupFinalSuspectName(FName InSuspectName)
+{
+	//이거 뒤에 SetLevelData바꿔서 사용하자
+	GetGameState<ARAIGameState>()->SetFinalSuspectName(InSuspectName);
+}
+
+void ARAIGameMode::StartEnding()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GM:StartEnding Run"));
+		if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Controller Cast success"));
+			EachController->StartEnding();
+		}
+	}
+}
+
 void ARAIGameMode::OnEventDelegate_NLP(FString InJsonData)
 {
 	//언리얼엔진의 멀티쓰레드 환경을 고려해 OnEventDelegate_OpenAI의 CM->AddMessageArray가 작동하는 것을 방지하기 위해 단일쓰레드 강제사용
 	AsyncTask(ENamedThreads::GameThread, [this, InJsonData]()
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_NLP"));
-
-		SetScoreStruct(InJsonData); //단일쓰레드에서 작동하기에 값중 하나만 설정돼도 이 함수가 전부 작동했음을 보장할 수 있다.
-
-		if (ScoreStruct.IsSet() && ResponseString.IsSet())
 		{
-			if (SendResponseDelegate.IsBound())
-			{
-				SendResponseDelegate.Broadcast(ResponseString.GetValue());
-			}
-			if (SendScoreDelegate.IsBound())
-			{
-				SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
-			}
-			//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
-			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), assistant);
+			UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_NLP"));
 
-			ScoreStruct.Reset();
-			ResponseString.Reset();
-		}
-		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_NLP finish"));
-	});
+			SetScoreStruct(InJsonData); //단일쓰레드에서 작동하기에 값중 하나만 설정돼도 이 함수가 전부 작동했음을 보장할 수 있다.
+
+			if (ScoreStruct.IsSet() && ResponseString.IsSet())
+			{
+				if (SendResponseDelegate.IsBound())
+				{
+					SendResponseDelegate.Broadcast(ResponseString.GetValue());
+				}
+				if (SendScoreDelegate.IsBound())
+				{
+					SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
+				}
+				//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
+				ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), assistant);
+
+				ScoreStruct.Reset();
+				ResponseString.Reset();
+			}
+			UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_NLP finish"));
+		});
 
 }
-
 
 void ARAIGameMode::OnEventDelegate_OpenAI(FString Message)
 {
 	//언리얼엔진의 멀티쓰레드 환경을 고려해 OnEventDelegate_NLP의 CM->AddMessageArray가 작동하는 것을 방지하기 위해 단일쓰레드 강제사용
 	AsyncTask(ENamedThreads::GameThread, [this, Message]()
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_OpenAI"));
-
-		ResponseString = Message;
-
-		if (ScoreStruct.IsSet() && ResponseString.IsSet())
 		{
-			if (SendResponseDelegate.IsBound())
-			{
-				SendResponseDelegate.Broadcast(ResponseString.GetValue());
-			}
-			if (SendScoreDelegate.IsBound())
-			{
-				SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
-			}
-			//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
-			ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), assistant);
+			UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_OpenAI"));
 
-			ScoreStruct.Reset();
-			ResponseString.Reset();
-		}
-		UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_OpenAI finish"));
-	});
+			ResponseString = Message;
+
+			if (ScoreStruct.IsSet() && ResponseString.IsSet())
+			{
+				if (SendResponseDelegate.IsBound())
+				{
+					SendResponseDelegate.Broadcast(ResponseString.GetValue());
+				}
+				if (SendScoreDelegate.IsBound())
+				{
+					SendScoreDelegate.Broadcast(ScoreStruct.GetValue());
+				}
+				//ChatManager->AddMessageArray의 통일성을 위해 Broadcast하지 않는다.
+				ChatManager->AddMessageArray(ScoreStruct.GetValue(), ResponseString.GetValue(), assistant);
+
+				ScoreStruct.Reset();
+				ResponseString.Reset();
+			}
+			UE_LOG(LogTemp, Warning, TEXT("OnEventDelegate_OpenAI finish"));
+		});
 }
 
 void ARAIGameMode::OnEventDelegate_SendMessageArray(FString MessageString)

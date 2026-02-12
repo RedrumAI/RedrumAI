@@ -15,20 +15,7 @@ class REDRUMAI_API URAIChatLogEntry : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	virtual void NativeConstruct() override;
-
-	/* ChatLogEntry 화자 표시용 이미지 폐기로 삭제
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UImage> SuspectImage;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UImage> UserImage;
-
-	void CollapseSuspectImage();
-	void CollapseUserImage();
-	*/
-
-	UPROPERTY()
-	TObjectPtr<USizeBox> SizeBox;
+	virtual void NativeOnInitialized() override;
 	UPROPERTY()
 	TObjectPtr<UTextBlock> Chat;
 
@@ -36,7 +23,4 @@ public:
 	void SetChat(FString InChat);
 	UFUNCTION(BlueprintCallable)
 	void SetChatColor(FSlateColor InColor);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RAI")
-	float SizeBoxWidth = 800.f;
 };

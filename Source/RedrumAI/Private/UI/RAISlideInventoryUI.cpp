@@ -4,11 +4,14 @@
 #include "UI/RAISlideInventoryUI.h"
 #include "Components/VerticalBox.h"
 #include "Components/Button.h"
-#include "GameMode/RAIPlayerState.h"
+
+#include "GameMode/RAIGameState.h"
+
 #include "GameMode/RAIPlayerController.h"
 #include "Animation/WidgetAnimation.h"
 #include "UI/RAIActionList.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Data/RAIEvidenceData.h"
 
 void URAISlideInventoryUI::NativeConstruct()
 {
@@ -24,8 +27,8 @@ void URAISlideInventoryUI::NativeConstruct()
 
 void URAISlideInventoryUI::InitSettingSlideInventory()
 {
-	RAIPlayerState = GetOwningPlayerState<ARAIPlayerState>();
-	if (IsValid(RAIPlayerState) && IsValid(ActionList))
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	if (IsValid(RAIGameState) && IsValid(ActionList))
 	{
 		SetupEvidenceData();
 
@@ -48,12 +51,12 @@ void URAISlideInventoryUI::InitSettingSlideInventory()
 
 void URAISlideInventoryUI::SetupEvidenceData()
 {
-	if (IsValid(RAIPlayerState))
+	if (ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>())
 	{
-		RAIPlayerState->UpdateEvidenceRowsDelegate.AddDynamic(this, &URAISlideInventoryUI::UpdateEvidenceData);
+		RAIGameState->UpdateEvidenceRowsDelegate.AddDynamic(this, &URAISlideInventoryUI::UpdateEvidenceData);
 
 		//InventoryData 크기 초기화
-		int32 EvidenceRowLength = RAIPlayerState->GetEvidenceRows().Num();
+		int32 EvidenceRowLength = RAIGameState->GetEvidenceRows().Num();
 		InventoryRowData.SetNum(EvidenceRowLength);
 
 		for (int i = 0;i < VerticalBox_Button->GetChildrenCount();++i)
@@ -71,7 +74,8 @@ void URAISlideInventoryUI::SetupEvidenceData()
 
 void URAISlideInventoryUI::UpdateEvidenceData()
 {
-	TArray<FName> EvidenceRows = RAIPlayerState->GetEvidenceRows();
+	ARAIGameState* RAIGameState = GetWorld()->GetGameState<ARAIGameState>();
+	TArray<FName> EvidenceRows = RAIGameState->GetEvidenceRows();
 
 	for (int i = 0;i < EvidenceRows.Num();++i)
 	{
@@ -87,7 +91,7 @@ void URAISlideInventoryUI::UpdateEvidenceData()
 			}
 			else
 			{
-				InventoryRowData[i].Value = RAIPlayerState->FindEvidenceData(EvidenceRows[i]);
+				InventoryRowData[i].Value = RAIGameState->FindEvidenceData(EvidenceRows[i]);
 
 				UButton* EvidenceButton = Cast<UButton>(VerticalBox_Button->GetChildAt(i));
 				UpdateButtonThumbnail(EvidenceButton, InventoryRowData[i].Value->EvidenceImage);
@@ -209,13 +213,9 @@ void URAISlideInventoryUI::UseEvidence()
 	FText ActionText = MakeActionText(ClickedIndex);
 	UseEvidenceDelegate.Broadcast(ActionText);
 
-	//누구를 보내야하나?
-	//RAIPlayerState->RemoveEvidence(InventoryRowData[ClickedIndex].Key);
-	//RAIPlayerController->GM의 RemoveEvidence부르는 함수만들어서 거기다가 요청.
 	RAIPlayerController->UseEvidence(InventoryRowData[ClickedIndex].Key);
 
-
-
+	//소비아이템 처럼 사용 시 아이템 사라지는 기능 추가하려면 GS->RemoveEvidence 호출할 것
 }
 
 FText URAISlideInventoryUI::MakeActionText(int32 InIndex)
@@ -232,4 +232,3 @@ void URAISlideInventoryUI::InspectEvidence()
 {
 	InspectEvidenceDelegate.Broadcast(*InventoryRowData[ClickedIndex].Value);
 }
-

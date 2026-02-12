@@ -10,7 +10,8 @@ class UCanvasPanel;
 class URAIStackWidget;
 class URAIChatUI;
 class URAIChatLogUI;
-class URAIChatLogUIButton;
+class URAIUIButton;
+class URAIFinalVerdictUI;
 class URAISlideInventoryUI;
 class URAIInspectionUI;
 
@@ -25,7 +26,11 @@ protected:
 	UPROPERTY()
 	TObjectPtr<URAIChatLogUI> ChatLogUI;
 	UPROPERTY()
-	TObjectPtr<URAIChatLogUIButton> ChatLogUIButton;
+	TObjectPtr<URAIUIButton> ChatLogUIButton;
+	UPROPERTY()
+	TObjectPtr<URAIFinalVerdictUI> FinalVerdictUI;
+	UPROPERTY()
+	TObjectPtr<URAIUIButton> FinalVerdictUIButton;
 	UPROPERTY()
 	TObjectPtr<URAISlideInventoryUI> SlideInventoryUI;
 	UPROPERTY()
@@ -55,6 +60,8 @@ public:
 	void SwitchChatUI(bool bIsTalking);
 	UFUNCTION()
 	void ToggleChatLogUI();
+	UFUNCTION()
+	void ToggleFinalVerdictUI();
 
 	UFUNCTION()
 	void SetAIChat(FString String);

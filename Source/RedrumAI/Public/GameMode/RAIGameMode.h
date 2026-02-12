@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "Data/RAIMessageRole.h"
 #include "Data/RAIEmotionScore.h"
+#include "Data/RAILevelDataStruct.h"
 #include "RAIGameMode.generated.h"
 
 //AI응답의 문장 혹은 NLP점수가 필요할 경우, 해당 클래스에서 ARAIGameMode::FResponseDelegate, FScoreDelegate에 바인드할것
@@ -16,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUpdateChatLogUIDelegate, FString, 
 class ARAIHttpManager;
 class ARAIChatManager;
 class ARAIInventoryManager;
+class ATargetPoint;
 
 enum EUpdateType
 {
@@ -29,15 +31,48 @@ class REDRUMAI_API ARAIGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY()
+	TObjectPtr<ARAIHttpManager> HttpManager;
+	UPROPERTY()
+	TObjectPtr<ARAIChatManager> ChatManager;
+	UPROPERTY()
+	TObjectPtr<ARAIInventoryManager> InventoryManager;
+
+	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
+	TOptional<FString> ResponseString;		    //OpenAI에서 온 응답 FString
+
+public:
+	UPROPERTY()
+	FResponseDelegate SendResponseDelegate;
+	UPROPERTY()
+	FScoreDelegate SendScoreDelegate;
+	UPROPERTY()
+	FUpdateChatLogUIDelegate UpdateChatLogUIDelegate;
+
 public:
 	ARAIGameMode();
 	
 	virtual void BeginPlay() override;
-
 	UFUNCTION()
 	void BindHM();
 	UFUNCTION()
 	void BindCM();
+	UFUNCTION()
+	void BindGS();
+
+	void SetupLevelByRowName(FName InRowName);
+	UFUNCTION()
+	void StartLevel();
+
+    //ATargetPoint* FindStageTargetPoint();
+	void SetupFinalSuspectName(FName InSuspectName);
+
+	UFUNCTION()
+	void StartEnding();
+
+	void MovePlayerToStartPoint(APlayerController* InPC);
+
 
 	UFUNCTION()
 	void OnEventDelegate_NLP(FString InJsonData);
@@ -49,7 +84,6 @@ public:
 	void UpdateChatLogUI();
 
 	void InitSettingOpenAI();
-	void tmpTimerFunction1();
 
 	void AskSuspect(const FText Text);
 
@@ -57,20 +91,4 @@ public:
 
 	void UpdateEvidence(FName EvidenceRowName, EUpdateType InType);
 
-	UPROPERTY()
-	TObjectPtr<ARAIHttpManager> HttpManager;
-	UPROPERTY()
-	TObjectPtr<ARAIChatManager> ChatManager;
-	UPROPERTY()
-	TObjectPtr<ARAIInventoryManager> InventoryManager;
-
-	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
-	TOptional<FString> ResponseString;		//OpenAI에서 온 응답 FString
-
-	UPROPERTY()
-	FResponseDelegate SendResponseDelegate;
-	UPROPERTY()
-	FScoreDelegate SendScoreDelegate;
-	UPROPERTY()
-	FUpdateChatLogUIDelegate UpdateChatLogUIDelegate;
 };

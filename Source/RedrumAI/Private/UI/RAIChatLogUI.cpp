@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/RAIChatLogUI.h"
@@ -47,5 +47,32 @@ void URAIChatLogUI::SetChatLogEntrySetting(TObjectPtr<URAIChatLogEntry> InChatLo
 
 		InChatLogEntry->SetChat(InMessage);
 		InChatLogEntry->SetChatColor(EntryChatSuspectColor);
+	}
+}
+
+void URAIChatLogUI::OnOpened()
+{
+	Super::OnOpened();
+
+	// Visible시, 레이아웃 재계산
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimerForNextTick(
+			this,
+			&URAIChatLogUI::CalculateUILayout
+		);
+	}
+}
+
+void URAIChatLogUI::CalculateUILayout()
+{
+	InvalidateLayoutAndVolatility();
+	ForceLayoutPrepass();
+
+	if (ScrollBox)
+	{
+		ScrollBox->InvalidateLayoutAndVolatility();
+		ScrollBox->ForceLayoutPrepass(); //안전 위해 한번더 재계산		
+		ScrollBox->ScrollToEnd();
 	}
 }

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Data/RAIEvidenceData.h"
 #include "RAISlideInventoryUI.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUseEvidenceDelegate, FText, ActionText);
@@ -12,11 +11,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInspectEvidenceDelegate, const FR
 
 class UButton;
 class UVerticalBox;
-class ARAIPlayerState;
+class ARAIGameState;
 class UWidgetAnimation;
 class URAIActionList;
-
 class ARAIPlayerController;
+
+struct FRAIEvidenceData;
 
 UCLASS()
 class REDRUMAI_API URAISlideInventoryUI : public UUserWidget
@@ -27,8 +27,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UVerticalBox> VerticalBox_Button;
 
-	TObjectPtr<ARAIPlayerState> RAIPlayerState;
-	TArray<TPair <FName, FRAIEvidenceData*>> InventoryRowData;
+	TArray<TPair <FName, const FRAIEvidenceData*>> InventoryRowData;
 
 	UPROPERTY(EditAnywhere, Category = "RAI")
 	TObjectPtr<UTexture2D> EmptyThunmbnail;

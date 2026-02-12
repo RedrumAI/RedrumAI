@@ -7,7 +7,8 @@
 #include "UI/RAIStackWidget.h"
 #include "UI/RAIChatUI.h"
 #include "UI/RAIChatLogUI.h"
-#include "UI/RAIChatLogUIButton.h"
+#include "UI/RAIFinalVerdictUI.h"
+#include "UI/RAIUIButton.h"
 #include "UI/RAISlideInventoryUI.h"
 #include "UI/RAIInspectionUI.h"
 
@@ -16,13 +17,16 @@ void URAIStageHUDWidget::NativeConstruct()
 	CanvasPanel = Cast<UCanvasPanel>(GetWidgetFromName(TEXT("CanvasPanel")));
 	ChatUI = Cast<URAIChatUI>(GetWidgetFromName(TEXT("WBP_RAIChatUI")));
 	ChatLogUI = Cast<URAIChatLogUI>(GetWidgetFromName(TEXT("WBP_RAIChatLogUI")));
-	ChatLogUIButton = Cast<URAIChatLogUIButton>(GetWidgetFromName(TEXT("WBP_RAIChatLogUIButton")));
+	ChatLogUIButton = Cast<URAIUIButton>(GetWidgetFromName(TEXT("WBP_RAIUIButton_ChatLog")));
+	FinalVerdictUI = Cast<URAIFinalVerdictUI>(GetWidgetFromName(TEXT("WBP_RAIFinalVerdictUI")));
+	FinalVerdictUIButton = Cast<URAIUIButton>(GetWidgetFromName(TEXT("WBP_RAIUIButton_FinalVerdict")));
 	SlideInventoryUI = Cast<URAISlideInventoryUI>(GetWidgetFromName(TEXT("WBP_RAISlideInventoryUI")));
 	InspectionUI = Cast<URAIInspectionUI>(GetWidgetFromName(TEXT("WBP_RAIInspectionUI")));
 
-	ChatUI->SetVisibility(ESlateVisibility::Hidden);
-	ChatLogUI->SetVisibility(ESlateVisibility::Hidden);
-	InspectionUI->SetVisibility(ESlateVisibility::Hidden);
+	ChatUI->SetVisibility(ESlateVisibility::Collapsed);
+	ChatLogUI->SetVisibility(ESlateVisibility::Collapsed);
+	FinalVerdictUI->SetVisibility(ESlateVisibility::Collapsed);
+	InspectionUI->SetVisibility(ESlateVisibility::Collapsed);
 
 	//ChatUI, LogUI, Button Valid검사. 불통과시 타이머로 다시돌리기
 	BindOwningUI();
@@ -75,6 +79,7 @@ void URAIStageHUDWidget::BindOwningUI()
 	ChatUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
 	ChatLogUI->ClickedWidgetDelegate.AddDynamic(this, &URAIStageHUDWidget::OpenUI);
 	ChatLogUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleChatLogUI);
+	FinalVerdictUIButton->RAIButtonClickedDelegate.AddDynamic(this, &URAIStageHUDWidget::ToggleFinalVerdictUI);
 
 	//UI간 바인드 연결
 	SlideInventoryUI->UseEvidenceDelegate.AddDynamic(ChatUI, &URAIChatUI::SubmitExternalMessage);
@@ -158,9 +163,35 @@ void URAIStageHUDWidget::ToggleChatLogUI()
 		//if(메뉴창 visible상태라면) closeUI(메뉴창)
 		OpenUI(ChatLogUI);
 		break;
+	case ESlateVisibility::Collapsed:
+		//if(메뉴창 visible상태라면) closeUI(메뉴창)
+		OpenUI(ChatLogUI);
+		break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("[StageHUDWidget] OpenChatLogUI failed, ChatLogUI->GetVisibility is '%s'"),
 			*StaticEnum<ESlateVisibility>()->GetNameStringByValue(static_cast<int64>(ChatLogUI->GetVisibility())));
+		break;
+	}
+}
+
+void URAIStageHUDWidget::ToggleFinalVerdictUI()
+{
+	switch (FinalVerdictUI->GetVisibility())
+	{
+	case ESlateVisibility::Visible:
+		CloseUI(FinalVerdictUI);
+		break;
+	case ESlateVisibility::Hidden:
+		//if(메뉴창 visible상태라면) closeUI(메뉴창)
+		OpenUI(FinalVerdictUI);
+		break;
+	case ESlateVisibility::Collapsed:
+		//if(메뉴창 visible상태라면) closeUI(메뉴창)
+		OpenUI(FinalVerdictUI);
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("[StageHUDWidget] Open FinalVerdictUI failed, FinalVerdictUI->GetVisibility is '%s'"),
+			*StaticEnum<ESlateVisibility>()->GetNameStringByValue(static_cast<int64>(FinalVerdictUI->GetVisibility())));
 		break;
 	}
 }

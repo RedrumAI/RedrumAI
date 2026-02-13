@@ -249,17 +249,6 @@ void ARAIGameMode::StartLevel()
 	//서버 스테이지 설정
 	//InitSettingOpenAI();
 
-	//ATargetPoint* StageTargetPoint = FindStageTargetPoint();
-	////각 클라이언트 스테이지 시작
-	//for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
-	//{
-	//	if (ARAIPlayerController* EachController = Cast<ARAIPlayerController>(PCIterator->Get()))
-	//	{
-	//		EachController->StartLevel();
-	//		EachController->GetPawn()->SetActorLocation(StageTargetPoint->GetActorLocation()); //전부 한자리에 생성되는 상황
-	//	}
-	//}
-
 	//플레이어 시작 위치 검색 및 이동
 	TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); //멀티코드 대비용 다수 TargetPoint 검색 이터레이터
 	for (FConstPlayerControllerIterator PCIterator = World->GetPlayerControllerIterator(); PCIterator; ++PCIterator)
@@ -278,18 +267,7 @@ void ARAIGameMode::StartLevel()
 	}
 }
 
-//ATargetPoint* ARAIGameMode::FindStageTargetPoint()
-//{
-//	for (TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); TargetPointIterator; ++TargetPointIterator)
-//	{
-//		ATargetPoint* TargetPoint = *TargetPointIterator;
-//		if (TargetPoint && TargetPoint->ActorHasTag(FName("StageTargetPoint")))
-//		{
-//			return TargetPoint;
-//		}
-//	}
-//	return nullptr;
-//}
+
 
 void ARAIGameMode::MovePlayerToStartPoint(APlayerController* InPC)
 {

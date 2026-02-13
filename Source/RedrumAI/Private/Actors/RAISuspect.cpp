@@ -4,11 +4,14 @@
 #include "Actors/RAISuspect.h"
 #include "Components/CapsuleComponent.h"
 #include "GameMode/RAIPlayerController.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameMode/RAIGameMode.h"
+#include "Data/RAIEmotionScore.h"
 
 ARAISuspect::ARAISuspect()
 {
 	OutlineMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("OutlineMesh"));
-	OutlineMesh->SetupAttachment(GetMesh());	
+	OutlineMesh->SetupAttachment(GetMesh());
 
 	//추후 Collision Preset 설정
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
@@ -28,11 +31,12 @@ ARAISuspect::ARAISuspect()
 	RightAnchor->bVisualizeComponent = true;
 
 	InteractType = ERAIInteractType::Suspect;
+	ConversationState = ERAIConversationState::Idle;
 }
 
-void ARAISuspect::OnConstruction(const FTransform& Transform)
+void ARAISuspect::PostInitializeComponents()
 {
-	Super::OnConstruction(Transform);
+	Super::PostInitializeComponents();
 
 	const FSoftObjectPath OutlineMaterialPath(TEXT("/Script/Engine.Material'/Game/YJ/Actors/EvidenceActor/M_HighlightOutline.M_HighlightOutline'"));
 	OutlineMaterial = Cast<UMaterialInterface>(OutlineMaterialPath.TryLoad());
@@ -42,6 +46,14 @@ void ARAISuspect::OnConstruction(const FTransform& Transform)
 	{
 		OutlineMesh->SetMaterial(0, OutlineMaterial);
 	}
+
+	//감정점수 bind
+	ARAIGameMode* RAIGameMode = Cast<ARAIGameMode>(UGameplayStatics::GetGameMode(this));
+	if (RAIGameMode)
+	{
+		RAIGameMode->SendScoreDelegate.AddDynamic(this, &ARAISuspect::CalculateConversationState);
+	}
+	
 }
 
 void ARAISuspect::Interacted(AController* InController)
@@ -49,6 +61,38 @@ void ARAISuspect::Interacted(AController* InController)
 	ARAIPlayerController* InPC = Cast<ARAIPlayerController>(InController);
 	InPC->TryStartConversation(this);
 	UE_LOG(LogTemp, Warning, TEXT("[%s] Interacted"), *this->GetName());
+}
+
+ERAIConversationState ARAISuspect::GetConversationState() const
+{
+	return ConversationState;
+}
+
+void ARAISuspect::CalculateConversationState(FRAIEmotionScore InScore)
+{
+	//V = (Love + Joy) - (Anger + Fear + Sadness)
+	//V >= +0.20 : 긍정 애니메이션
+	//V <= -0.20 : 부정 애니메이션
+	//그 사이 : 평범 애니메이션
+
+	float sum = (InScore.Love + InScore.Joy) - (InScore.Anger + InScore.Fear + InScore.Sadness);
+	if (sum >= 0.2)
+	{
+		SetConversationState(ERAIConversationState::Positive);
+	}
+	else if (sum <= -0.2)
+	{
+		SetConversationState(ERAIConversationState::Negative);
+	}
+	else
+	{
+		SetConversationState(ERAIConversationState::Normal);
+	}
+}
+
+void ARAISuspect::SetConversationState(ERAIConversationState InState)
+{
+	ConversationState = InState;
 }
 
 void ARAISuspect::BeginFocused()

@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "RAIConversationInterface.generated.h"
 
+struct FRAIEmotionScore;
+
 UENUM(BlueprintType)
 enum class ERAIConversationSide : uint8
 {
@@ -17,10 +19,10 @@ enum class ERAIConversationSide : uint8
 UENUM(BlueprintType)
 enum class ERAIConversationState : uint8
 {
-	Idle  UMETA(DisplayName = "Idle"),
-	Normal  UMETA(DisplayName = "Normal"),
-	Agree  UMETA(DisplayName = "Agree"),
-	Disagree   UMETA(DisplayName = "Left")
+	Idle        UMETA(DisplayName = "Idle"),
+	Normal      UMETA(DisplayName = "Normal"),
+	Positive    UMETA(DisplayName = "Positive"),
+	Negative    UMETA(DisplayName = "Negative")
 };
 
 UINTERFACE(MinimalAPI)
@@ -34,6 +36,10 @@ class REDRUMAI_API IRAIConversationInterface
 	GENERATED_BODY()
 
 public:
+    virtual ERAIConversationState GetConversationState() const = 0;
+    virtual void CalculateConversationState(FRAIEmotionScore InScore) = 0;
+    virtual void SetConversationState(ERAIConversationState InState) = 0;
+
     float VisionHalfAngle = 50.f;
 
     // 플레이어 컨트롤러를 기준으로, 이 타겟 기준 방향을 계산

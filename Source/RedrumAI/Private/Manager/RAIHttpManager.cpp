@@ -21,7 +21,7 @@ ARAIHttpManager::ARAIHttpManager()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load OpenAI_API_KEY from Secrets"));
 	}
-
+	
 	//APIKey_NLP
 	if (GConfig->GetString(TEXT("HuggingFace"), TEXT("HF_API_KEY"), APIKey_NLP, SecretsPath))
 	{

@@ -111,6 +111,7 @@ void ARAIChatManager::AddMessageArray(FString Message, ERAIMessageRole MessageRo
 		FString ScoreAddedMessage = ScoreString.Append(Message);
 
 		UserMessage->SetStringField("content", ScoreAddedMessage);
+
 		break;
 	}
 	case ERAIMessageRole::assistant:
@@ -123,7 +124,9 @@ void ARAIChatManager::AddMessageArray(FString Message, ERAIMessageRole MessageRo
 	}
 
 	MessageArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
-	
+	//디버깅용 MessageArray 확인
+	ShowMessageArray();
+
 	SendMessageArrayToGM();
 
 	AddMessageArrayDelegate.Broadcast();

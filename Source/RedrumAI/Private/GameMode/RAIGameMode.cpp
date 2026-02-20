@@ -247,7 +247,7 @@ void ARAIGameMode::StartLevel()
 	}
 
 	//서버 스테이지 설정
-	//InitSettingOpenAI();
+	InitSettingOpenAI();
 
 	//플레이어 시작 위치 검색 및 이동
 	TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); //멀티코드 대비용 다수 TargetPoint 검색 이터레이터

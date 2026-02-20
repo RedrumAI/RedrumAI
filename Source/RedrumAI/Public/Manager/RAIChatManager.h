@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -28,9 +28,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//ÃßÈÄ AI°¡ ¿©·¯°³°¡ µÈ´Ù¸é TMap¸¦ »ç¿ëÇØ AIÀÌ¸§°ú ³»¿ªÀ» Â¦Áö¾î °ü¸®ÇÏ´Â°Ô ÁÁ°Ú´Ù.
+	//ì¶”í›„ AIê°€ ì—¬ëŸ¬ê°œê°€ ëœë‹¤ë©´ TMapë¥¼ ì‚¬ìš©í•´ AIì´ë¦„ê³¼ ë‚´ì—­ì„ ì§ì§€ì–´ ê´€ë¦¬í•˜ëŠ”ê²Œ ì¢‹ê² ë‹¤.
 	TArray<TSharedPtr<FJsonValue>> MessageArray;
-
+	
 	void ClearChatSession();
 
 	FRAIEmotionScore EmotionScore;
@@ -47,6 +47,7 @@ public:
 
 	void SendMessageArrayToGM();
 
+	//ë””ë²„ê¹…ìš© MessageArray í™•ì¸ì½”ë“œ, FJsonì€ UObjectê¸°ë°˜ì´ ì•„ë‹ˆê¸°ì— Detailsí‘œê¸° ë¶ˆê°€í•˜ì—¬ ì¶”ê°€ëœ í•¨ìˆ˜
 	void ShowMessageArray();
 
 	const TArray<TPair<FString, FString>> GetChatLog();

@@ -21,7 +21,7 @@ ARAIHttpManager::ARAIHttpManager()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load OpenAI_API_KEY from Secrets"));
 	}
-
+	
 	//APIKey_NLP
 	if (GConfig->GetString(TEXT("HuggingFace"), TEXT("HF_API_KEY"), APIKey_NLP, SecretsPath))
 	{
@@ -49,20 +49,30 @@ void ARAIHttpManager::SendRequestToOpenAI(const FString& InputString)
 	Request->SetHeader("Content-Type", "application/json");
 	Request->SetHeader("Authorization", FString::Printf(TEXT("Bearer %s"), *APIKey_OpenAI));
 
-	// 요청 본문 설정
+	// 요청 설정
 	TSharedPtr<FJsonObject> RequestBody = MakeShareable(new FJsonObject);
 	RequestBody->SetStringField("model", "gpt-4o-mini"); // 사용 모델 설정. gpt-4o-mini 선택
 	RequestBody->SetNumberField("max_tokens", 100); // 응답 길이 설정
 	RequestBody->SetNumberField("temperature", 0.7); // 창의성 설정
 
-	// 'messages' 배열 생성
-	TArray<TSharedPtr<FJsonValue>> MessagesArray;
-	TSharedPtr<FJsonObject> UserMessage = MakeShareable(new FJsonObject);
-	UserMessage->SetStringField("role", "user");
-	UserMessage->SetStringField("content", InputString);
-	MessagesArray.Add(MakeShareable(new FJsonValueObject(UserMessage)));
+	// CM->MessageArray 역직렬화
+	TArray<TSharedPtr<FJsonValue>> ParsedMessages;		
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(InputString);
+	const bool bParsedOk = FJsonSerializer::Deserialize(Reader, ParsedMessages);
 
-	RequestBody->SetArrayField("messages", MessagesArray);
+	if (!bParsedOk || ParsedMessages.Num() == 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to parse InputString as messages array JSON."));
+
+		//파싱 실패 시 fallback - 최소 1개 메시지라도 보내서 크래시/무응답 방지
+		TSharedPtr<FJsonObject> FallbackUser = MakeShareable(new FJsonObject);
+		FallbackUser->SetStringField(TEXT("role"), TEXT("user"));
+		FallbackUser->SetStringField(TEXT("content"), InputString);
+
+		ParsedMessages.Empty();
+		ParsedMessages.Add(MakeShareable(new FJsonValueObject(FallbackUser)));
+	}
+	RequestBody->SetArrayField(TEXT("messages"), ParsedMessages);	
 
 	// JSON 직렬화
 	FString OutputString;

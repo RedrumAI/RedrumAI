@@ -28,9 +28,12 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "RAI")
     TObjectPtr<UMaterialInterface> OutlineMaterial;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "RAI")
     ERAIInteractType InteractType;
 
+    UPROPERTY(EditAnywhere, Category = "RAI")
+    ERAIConversationState ConversationState;
+    
     UPROPERTY(VisibleAnywhere, Category = "RAI")
     TObjectPtr<USceneComponent> FrontAnchor;
     UPROPERTY(VisibleAnywhere, Category = "RAI")
@@ -39,9 +42,16 @@ protected:
     TObjectPtr<USceneComponent> RightAnchor;
 
 public:
-    virtual void OnConstruction(const FTransform& Transform) override;
+    virtual void PostInitializeComponents() override;
 	virtual void Interacted(AController* InController) override;
 
+	UFUNCTION(BlueprintCallable)
+	virtual ERAIConversationState GetConversationState() const override;
+	UFUNCTION()
+	virtual void CalculateConversationState(FRAIEmotionScore InScore) override;
+    UFUNCTION(BlueprintCallable)
+	virtual void SetConversationState(ERAIConversationState InState) override;
+	
     //캐릭터 Focus시, 관련 함수
     virtual void BeginFocused() override;
     virtual void EndFocused() override;

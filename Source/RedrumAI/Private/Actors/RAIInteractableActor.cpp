@@ -11,6 +11,7 @@ ARAIInteractableActor::ARAIInteractableActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
 	//정확한 InteractType은 하위 클래스 OnConstruct에서 지정한다.
 	InteractType = ERAIInteractType::Unknown;
 
@@ -21,12 +22,16 @@ ARAIInteractableActor::ARAIInteractableActor()
 	OutlineMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OutlineMesh"));
 	OutlineMesh->SetupAttachment(OriginalMesh);
 
-	//추후 Collision Preset 설정해주기, 일단 TestBP에서 설정
+	// Simulation Generates Hit Events
+	CollisionBox->SetNotifyRigidBodyCollision(true);
 	CollisionBox->SetGenerateOverlapEvents(true);
+	CollisionBox->SetCollisionProfileName(TEXT("RAIEvidenceChannel"));
+
 	OriginalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	OutlineMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	OutlineMesh->SetCastShadow(false);
 	OutlineMesh->SetVisibility(false);
+
 }
 
 // Called when the game starts or when spawned

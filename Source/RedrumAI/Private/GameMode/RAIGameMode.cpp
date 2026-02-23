@@ -11,6 +11,8 @@
 #include "EngineUtils.h"
 #include "Engine/TargetPoint.h"
 
+#include "Actors/RAIEvidenceInterface.h"
+
 ARAIGameMode::ARAIGameMode()
 {
 	ScoreStruct.Reset();
@@ -170,6 +172,24 @@ void ARAIGameMode::UpdateChatLogUI()
 	UpdateChatLogUIDelegate.Broadcast(LastRole, LastMessage);
 }
 
+void ARAIGameMode::RegisterEvidence(AActor* InActor)
+{
+	if (!RegisteredEvidences.Contains(InActor))
+	{		
+		RegisteredEvidences.Add(InActor);
+	}	
+}
+
+void ARAIGameMode::ActivateRegisteredEvidences()
+{
+	for (auto EachEvidence : RegisteredEvidences)
+	{
+		IRAIEvidenceInterface* Evidence = Cast<IRAIEvidenceInterface>(EachEvidence);
+		Evidence->SetActorActivate(true);
+		UE_LOG(LogTemp, Warning, TEXT("Actor Activated"));
+	}
+}
+
 void ARAIGameMode::BindHM()
 {
 	if (IsValid(HttpManager))
@@ -248,6 +268,8 @@ void ARAIGameMode::StartLevel()
 
 	//서버 스테이지 설정
 	InitSettingOpenAI();
+	//스테이지 증거물 활성화
+	ActivateRegisteredEvidences();
 
 	//플레이어 시작 위치 검색 및 이동
 	TActorIterator<ATargetPoint> TargetPointIterator(GetWorld()); //멀티코드 대비용 다수 TargetPoint 검색 이터레이터
@@ -266,8 +288,6 @@ void ARAIGameMode::StartLevel()
 		}
 	}
 }
-
-
 
 void ARAIGameMode::MovePlayerToStartPoint(APlayerController* InPC)
 {

@@ -25,5 +25,5 @@ public:
 	virtual void BeginFocused();
 	virtual void EndFocused();
 
-	virtual ERAIInteractType GetInteractType();
+	virtual ERAIInteractType GetInteractType() = 0;
 };

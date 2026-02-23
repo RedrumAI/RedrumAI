@@ -29,11 +29,31 @@ void ARAIEvidenceActor::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
+void ARAIEvidenceActor::BeginPlay()
+{
+	ARAIGameMode* RAIGameMode = Cast<ARAIGameMode>(GetWorld()->GetAuthGameMode());
+	if (IsValid(RAIGameMode))
+	{
+		RAIGameMode->RegisterEvidence(this);
+		UE_LOG(LogTemp, Warning, TEXT("Actor Registered"));
+	}
+
+}
+
+void ARAIEvidenceActor::SetActorActivate(bool InBool)
+{
+	SetActorHiddenInGame(!InBool); //인자 Not에 주의
+	SetActorEnableCollision(InBool);
+	SetActorTickEnabled(InBool);
+}
+
 void ARAIEvidenceActor::Interacted()
 {
 	ARAIGameMode* RAIGameMode= Cast<ARAIGameMode>(GetWorld()->GetAuthGameMode());
 	if (IsValid(RAIGameMode))
 	{
 		RAIGameMode->UpdateEvidence(EvidenceDataRow.RowName, EUpdateType::Add);
-	}	
+
+		SetActorActivate(false); //정상 사용 후 비활성화
+	}
 }

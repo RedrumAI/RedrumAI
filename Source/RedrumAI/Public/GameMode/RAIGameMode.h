@@ -42,6 +42,9 @@ protected:
 	TOptional<FRAIEmotionScore> ScoreStruct;	//NLP에서 온 점수 FStruct
 	TOptional<FString> ResponseString;		    //OpenAI에서 온 응답 FString
 
+	UPROPERTY()
+	TArray<AActor*> RegisteredEvidences;
+
 public:
 	UPROPERTY()
 	FResponseDelegate SendResponseDelegate;
@@ -73,7 +76,6 @@ public:
 
 	void MovePlayerToStartPoint(APlayerController* InPC);
 
-
 	UFUNCTION()
 	void OnEventDelegate_NLP(FString InJsonData);
 	UFUNCTION()
@@ -82,6 +84,10 @@ public:
 	void OnEventDelegate_SendMessageArray(FString MessageString);
 	UFUNCTION()
 	void UpdateChatLogUI();
+
+	void RegisterEvidence(AActor* InActor);
+
+	void ActivateRegisteredEvidences();
 
 	void InitSettingOpenAI();
 
